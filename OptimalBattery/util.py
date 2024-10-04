@@ -86,7 +86,7 @@ def align_conditions(Ya, Yb, info_a, info_b):
 
     return combined_data, combined_info
 
-def find_optimal_battery(task_matrix, task_names, num_tasks=4, function='trace', top_n=1, sample_size=1000, average_across_subjects=True,offset=0):
+def find_optimal_battery(task_matrix, task_names, num_tasks=4, function='trace', top_n=1, sample_size=1000, average_across_subjects=True,offset=0.0001):
 
     """
     Finds the top N combinations of tasks based on a specified function, either on the group-averaged second moment matrix or by averaging matrices across subjects.
@@ -201,6 +201,30 @@ def find_optimal_battery(task_matrix, task_names, num_tasks=4, function='trace',
 
     return top_results
 
+def off_diag(G):
+    off_diag_sum = np.sum(G**2) - np.sum(np.diag(G)**2)
+    return off_diag_sum
+
+def composite_crit(G,eigenvalues,var=0.75,cov = 0.25):
+    total_variance = np.sum(eigenvalues)
+    off_diag_sum = off_diag(G)
+    composite_score = var * total_variance - cov * off_diag_sum
+    return composite_score
+
+def condition_number(eigenvalues):
+    positive_eigenvalues = eigenvalues[eigenvalues > 1e-10]
+    if len(positive_eigenvalues) == 0:
+        return np.inf
+    return np.max(positive_eigenvalues) / np.min(positive_eigenvalues)
+
+def effective_rank(eigenvalues):
+    total_variance = np.sum(eigenvalues)
+    p = eigenvalues / total_variance
+    p = np.where(p > 0, p, 1e-10)  # Avoid log(0)
+    return np.exp(-np.sum(p * np.log(p)))
+
+
+
 def eigenval_crit(G,center=True,offset=[1e-6,1e-3,1e-1]):
     """ Computes various criteria based on the eigenvalues of a matrix G.
     assumes that G is symmetric"""
@@ -223,7 +247,16 @@ def eigenval_crit(G,center=True,offset=[1e-6,1e-3,1e-1]):
     d = {'offset':offset,
          'max_var':np.sum(lex,axis=1),
          'min_est':np.sum(1/lex,axis=1),
-         'log_det':np.sum(np.log(lex),axis=1)}
+         'log_det':np.sum(np.log(lex),axis=1),
+         'off_diag':off_diag(Gs),
+         'composite_90var':composite_crit(Gs,lex,var=0.9,cov=0.1),
+            'composite_75var':composite_crit(Gs,lex,var=0.75,cov=0.25),
+            'composite_50var':composite_crit(Gs,lex,var=0.5,cov=0.5),
+            'composite_25var':composite_crit(Gs,lex,var=0.25,cov=0.75),
+            'composite_10var':composite_crit(Gs,lex,var=0.1,cov=0.9),
+            'condition_number':condition_number(lex),
+            'effective_rank':effective_rank(lex),
+         }
     return d
 
 def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4): 
@@ -242,10 +275,105 @@ def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4):
     else:
         raise ValueError('Invalid strategy')
     for i in range(comb.shape[0]):
+        has_Repeats = len(set(comb[i])) < len(comb[i])
+        n_unique = len(set(comb[i]))
         d = eigenval_crit(G_lib[comb[i],:][:,comb[i]],center=True,offset=offs)
         d['combination'] = [comb[i]]*len(offs)
+        d['has_repeats'] = [has_Repeats * 1]*len(offs)
+        d['n_unique'] = [n_unique]*len(offs)
         D = pd.concat([D,pd.DataFrame(d)],axis=0,ignore_index=True)
-    return D 
+    return D
+
+
+def combination_vectors(data, info, battery, n_repeats, random_seed=1):
+    """
+    Create a dataset with multiple betas per task, updating condition and partition vectors.
+    Handles repeated tasks in the battery, ensuring different betas are selected for each occurrence.
+
+    Parameters:
+    - data: numpy array of shape [voxels, conditions, subjects]
+    - info: pandas DataFrame with 'cond_name' column
+    - battery: list of task names (can include repeats)
+    - n_repeats: number of betas to select per task
+    - random_seed: int, optional random seed for reproducibility
+
+    Returns:
+    - dataset: numpy array of shape [voxels, selected_conditions, subjects]
+    - cond_v_train: numpy array of condition labels
+    - part_v_train: numpy array of partition labels
+    """
+    if random_seed is not None:
+        np.random.seed(random_seed)
+
+    # if battery is indices instead of names, convert to names, it could be numpy int
+    if isinstance(battery[0], (int,np.int32)):
+        battery = info['cond_name'].iloc[battery].tolist()
+
+    indices = []
+    cond_v_train = []
+    part_v_train = []
+    
+    # Keep track of the number of times each task has appeared
+    task_occurrence = {}
+    
+    # Keep track of betas already selected for each task
+    task_selected_betas = {}
+    
+    # For consistent partition numbers across tasks, create partition_numbers list
+    partition_numbers = list(range(1, n_repeats+1))
+    
+    # Initialize condition counter
+    condition_counter = 1
+    
+    # For each task in the battery
+    for task in battery:
+        # Update the occurrence count for the task
+        occurrence = task_occurrence.get(task, 0) + 1
+        task_occurrence[task] = occurrence
+        
+        # Get all indices for the current task
+        task_indices_all = info[info['cond_name'] == task].index.tolist()
+        
+        # Initialize selected betas for this task if not already
+        if task not in task_selected_betas:
+            task_selected_betas[task] = []
+        
+        # Exclude betas already selected for this task
+        available_indices = list(set(task_indices_all) - set(task_selected_betas[task]))
+        
+        # Check if there are enough betas for the task occurrence
+        if len(available_indices) < n_repeats:
+            print(f"Not enough betas for task '{task}' occurrence {occurrence}. Available betas: {len(available_indices)}")
+            continue  # Skip if not enough betas
+        
+        # Randomly select 'n_repeats' betas without replacement
+        selected_indices = np.random.choice(available_indices, size=n_repeats, replace=False).tolist()
+        
+        # Update the selected betas for this task and occurrence
+        task_selected_betas[task].extend(selected_indices)
+        
+        # Extend the indices list with the selected indices
+        indices.extend(selected_indices)
+        
+        # For each selected beta, update the condition and partition vectors
+        for i in range(n_repeats):
+            # Condition number: assign a unique number per task occurrence
+            cond_v_train.append(condition_counter)
+            # Partition number: cycle through 1 to n_repeats for each beta
+            part_v_train.append(partition_numbers[i])
+        
+        # Increment condition counter after each task occurrence
+        condition_counter += 1
+    
+    # Convert condition and partition vectors to numpy arrays
+    cond_v_train = np.array(cond_v_train)
+    part_v_train = np.array(part_v_train)
+    
+    # Create the dataset with the selected indices
+    dataset = data[:, indices, :]
+    
+    return dataset, cond_v_train, part_v_train
+
 
 # def genetic_algorithm(task_matrix, task_names, num_tasks=4, function='trace', population_size=100, generations=50, mutation_rate=0.1, top_n=1):
 #         """evolution based algorithm to find the best combination of tasks."""
