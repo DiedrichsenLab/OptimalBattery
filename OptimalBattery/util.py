@@ -223,40 +223,50 @@ def effective_rank(eigenvalues):
     p = np.where(p > 0, p, 1e-10)  # Avoid log(0)
     return np.exp(-np.sum(p * np.log(p)))
 
-
-
-def eigenval_crit(G,center=True,offset=[1e-6,1e-3,1e-1]):
-    """ Computes various criteria based on the eigenvalues of a matrix G.
-    assumes that G is symmetric"""
+def eigenval_crit(G, center=True, offset=[1e-6, 1e-3, 1e-1]):
+    """Computes various criteria based on the eigenvalues and mutual information of a matrix G.
+    Assumes that G is symmetric."""
 
     N = G.shape[0]
-    # Center
+    # Center the G matrix
     if center: 
-        H = pcm.matrix.centering(N)
+        H = np.eye(N) - np.ones((N, N)) / N
         Gs = H @ G @ H
     else:
         Gs = G
-    l,V = eigh(Gs)
-    l = l[::-1] # reverse order 
-    if center:
-        l = l[:-1]
-    l[l<0]=0 # remove negative eigenvalues for cross-validated matrices 
 
-    off = np.array(offset).reshape(-1,1)
-    lex = l + off   # Expanded eigenvalues, one row per offset 
-    d = {'offset':offset,
-         'max_var':np.sum(lex,axis=1),
-         'min_est':np.sum(1/lex,axis=1),
-         'log_det':np.sum(np.log(lex),axis=1),
-         'off_diag':off_diag(Gs),
-         'composite_90var':composite_crit(Gs,lex,var=0.9,cov=0.1),
-            'composite_75var':composite_crit(Gs,lex,var=0.75,cov=0.25),
-            'composite_50var':composite_crit(Gs,lex,var=0.5,cov=0.5),
-            'composite_25var':composite_crit(Gs,lex,var=0.25,cov=0.75),
-            'composite_10var':composite_crit(Gs,lex,var=0.1,cov=0.9),
-            'condition_number':condition_number(lex),
-            'effective_rank':effective_rank(lex),
-         }
+    # Compute eigenvalues and eigenvectors
+    l, _ = eigh(Gs)
+    l = l[::-1]  # Reverse order
+
+    if center:
+        l = l[:-1]  # Remove the last eigenvalue (should be zero after centering)
+    
+    l[l < 0] = 0  # Remove negative eigenvalues
+
+    # Calculate expanded eigenvalues for numerical stability
+    off = np.array(offset).reshape(-1, 1)
+    lex = l + off  # Expanded eigenvalues, one row per offset
+
+  
+
+    # Create a dictionary of criteria
+    d = {
+        'offset': offset,
+        'max_var': np.sum(lex, axis=1),
+        'min_est': np.sum(1 / lex, axis=1),
+        'log_det': np.sum(np.log(lex), axis=1),
+        'off_diag': off_diag(Gs),
+        'composite_90var': composite_crit(Gs, lex, var=0.9, cov=0.1),
+        'composite_75var': composite_crit(Gs, lex, var=0.75, cov=0.25),
+        'composite_50var': composite_crit(Gs, lex, var=0.5, cov=0.5),
+        'composite_25var': composite_crit(Gs, lex, var=0.25, cov=0.75),
+        'composite_10var': composite_crit(Gs, lex, var=0.1, cov=0.9),
+        'composite_0.01var': composite_crit(Gs, lex, var=0.01, cov=0.99),
+        'condition_number': condition_number(lex),
+        'effective_rank': effective_rank(lex),
+    }
+    
     return d
 
 def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4): 
