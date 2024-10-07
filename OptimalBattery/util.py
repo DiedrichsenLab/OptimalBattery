@@ -256,6 +256,7 @@ def eigenval_crit(G, center=True, offset=[1e-6, 1e-3, 1e-1]):
         'max_var': np.sum(lex, axis=1),
         'min_est': np.sum(1 / lex, axis=1),
         'log_det': np.sum(np.log(lex), axis=1),
+        'log_det_5':np.sum(np.log(lex[:5]),axis=1),
         'off_diag': off_diag(Gs),
         'composite_90var': composite_crit(Gs, lex, var=0.9, cov=0.1),
         'composite_75var': composite_crit(Gs, lex, var=0.75, cov=0.25),
@@ -265,16 +266,18 @@ def eigenval_crit(G, center=True, offset=[1e-6, 1e-3, 1e-1]):
         'composite_0.01var': composite_crit(Gs, lex, var=0.01, cov=0.99),
         'condition_number': condition_number(lex),
         'effective_rank': effective_rank(lex),
+        'eigenvalues':lex.tolist()
     }
     
     return d
 
-def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4): 
+def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1): 
     """ Builds a set of task-batteries and evalates them 
     G_lib: second moment matrices of task-library
     strategy: 'random' or 'exhaustive'
     n_iter: number of iterations for random strategy
     """
+    np.random.seed(seed)
     D=pd.DataFrame()
     offs = [1e-6,1e-3,1e-1]
     n_lib_task = G_lib.shape[0]
