@@ -217,12 +217,6 @@ def condition_number(eigenvalues):
         return np.inf
     return np.max(positive_eigenvalues) / np.min(positive_eigenvalues)
 
-def effective_rank(eigenvalues):
-    total_variance = np.sum(eigenvalues)
-    p = eigenvalues / total_variance
-    p = np.where(p > 0, p, 1e-10)  # Avoid log(0)
-    return np.exp(-np.sum(p * np.log(p)))
-
 def eigenval_crit(G, center=True, offset=[1e-6, 1e-3, 1e-1]):
     """Computes various criteria based on the eigenvalues and mutual information of a matrix G.
     Assumes that G is symmetric."""
@@ -265,7 +259,6 @@ def eigenval_crit(G, center=True, offset=[1e-6, 1e-3, 1e-1]):
         'composite_10var': composite_crit(Gs, lex, var=0.1, cov=0.9),
         'composite_0.01var': composite_crit(Gs, lex, var=0.01, cov=0.99),
         'condition_number': condition_number(lex),
-        'effective_rank': effective_rank(lex),
         'eigenvalues':lex.tolist()
     }
     
