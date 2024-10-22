@@ -133,8 +133,12 @@ def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1):
     D=pd.DataFrame()
     offs = [1e-6,1e-3,1e-1]
     n_lib_task = G_lib.shape[0]
+
+    if isinstance(n_tasks, int):
+        n_tasks = (n_tasks, n_tasks)
+
     if strategy == 'random':
-        comb = [np.random.choice(n_lib_task, size=n_tasks, replace=True) for _ in range(n_iter)]
+        comb = [np.random.choice(n_lib_task, size=np.random.randint(n_tasks[0], n_tasks[1] + 1), replace=True) for _ in range(n_iter)]
     elif strategy == 'exhaustive':
         pass 
     else:
@@ -143,6 +147,7 @@ def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1):
         has_Repeats = len(set(comb[i])) < len(comb[i])
         n_unique = len(set(comb[i]))
         d = eigenval_crit(G_lib[comb[i],:][:,comb[i]],center=True,offset=offs)
+        d['n_tasks'] = [len(comb[i])]*len(offs)
         d['combination'] = [comb[i]]*len(offs)
         d['has_repeats'] = [has_Repeats * 1]*len(offs)
         d['n_unique'] = [n_unique]*len(offs)
