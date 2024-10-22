@@ -13,7 +13,7 @@ from Functional_Fusion.dataset import DataSetMDTB
 # Add your functional fusion dir here
 BASE_DIR = BASE_DIR = '/cifs/diedrichsen/data/FunctionalFusion'
 if not os.path.exists(BASE_DIR):
-    BASE_DIR = 'x'
+    BASE_DIR = '/Volumes/diedrichsen_data$/data/FunctionalFusion'
 
 # Load atlas
 atlas,_= am.get_atlas(atlas_str='MNISymC2')
@@ -29,14 +29,14 @@ ar_model = ar.build_arrangement_model(U, prior_type='prob', atlas=atlas,
                                         sym_type='sym')
 
 # Load data
-MDTB_dataset = DataSetMDTB('/cifs/diedrichsen/data/FunctionalFusion/MDTB')
+MDTB_dataset = DataSetMDTB(BASE_DIR + '/MDTB')
 data_mdtb_s1,info_mdtb_1  =MDTB_dataset.get_data(space='MNISymC2',ses_id='ses-s1',type='CondRun')
 
 # record kappas
 kappas = []
 max_n_tasks = 26 # max number of tasks to include 
 
-for n_tasks in range(1,max_n_tasks+1):
+for n_tasks in range(3,max_n_tasks+1):
     # Find condition names for the first n_tasks
     unique_conditions = info_mdtb_1['cond_name'].unique()[:n_tasks]
 
