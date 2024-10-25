@@ -123,7 +123,7 @@ def eigenval_crit(G, center=True, offset=[1e-6, 1e-3, 1e-1]):
     
     return d
 
-def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1): 
+def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000,n_tasks=4,seed=1): 
     """ Builds a set of task-batteries and evalates them 
     G_lib: second moment matrices of task-library
     strategy: 'random' or 'exhaustive'
@@ -131,7 +131,7 @@ def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1):
     """
     np.random.seed(seed)
     D=pd.DataFrame()
-    offs = [1e-06, 5e-06, 1e-05, 5e-05, 0.0001, 0.0005, 0.001, 0.01, 0.1, 1,1.1,1.5,2]
+    offs = offs
     n_lib_task = G_lib.shape[0]
 
     if isinstance(n_tasks, int):
