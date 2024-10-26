@@ -8,7 +8,7 @@ import HierarchBayesParcel.full_model as fm
 import os
 import nitools as nt
 from Functional_Fusion.dataset import DataSetMDTB
-
+import torch as pt
 
 # Add your functional fusion dir here
 BASE_DIR = BASE_DIR = '/cifs/diedrichsen/data/FunctionalFusion'
@@ -36,7 +36,7 @@ data_mdtb_s1,info_mdtb_1  =MDTB_dataset.get_data(space='MNISymC2',ses_id='ses-s1
 kappas = []
 max_n_tasks = 26 # max number of tasks to include 
 
-for n_tasks in range(3,max_n_tasks+1):
+for n_tasks in range(5,max_n_tasks+1):
     # Find condition names for the first n_tasks
     unique_conditions = info_mdtb_1['cond_name'].unique()[:n_tasks]
 
@@ -58,12 +58,14 @@ for n_tasks in range(3,max_n_tasks+1):
     em_model = em.MixVMF(K=K, P=atlas.P, X=x_matrix, part_vec=part_vec,
                             subject_specific_kappa=False, parcel_specific_kappa=False, 
                             subjects_equal_weight=True)
+    
 
     M_1 = fm.FullMultiModel(arrange=ar_model, emission=[em_model])
     M_1.initialize([data_t])
 
     # Fit the model
-    M_1, ll,_,U_individual = M_1.fit_em(iter=200, tol=0.01,
+    em_model.kappa=pt.tensor([3.0])
+    M_1, ll,th,U_individual = M_1.fit_em(iter=200, tol=0.01,
                                         fit_arrangement=False,
                                         fit_emission= True,
                                         first_evidence=False)
