@@ -134,16 +134,15 @@ def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000
     offs = offs
     n_lib_task = G_lib.shape[0]
 
-    if isinstance(n_tasks, int):
-        n_tasks = (n_tasks, n_tasks)
-
     if strategy == 'random':
-        comb = [np.random.choice(n_lib_task, size=np.random.randint(n_tasks[0], n_tasks[1] + 1), replace=True) for _ in range(n_iter)]
+        comb = np.array([np.random.choice(n_lib_task, size=n_tasks, replace=False) for _ in range(n_iter)])
     elif strategy == 'exhaustive':
         pass 
     else:
         raise ValueError('Invalid strategy')
     for i in range(len(comb)):
+        if i % 10000 == 0:
+            print(f'building{i}')
         has_Repeats = len(set(comb[i])) < len(comb[i])
         n_unique = len(set(comb[i]))
         # if n_unique < n_parcels: then skip the combination
