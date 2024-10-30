@@ -123,7 +123,7 @@ def eigenval_crit(G, center=True, offset=[1e-6, 1e-3, 1e-1]):
     
     return d
 
-def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000,n_tasks=4,seed=1): 
+def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000,n_tasks=4,seed=1,n_parcels =4): 
     """ Builds a set of task-batteries and evalates them 
     G_lib: second moment matrices of task-library
     strategy: 'random' or 'exhaustive'
@@ -146,6 +146,9 @@ def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000
     for i in range(len(comb)):
         has_Repeats = len(set(comb[i])) < len(comb[i])
         n_unique = len(set(comb[i]))
+        # if n_unique < n_parcels: then skip the combination
+        if n_unique < n_parcels:
+            continue
         d = eigenval_crit(G_lib[comb[i],:][:,comb[i]],center=True,offset=offs)
         d['n_tasks'] = [len(comb[i])]*len(offs)
         d['combination'] = [comb[i]]*len(offs)

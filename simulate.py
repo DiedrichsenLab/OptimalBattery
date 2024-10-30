@@ -53,8 +53,8 @@ def estimate_Us_ols(Y,V):
     """
     # Uhat =  (V^T V)^-1 V^T Y
 
-    # ensure number of parcels is less than number of tasks
-    assert V.shape[1] < V.shape[0], "Number of parcels should be less than number of tasks"
+    # ensure number of parcels is less than or equal to number of voxels
+    assert V.shape[1] <= V.shape[0], "Number of parcels should be less than or equal to number of voxels"
     U_hats = np.linalg.inv(V.T @ V) @ V.T @ Y
     return U_hats # s, k, p
 
