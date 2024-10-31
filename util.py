@@ -135,7 +135,7 @@ def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000
     n_lib_task = G_lib.shape[0]
 
     if strategy == 'random':
-        comb = np.array([np.random.choice(n_lib_task, size=n_tasks, replace=False) for _ in range(n_iter)])
+        comb = np.array([np.random.choice(n_lib_task, size=n_tasks, replace=True) for _ in range(n_iter)])
     elif strategy == 'exhaustive':
         pass 
     else:
