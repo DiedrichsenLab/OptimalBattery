@@ -269,3 +269,92 @@ def generate_Vs(n_tasks, n_parcel, Vs_type='random', noise_std=0.01):
         raise ValueError(f"Unknown Vs_type '{Vs_type}'. Choose 'normal', 'orthogonal', or 'correlated'.")
     
     return Vs
+
+
+def estimate_Us_NNLS(Y, V):
+    """
+    Estimate the U matrices using NNLS regression.
+
+    Args:
+        Y: Individual fMRI data (n_subjects, n_tasks, n_voxels)
+        V: Functional Profile (n_tasks, n_components)
+
+    Returns:
+        U_hat: Individual parcellations (n_subjects, n_components, n_voxels)
+    """
+    n_subjects, n_tasks, n_voxels = Y.shape
+    _, n_components = V.shape
+
+    U_hat = np.zeros((n_subjects, n_components, n_voxels))
+
+    for subj in range(n_subjects):
+        for voxel in range(n_voxels):
+            y_voxel = Y[subj, :, voxel]  # Shape: (n_tasks,)
+            u_voxel, error = nnls(V, y_voxel)
+            U_hat[subj, :, voxel] = u_voxel
+
+    return U_hat
+
+
+def estimate_Us_NNLS_lasso(Y, V, alpha=0.005, max_iter=50000):
+    """
+    Estimate the U matrices using NNLS regression with Lasso regularization.
+
+    Args:
+        Y: Individual fMRI data (n_subjects, n_tasks, n_voxels)
+        V: Functional Profile (n_tasks, n_components)
+        alpha: Regularization strength
+        max_iter: Maximum number of iterations
+
+    Returns:
+        U_hat: Individual parcellations (n_subjects, n_components, n_voxels)
+    """
+
+    n_subjects, n_tasks, n_voxels = Y.shape
+    _, n_components = V.shape
+
+    U_hat = np.zeros((n_subjects, n_components, n_voxels))
+
+    for subj in range(n_subjects):
+        for voxel in range(n_voxels):
+            y_voxel = Y[subj, :, voxel]  # Shape: (n_tasks,)
+
+            # Create and fit the Lasso model for each voxel
+            lasso = Lasso(alpha=alpha, positive=True)
+            lasso.fit(V, y_voxel) 
+
+            # Store weigts
+            U_hat[subj, :, voxel] = lasso.coef_
+    return U_hat
+
+def estimate_Us_NNLS_ridge(Y, V, alpha=0.1, max_iter=50000):
+    """
+    Estimate the U matrices using NNLS regression with Ridge regularization (L2).
+
+    Args:
+        Y: Individual fMRI data (n_subjects, n_tasks, n_voxels)
+        V: Functional Profile (n_tasks, n_components)
+        alpha: Regularization strength for Ridge
+        max_iter: Maximum number of iterations (currently not used in Ridge)
+
+    Returns:
+        U_hat: Individual parcellations (n_subjects, n_components, n_voxels)
+    """
+    n_subjects, n_tasks, n_voxels = Y.shape
+    _, n_components = V.shape
+
+    U_hat = np.zeros((n_subjects, n_components, n_voxels))
+
+    # Loop over each subject and each voxel
+    for subj in range(n_subjects):
+        for voxel in range(n_voxels):
+            y_voxel = Y[subj, :, voxel]  # Shape: (n_tasks,)
+
+            # Create and fit the Ridge model for each voxel
+            ridge = Ridge(alpha=alpha)
+            ridge.fit(V, y_voxel)
+
+            # Store the weights
+            U_hat[subj, :, voxel] = ridge.coef_
+
+    return U_hat

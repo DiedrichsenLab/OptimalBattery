@@ -86,6 +86,65 @@ def align_conditions(Ya, Yb, info_a, info_b):
 
     return combined_data, combined_info
 
+def make_dataset(data, info, battery, n_repeats, random_seed=1):
+    """
+    Creates a dataset with multiple betas per task, updating condition and partition vectors,
+    while handling repeated tasks with different betas for each occurrence.
+    
+    Parameters:
+    - data: numpy array of shape [voxels, conditions, subjects]
+    - info: pandas DataFrame with 'cond_name' column
+    - battery: list of task names (can include repeats)
+    - n_repeats: number of betas to select per task
+    - random_seed: int, optional random seed for reproducibility
+    
+    Returns:
+    - dataset: numpy array of shape [voxels, selected_conditions, subjects]
+    - cond_v_train: numpy array of condition labels
+    - part_v_train: numpy array of partition labels
+    """
+    if random_seed is not None:
+        np.random.seed(random_seed)
+    
+    # Convert battery from indices to names if necessary
+    if isinstance(battery[0], (int, np.integer)):
+        battery = info['cond_name'].iloc[battery].tolist()
+    
+    indices, cond_v_train, part_v_train = [], [], []
+    task_selected_betas = {}
+    partition_numbers = list(range(1, n_repeats + 1))
+    condition_counter = 1
+
+    for task in battery:
+        task_indices_all = info[info['cond_name'] == task].index.tolist()
+        task_selected_betas.setdefault(task, set())
+
+        # Filter available indices not yet selected for this task
+        available_indices = list(set(task_indices_all) - task_selected_betas[task])
+
+        # Ensure enough available betas for the current repetition
+        if len(available_indices) < n_repeats:
+            print(f"Insufficient betas for task '{task}'. Available: {len(available_indices)}")
+            continue
+
+        # Randomly select 'n_repeats' betas and update tracking
+        selected_indices = np.random.choice(available_indices, size=n_repeats, replace=False).tolist()
+        task_selected_betas[task].update(selected_indices)
+        indices.extend(selected_indices)
+
+        # Update condition and partition vectors for each selected beta
+        cond_v_train.extend([condition_counter] * n_repeats)
+        part_v_train.extend(partition_numbers)
+        
+        condition_counter += 1
+
+    # Convert vectors to numpy arrays and create the dataset
+    cond_v_train = np.array(cond_v_train)
+    part_v_train = np.array(part_v_train)
+    dataset = data[:, indices, :]
+
+    return dataset, cond_v_train, part_v_train  
+
 def eigenval_crit(G, center=True, offset=[1e-6, 1e-3, 1e-1]):
     """Computes various criteria based on the eigenvalues and mutual information of a matrix G.
     Assumes that G is symmetric."""
@@ -156,64 +215,7 @@ def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000
         D = pd.concat([D,pd.DataFrame(d)],axis=0,ignore_index=True)
     return D
 
-def make_dataset(data, info, battery, n_repeats, random_seed=1):
-    """
-    Creates a dataset with multiple betas per task, updating condition and partition vectors,
-    while handling repeated tasks with different betas for each occurrence.
-    
-    Parameters:
-    - data: numpy array of shape [voxels, conditions, subjects]
-    - info: pandas DataFrame with 'cond_name' column
-    - battery: list of task names (can include repeats)
-    - n_repeats: number of betas to select per task
-    - random_seed: int, optional random seed for reproducibility
-    
-    Returns:
-    - dataset: numpy array of shape [voxels, selected_conditions, subjects]
-    - cond_v_train: numpy array of condition labels
-    - part_v_train: numpy array of partition labels
-    """
-    if random_seed is not None:
-        np.random.seed(random_seed)
-    
-    # Convert battery from indices to names if necessary
-    if isinstance(battery[0], (int, np.integer)):
-        battery = info['cond_name'].iloc[battery].tolist()
-    
-    indices, cond_v_train, part_v_train = [], [], []
-    task_selected_betas = {}
-    partition_numbers = list(range(1, n_repeats + 1))
-    condition_counter = 1
-
-    for task in battery:
-        task_indices_all = info[info['cond_name'] == task].index.tolist()
-        task_selected_betas.setdefault(task, set())
-
-        # Filter available indices not yet selected for this task
-        available_indices = list(set(task_indices_all) - task_selected_betas[task])
-
-        # Ensure enough available betas for the current repetition
-        if len(available_indices) < n_repeats:
-            print(f"Insufficient betas for task '{task}'. Available: {len(available_indices)}")
-            continue
-
-        # Randomly select 'n_repeats' betas and update tracking
-        selected_indices = np.random.choice(available_indices, size=n_repeats, replace=False).tolist()
-        task_selected_betas[task].update(selected_indices)
-        indices.extend(selected_indices)
-
-        # Update condition and partition vectors for each selected beta
-        cond_v_train.extend([condition_counter] * n_repeats)
-        part_v_train.extend(partition_numbers)
-        
-        condition_counter += 1
-
-    # Convert vectors to numpy arrays and create the dataset
-    cond_v_train = np.array(cond_v_train)
-    part_v_train = np.array(part_v_train)
-    dataset = data[:, indices, :]
-
-    return dataset, cond_v_train, part_v_train    
+  
 
 if __name__ == "__main__":
     N = 8 
