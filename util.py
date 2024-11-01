@@ -207,7 +207,7 @@ def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000
         # if n_unique < n_parcels: then skip the combination
         if n_unique < n_parcels:
             continue
-        d = eigenval_crit(G_lib[comb[i],:][:,comb[i]],center=True,offset=offs)
+        d = eigenval_crit(G_lib[comb[i],:][:,comb[i]],center=False,offset=offs)
         d['n_tasks'] = [len(comb[i])]*len(offs)
         d['combination'] = [comb[i]]*len(offs)
         d['has_repeats'] = [has_Repeats * 1]*len(offs)
