@@ -1,9 +1,6 @@
 import numpy as np
 import pandas as pd
-from scipy.optimize import nnls
-from sklearn.linear_model import Lasso
-from sklearn.linear_model import Ridge
-
+import matplotlib.pyplot as plt
 
 def generate_Us(s=24, k=16, p=40, type='hard', seed=1):
     """
@@ -67,10 +64,8 @@ def random_matrix_normal(G, R, make_exact=False, rng=None):
 
     if make_exact:
         P_row = np.linalg.inv(V @ V.T)
-        P_col = np.linalg.inv(V.T @ V)
-        L_col = np.linalg.cholesky(P_col)
         L_row = np.linalg.cholesky(P_row)
-        Vs = L_row.T @ V 
+        Vs = L_row.T @ V  
     else:
         Vs = V
 
@@ -84,14 +79,7 @@ def random_matrix_normal(G, R, make_exact=False, rng=None):
     lam = np.sqrt(lam)
     chol_R = eV * lam.reshape((1, eV.shape[1]))
     V = chol_G @ Vs @ chol_R.T
-
     return V
-
-
-
-
-
-
 
 def U_MSE(U_true, U_pred):
     MSE = []
@@ -100,12 +88,52 @@ def U_MSE(U_true, U_pred):
         MSE.append(mse)
     return np.mean(MSE)
 
-if __name__=='__main__':
-    N = 10
-    R = np.random.normal(0,1,(4,4))
-    C = np.random.normal(0,1,(4,4))
-    cov_R = R @ R.T
-    cov_V = C @ C.T 
-    Vs = random_matrix_normal(cov_R, cov_V, make_exact=True)
-    
+def test_produce_V(): 
+    """ Simple test whether matrix normal production works on average. 
+    """
+    N = 5
+    num_iter = 1000
+    R = np.random.normal(0,1,(N,N))
+    C = np.random.normal(0,1,(N,N))
+    cov_R = R @ R.T / N
+    cov_C = C @ C.T / N 
+
+    V = np.zeros((num_iter, N, N)) 
+    for i in range(num_iter):
+        V[i] = random_matrix_normal(cov_R, cov_C, make_exact=True)
+
+    Rs = V@V.transpose([0,2,1])
+    Cs = V.transpose([0,2,1])@V
+    fig = plt.figure()
+
+    # Plot mean covariance matrices 
+    plt.subplot(3,2,1)
+    plt.imshow(cov_R)
+    plt.title('Row desired')
+    plt.colorbar()
+    plt.subplot(3,2,2)
+    plt.imshow(Rs.mean(axis=0)/N)
+    plt.title('Row produced')
+    plt.colorbar()
+    plt.subplot(3,2,3)
+    plt.imshow(cov_C)
+    plt.title('Col desired')
+    plt.colorbar()
+    plt.subplot(3,2,4)
+    plt.imshow(Cs.mean(axis=0)/N)
+    plt.title('Col produced')
+    plt.colorbar()
+    # Plot deviation from desired covariance structure
+    dev_R = np.sqrt(np.sum(np.sum((Rs - cov_R)**2,axis=2),axis=1))
+    dev_C = np.sqrt(np.sum(np.sum((Cs - cov_C)**2,axis=2),axis=1))
+    plt.subplot(3,2,5)
+    plt.scatter(dev_R,dev_C)
+    plt.xlabel('Row deviation')
+    plt.ylabel('Col deviation')
+    plt.show()
     pass 
+
+
+if __name__=='__main__':
+    test_produce_V()
+    pass
