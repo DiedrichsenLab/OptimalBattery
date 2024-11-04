@@ -57,6 +57,41 @@ def estimate_Us_ols(Y,V):
     U_hats = np.linalg.inv(V.T @ V) @ V.T @ Y
     return U_hats # s, k, p
 
+def random_matrix_normal(G, R, make_exact=False, rng=None):
+    n_tasks = G.shape[0]
+    n_parcels = R.shape[0]
+
+    if rng is None:
+        rng = np.random.default_rng()
+    V = rng.standard_normal((n_tasks, n_parcels))
+
+    if make_exact:
+        P_row = np.linalg.inv(V @ V.T)
+        P_col = np.linalg.inv(V.T @ V)
+        L_col = np.linalg.cholesky(P_col)
+        L_row = np.linalg.cholesky(P_row)
+        Vs = L_row.T @ V 
+    else:
+        Vs = V
+
+    lam, eV = np.linalg.eigh(G)
+    lam[lam < 1e-15] = 0
+    lam = np.sqrt(lam)
+    chol_G = eV * lam.reshape((1, eV.shape[1]))
+
+    lam, eV = np.linalg.eigh(R)
+    lam[lam < 1e-15] = 0
+    lam = np.sqrt(lam)
+    chol_R = eV * lam.reshape((1, eV.shape[1]))
+    V = chol_G @ Vs @ chol_R.T
+
+    return V
+
+
+
+
+
+
 
 def U_MSE(U_true, U_pred):
     MSE = []
@@ -65,3 +100,12 @@ def U_MSE(U_true, U_pred):
         MSE.append(mse)
     return np.mean(MSE)
 
+if __name__=='__main__':
+    N = 10
+    R = np.random.normal(0,1,(4,4))
+    C = np.random.normal(0,1,(4,4))
+    cov_R = R @ R.T
+    cov_V = C @ C.T 
+    Vs = random_matrix_normal(cov_R, cov_V, make_exact=True)
+    
+    pass 
