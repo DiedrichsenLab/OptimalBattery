@@ -63,6 +63,8 @@ def random_matrix_normal(G, R, make_exact=False, rng=None):
 
     if rng is None:
         rng = np.random.default_rng()
+    else:
+        rng = rng
     V = rng.standard_normal((n_tasks, n_parcels))
 
     if make_exact:
@@ -87,14 +89,12 @@ def random_matrix_normal(G, R, make_exact=False, rng=None):
 
     return V
 
-
-
-
-
-
-
 def U_MSE(U_true, U_pred):
     MSE = []
+    # if its only two dimensions then add a dimension
+    if len(U_true.shape) == 2:
+        U_true = U_true.reshape(1, U_true.shape[0], U_true.shape[1])
+        U_pred = U_pred.reshape(1, U_pred.shape[0], U_pred.shape[1])
     for subject in range(U_true.shape[0]):
         mse = np.mean((U_true[subject] - U_pred[subject])**2)
         MSE.append(mse)
