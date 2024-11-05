@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def generate_Us(s=24, k=16, p=40, type='hard', seed=1):
+def make_U_basic(s=24, k=16, p=40, type='hard', seed=1):
     """
     Generate the true U matrices for simulation using a normal distribution.
     
@@ -39,7 +39,7 @@ def generate_Us(s=24, k=16, p=40, type='hard', seed=1):
 
     return Us
 
-def estimate_Us_ols(Y,V):
+def estimate_Us_ols(Y,V, regularize = None):
     """
     get U_hat using OLS regression
     Args:
@@ -51,7 +51,10 @@ def estimate_Us_ols(Y,V):
     # Uhat =  (V^T V)^-1 V^T Y
 
     # ensure number of parcels is less than or equal to number of voxels
-    U_hats = np.linalg.inv(V.T @ V) @ V.T @ Y
+    if regularize is not None:
+        U_hats = np.linalg.inv(V.T @ V + regularize*np.eye(V.shape[1])) @ V.T @ Y
+    else:
+        U_hats = np.linalg.inv(V.T @ V) @ V.T @ Y
     return U_hats # s, k, p
 
 def random_matrix_normal(G, R, make_exact=False, rng=None):
@@ -81,6 +84,8 @@ def random_matrix_normal(G, R, make_exact=False, rng=None):
     lam = np.sqrt(lam)
     chol_R = eV * lam.reshape((1, eV.shape[1]))
     V = chol_G @ Vs @ chol_R.T
+    # V =Vs @ chol_R.T
+
     return V
 
 def U_MSE(U_true, U_pred):
@@ -138,6 +143,91 @@ def test_produce_V():
     plt.ylabel('Col deviation')
     plt.show()
     pass 
+
+def make_U_spatial(grid, centroids, K_main, K_subparcels):
+    """
+    Computes parcel labels for all pixels based on distances to centroids and divides them into subparcels.
+    
+    """
+    # Compute positions of all pixels
+    width, height = grid.width, grid.height
+    X_coords, Y_coords = np.meshgrid(np.arange(width), np.arange(height), indexing='ij')
+    X_coords = X_coords.flatten()
+    Y_coords = Y_coords.flatten()
+    positions = np.column_stack((X_coords, Y_coords))
+    
+    # Compute distances from each pixel to each centroid
+    D = np.zeros((grid.P, K_main))
+    for k, (cx, cy) in enumerate(centroids):
+        D[:, k] = np.sqrt((X_coords - cx)**2 + (Y_coords - cy)**2)
+    
+    # Initialize the parcel labels and define the size of each parcel
+    parcel_labels = np.full(grid.P, -1, dtype=int)
+    unassigned_nodes = set(range(grid.P))
+    desired_size = grid.P // K_main
+    
+    for k in range(K_main - 1):
+        unassigned_nodes_list = list(unassigned_nodes)
+        distances = D[unassigned_nodes_list, k]
+        sorted_indices = np.argsort(distances)
+        nodes_to_assign = np.array(unassigned_nodes_list)[sorted_indices[:desired_size]]
+        parcel_labels[nodes_to_assign] = k
+        unassigned_nodes -= set(nodes_to_assign)
+    
+    # Assign the remaining pixels to the last parcel
+    parcel_labels[list(unassigned_nodes)] = K_main - 1
+    
+    # Initialize new parcel labels
+    new_parcel_labels = np.full(grid.P, -1, dtype=int)
+    
+    for k in range(K_main):  # For each main parcel
+        nodes_in_parcel = np.where(parcel_labels == k)[0]
+        # Split nodes_in_parcel into K_subparcels of equal size
+        subparcel_nodes = np.array_split(nodes_in_parcel, K_subparcels)
+        for sub_k, nodes in enumerate(subparcel_nodes):
+            new_parcel_label = k * K_subparcels + sub_k
+            new_parcel_labels[nodes] = new_parcel_label
+    
+    # Convert new parcel labels to a matrix U_true
+    K_total = K_main * K_subparcels
+    U_true = np.zeros((K_total, grid.P))
+    for k in range(K_total):
+        U_true[k, new_parcel_labels == k] = 1
+    
+    return U_true
+
+
+def custom_G(n_tasks=16, n_groups=4, group_size=4, target_corr=0.0004, variance_factors=[1.0, 0.75, 0.5, 0.25]):
+    " makes a task covariance matrix with a target correlation between tasks"
+    G = np.zeros((n_tasks, n_tasks))
+    task_index = 0
+
+    for group in range(n_groups):
+        variances = variance_factors
+
+        # Compute covariances based on desired correlation
+        covariances = target_corr * np.outer(variance_factors, variance_factors)
+        np.fill_diagonal(covariances, variances)
+
+        # Place the block into G
+        start, end = task_index, task_index + group_size
+        G[start:end, start:end] = covariances
+
+        task_index += group_size
+
+    return G
+
+def custom_R(K_total, group_size, base_parcel_correlation, sub_parcel_extra_correlation):
+    """
+    makes a parcel covariance matrix with a base correlation between main parcels and extra correlation within subparcels
+    """
+    R = np.full((K_total, K_total), base_parcel_correlation)
+    for i in range(0, K_total, group_size):
+        R[i:i+group_size, i:i+group_size] = base_parcel_correlation + sub_parcel_extra_correlation
+
+    np.fill_diagonal(R, 1)
+    return R
+
 
 
 if __name__=='__main__':
