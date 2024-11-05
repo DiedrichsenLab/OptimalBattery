@@ -4,7 +4,7 @@ import torch as pt
 import OptimalBattery.simulate as sim
 import HierarchBayesParcel.evaluation as ev
 
-def evaluate_combinations_simulation(D, YLib,VLib, ytest, vtest, U_true_region):
+def evaluate_combinations_simulation(D, YLib,VLib, ytest, vtest, U_true,parcels_to_evaluate):
     # Create a new column with combinations as tuples to make them hashable
     D['combination_tuple'] = D['combination'].apply(lambda x: tuple(x))
     
@@ -17,7 +17,7 @@ def evaluate_combinations_simulation(D, YLib,VLib, ytest, vtest, U_true_region):
 
     ytest = pt.tensor(ytest,dtype=pt.float32)
     vtest = pt.tensor(vtest,dtype=pt.float32)
-    U_true_region = U_true_region.numpy()
+    U_true = U_true.numpy()
     
     # Loop over each unique combination
     for i, comb_tuple in enumerate(unique_combinations):
@@ -38,10 +38,10 @@ def evaluate_combinations_simulation(D, YLib,VLib, ytest, vtest, U_true_region):
         
         
         U_hat_ols = sim.estimate_Us_ols(y_subset, V_subset)
-        mse_ols = sim.U_MSE(U_true_region, U_hat_ols[20:,:])
+        mse_ols = sim.U_MSE(U_true[parcels_to_evaluate,:], U_hat_ols[parcels_to_evaluate,:])
         
         U_hat_ols = pt.tensor(U_hat_ols,dtype=pt.float32)
-        cos_ols = ev.coserr(ytest,vtest,U_hat_ols[20:,:]).mean().cpu().numpy()
+        cos_ols = ev.coserr(ytest,vtest,U_hat_ols[parcels_to_evaluate,:]).mean().cpu().numpy()
         cos_ols = cos_ols.item()
         
         # Store the result in the dictionary
