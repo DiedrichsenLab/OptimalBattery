@@ -88,6 +88,46 @@ def random_matrix_normal(G, R, make_exact=False, rng=None):
 
     return V
 
+
+def find_best_V(G, R, num_iter=1000,rng=None):
+    """
+    Finds the best V matrix that minimizes the deviation from the desired 
+    row and column covariance matrices.
+    
+    Parameters:
+        G (np.ndarray): Desired row covariance matrix.
+        R (np.ndarray): Desired column covariance matrix.
+        num_iter (int): Number of iterations to try generating V.
+
+    Returns:
+        np.ndarray: The V matrix with the lowest deviation from the desired covariances.
+    """
+    min_deviation = float('inf')
+    best_V = None
+
+    for i in range(num_iter):
+        # Generate a random V matrix with desired properties
+        V = random_matrix_normal(G, R, make_exact=True,rng = rng)
+        
+        # Compute the row and column covariance matrices of V
+        Rs = V @ V.T
+        Cs = V.T @ V
+        
+        # Calculate deviations using nested summations
+        dev_R = np.sqrt(np.sum(np.sum((Rs - G) ** 2, axis=1), axis=0))
+        dev_C = np.sqrt(np.sum(np.sum((Cs - R) ** 2, axis=1), axis=0))
+        
+        # Calculate the total deviation
+        total_deviation = dev_R + dev_C
+        
+        # Update best_V if the current total deviation is the lowest found
+        if total_deviation < min_deviation:
+            min_deviation = total_deviation
+            best_V = V
+
+    return best_V
+
+
 def U_MSE(U_true, U_pred):
     MSE = []
     # if its only two dimensions then add a dimension

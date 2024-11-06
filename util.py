@@ -218,7 +218,24 @@ def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000
         D = pd.concat([D,pd.DataFrame(d)],axis=0,ignore_index=True)
     return D
 
-  
+
+def traditional_battery(Vs, isolate_parcels, length=8):
+    # find task with highest activiy for isolated parcels
+    isolated_parcels = Vs[:, isolate_parcels]
+    isolated_sums = isolated_parcels.sum(axis=1)
+    task_max_isolated = np.argmax(isolated_sums)
+    
+    # find task with highest activiy for isolated parcels
+    other_parcel_indices = [i for i in range(Vs.shape[1]) if i not in isolate_parcels]
+    other_parcels = Vs[:, other_parcel_indices]
+    other_parcels_sums = other_parcels.sum(axis=1) 
+    task_max_other = np.argmax(other_parcels_sums)
+    
+    # make task battery
+    tasks_list = [task_max_isolated, task_max_other] * (length // 2)
+    
+    
+    return tuple(tasks_list)  
 
 if __name__ == "__main__":
     N = 8 
