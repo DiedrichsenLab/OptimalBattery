@@ -29,10 +29,13 @@ def evaluate_combinations_simulation(D, YLib,VLib, U_true,parcels_to_evaluate):
         y_subset = y_subset - y_subset.mean(axis=0)
         
         U_hat_ols = sim.estimate_Us_ols(y_subset, V_subset,regularize=1e-4)
-        U_hat_ols = U_hat_ols.reshape(5, 5, 900).mean(axis=1)
-        Us.append(U_hat_ols)
+        max_indices = np.argmax(U_hat_ols, axis=0)
+        U_hat_one_hot = np.zeros_like(U_hat_ols)
+        U_hat_one_hot[max_indices, np.arange(U_hat_ols.shape[1])] = 1
+        Us.append(U_hat_one_hot)
 
-        U_hat_ols_evaluation = U_hat_ols[parcels_to_evaluate,:]
+
+        U_hat_ols_evaluation = U_hat_one_hot[parcels_to_evaluate,:]
         U_true_evaluation = U_true[parcels_to_evaluate,:]
         
         mse_ols = sim.U_MSE(U_true_evaluation, U_hat_ols_evaluation)
@@ -55,15 +58,14 @@ def evaluate_single_combination(YLib,VLib, U_true,combination,parcels_to_evaluat
     y_subset = YLib[task_subset_indices, :]
     y_subset = y_subset - y_subset.mean(axis=0)
 
-   
-
     U_hat_ols = sim.estimate_Us_ols(y_subset, V_subset,regularize=1e-4)
-    U_hat_ols = U_hat_ols.reshape(5, 5, 900).mean(axis=1)
-    U_hat_ols_evaluation = U_hat_ols[parcels_to_evaluate,:]
+    max_indices = np.argmax(U_hat_ols, axis=0)
+    U_hat_one_hot = np.zeros_like(U_hat_ols)
+    U_hat_one_hot[max_indices, np.arange(U_hat_ols.shape[1])] = 1
+
+    U_hat_ols_evaluation = U_hat_one_hot[parcels_to_evaluate,:]
     U_true_evaluation = U_true[parcels_to_evaluate,:]
     
     mse_ols = sim.U_MSE(U_true_evaluation, U_hat_ols_evaluation)
-    print(mse_ols)
-
     
     return mse_ols,U_hat_ols

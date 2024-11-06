@@ -39,7 +39,7 @@ def make_U_basic(s=24, k=16, p=40, type='hard', seed=1):
 
     return Us
 
-def estimate_Us_ols(Y,V, regularize = None):
+def estimate_Us_ols(Y,V,regularize = None):
     """
     get U_hat using OLS regression
     Args:
@@ -49,8 +49,6 @@ def estimate_Us_ols(Y,V, regularize = None):
         U_hat: Individual parcellations (n_subjects, n_components, n_voxels)
     """
     # Uhat =  (V^T V)^-1 V^T Y
-
-    # ensure number of parcels is less than or equal to number of voxels
     if regularize is not None:
         U_hats = np.linalg.inv(V.T @ V + regularize*np.eye(V.shape[1])) @ V.T @ Y
     else:
