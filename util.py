@@ -234,7 +234,23 @@ def traditional_battery_old(Vs, isolate_parcels, length=8):
     tasks_list = [task_max_isolated, task_max_other] * (length // 2)
     
     
-    return tuple(tasks_list)  
+    return tuple(tasks_list) 
+
+def exhuastive_traditional_batteries(Vs, isolate_parcels, length=8):
+    isolated_parcels = Vs[:, isolate_parcels]
+    isolated_sums = isolated_parcels.sum(axis=1)
+    task_max_isolated = np.argmax(isolated_sums)
+
+    other_task_indices = [i for i in range(Vs.shape[0]) if i != task_max_isolated]
+    
+    task_batteries = []
+    for task in other_task_indices:
+        task_list = [task_max_isolated, task] * (length // 2)
+        task_batteries.append(tuple(task_list))
+        
+    return task_batteries
+    
+
 
 def traditional_battery(Vs, isolate_parcels, length=8):
     n_tasks, _ = Vs.shape
