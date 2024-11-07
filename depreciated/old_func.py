@@ -358,3 +358,41 @@ def estimate_Us_NNLS_ridge(Y, V, alpha=0.1, max_iter=50000):
             U_hat[subj, :, voxel] = ridge.coef_
 
     return U_hat
+
+
+def make_U_basic(s=24, k=16, p=40, type='hard', seed=1):
+    """
+    Generate the true U matrices for simulation using a normal distribution.
+    
+    Parameters:
+    s: number of subjects
+    k: number of parcels
+    p: number of voxels
+    type: type of Us
+    seed: random seed for reproducibility
+
+    Returns:
+    Us: ndarray, shape (s, k, p)
+
+    """
+    np.random.seed(seed)
+
+    if type == 'hard':
+        values = np.random.normal(0, 1, (s, k, p))  # Shape: (s, k, p)
+        
+        # Find the max indices for each voxel
+        max_indices = np.argmax(values, axis=1)  # Shape: (s, p)
+
+        Us = np.zeros((s, k, p))
+
+        for subj in range(s):
+            Us[subj][max_indices[subj], np.arange(p)] = 1
+
+    elif type == 'prob':
+        # Generate soft assignments using a normal distribution
+        Us = np.random.normal(0, 1, (s, k, p))  # Shape: (s, k, p)
+        Us = np.exp(Us)  # Apply exponential function
+        Us_sum = np.sum(Us, axis=1, keepdims=True)  # Calculate sum along parcel dimension
+        Us = Us / Us_sum  # Normalize to get probabilities 
+
+    return Us

@@ -218,8 +218,7 @@ def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000
         D = pd.concat([D,pd.DataFrame(d)],axis=0,ignore_index=True)
     return D
 
-
-def traditional_battery(Vs, isolate_parcels, length=8):
+def traditional_battery_old(Vs, isolate_parcels, length=8):
     # find task with highest activiy for isolated parcels
     isolated_parcels = Vs[:, isolate_parcels]
     isolated_sums = isolated_parcels.sum(axis=1)
@@ -236,6 +235,48 @@ def traditional_battery(Vs, isolate_parcels, length=8):
     
     
     return tuple(tasks_list)  
+
+def traditional_battery(Vs, isolate_parcels, length=8):
+    n_tasks, _ = Vs.shape
+    contrast_results = []
+
+    for task1 in range(n_tasks):
+        for task2 in range(n_tasks):
+            if task1 != task2:
+                Vs_contrast = Vs[task1, :] - Vs[task2, :]
+
+                # Find the highest activation parcel and its parcel index
+                max_activation = np.max(Vs_contrast)
+                max_parcel_index = np.argmax(Vs_contrast)
+
+                # Find the second-highest activation parcel
+                sorted_activations = np.sort(Vs_contrast)
+                second_highest_activation = sorted_activations[-2]
+
+                # Check if max_parcel_index is the parcel of interest and get the difference with 2nd highest activation
+                if max_parcel_index in isolate_parcels:
+                    difference = max_activation - second_highest_activation
+
+                    contrast_results.append({
+                        'task1': task1,
+                        'task2': task2,
+                        'difference': difference,
+                        'max_activation': max_activation,
+                        'second_highest_activation': second_highest_activation
+                    })
+
+    # Find the pairwise contrast with the maximum difference 
+    if contrast_results:
+        best_contrast = max(contrast_results, key=lambda x: x['difference'])
+        best_task1 = best_contrast['task1']
+        best_task2 = best_contrast['task2']
+
+        # Make the battery
+        tasks_list = [best_task1, best_task2] * (length // 2)
+        return tuple(tasks_list)
+
+
+
 
 if __name__ == "__main__":
     N = 8 
