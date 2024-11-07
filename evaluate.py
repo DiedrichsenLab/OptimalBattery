@@ -3,6 +3,7 @@ import pandas as pd
 import torch as pt
 import OptimalBattery.simulate as sim
 import OptimalBattery.estimate as et
+import HierarchBayesParcel.evaluation as hbpev
 
 
 def U_MSE(U_true, U_pred):
@@ -18,7 +19,7 @@ def U_MSE(U_true, U_pred):
 
 
 
-def evaluate_combinations_simulation(D, YLib,VLib, U_true,parcels_to_evaluate,estimation_method = 'OLS'):
+def evaluate_combinations_simulation(D, YLib,VLib, U_true,parcels_to_evaluate,ytest,vtest,estimation_method = 'OLS', ):
     # Create a new column with combinations as tuples to make them hashable
     D['combination_tuple'] = D['combination'].apply(lambda x: tuple(x)) 
     # Get unique combinations
@@ -30,6 +31,7 @@ def evaluate_combinations_simulation(D, YLib,VLib, U_true,parcels_to_evaluate,es
     Us = []
 
     mse_dict = {}
+    cos_dict = {}
 
     # Loop over each unique combination
     for i, comb_tuple in enumerate(unique_combinations):
@@ -68,6 +70,12 @@ def evaluate_combinations_simulation(D, YLib,VLib, U_true,parcels_to_evaluate,es
         U_true_evaluation = U_true[parcels_to_evaluate,:]
         
         mse = U_MSE(U_true_evaluation, U_hat_ols_evaluation)
+
+
+        cos  =hbpev.coserr(ytest,vtest,U_hat_ols_evaluation,adjusted=True)
+
+
+
         mse_dict[comb_tuple] = mse
     
     # Map the computed cos_HBP values back to the DataFrame
