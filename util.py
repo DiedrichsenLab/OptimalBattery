@@ -194,7 +194,7 @@ def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000
     n_iter: number of iterations for random strategy
     """
     np.random.seed(seed)
-    D=pd.DataFrame()
+    D_list = []
     offs = offs
     n_lib_task = G_lib.shape[0]
 
@@ -215,7 +215,8 @@ def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000
         d['combination'] = [comb[i]]*len(offs)
         d['has_repeats'] = [has_Repeats * 1]*len(offs)
         d['n_unique'] = [n_unique]*len(offs)
-        D = pd.concat([D,pd.DataFrame(d)],axis=0,ignore_index=True)
+        D_list.append(pd.DataFrame(d))
+    D = pd.concat(D_list)
     return D 
 
 def exhuastive_traditional_batteries(Vs, isolate_parcels, length=8):

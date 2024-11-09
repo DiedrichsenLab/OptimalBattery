@@ -69,6 +69,8 @@ def find_best_V(G, R, num_iter=1000,rng=None):
         if total_deviation < min_deviation:
             min_deviation = total_deviation
             best_V = V
+            print(min_deviation)
+
 
     return best_V
 
@@ -201,8 +203,6 @@ def custom_R(K_total, group_size, base_parcel_correlation, sub_parcel_extra_corr
 
     np.fill_diagonal(R, 1)
     return R
-
-
 
 if __name__=='__main__':
     test_produce_V()
