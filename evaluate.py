@@ -32,6 +32,8 @@ def center_normalize(X,axis=0):
 def get_U_hat_one_hot(U_hat):
     if len(U_hat.shape) == 2:
         U_hat = U_hat.reshape(1, U_hat.shape[0], U_hat.shape[1])
+    if type(U_hat) == pt.Tensor:
+        U_hat = U_hat.cpu().numpy()
 
     Us=[]
     for i in range(U_hat.shape[0]):
@@ -138,14 +140,19 @@ def evaluate_single_real(combination, YLib,VLib,info,ytest, vtest,M_test,ar_mode
         # leverage repeats for HBP
         HBP_data,HBP_cond_vec,HBP_part_vec = ut.make_dataset(YLib,info,task_subset_indices,n_repeats=2)
         HBP_data = center_normalize(HBP_data,axis=1)
+
         U_hat_HBP = et.estiamte_HBP_U(HBP_data, HBP_cond_vec, HBP_part_vec,ar_model)
         U_hat_one_hot = get_U_hat_one_hot(U_hat_HBP)
-        U_hat_HBP_eval = U_hat_HBP[:,parcels_to_evaluate,:]
+
+        U_hat_HBP_eval = U_hat_one_hot[:,parcels_to_evaluate,:]
+        if type(U_hat_HBP_eval) == np.ndarray:
+            U_hat_HBP_eval = pt.tensor(U_hat_HBP_eval,dtype=pt.float32)
         if U_hat_HBP_eval.ndim == 2:
             U_hat_HBP_eval = U_hat_HBP_eval.reshape(-1,1,U_hat_HBP_eval.shape[1])
         U_hat_HBP_eval = [U_hat_HBP_eval]
-        # Compute cos_HBP
-        cos = calc_test_error(M=M_test, tdata=ytest, U_hats=U_hat_HBP_eval, fit_emission='use_Uhats').mean()
+
+        # Compute cos
+        cos = calc_test_error(M=M_test, tdata=ytest, U_hats=U_hat_HBP_eval, coserr_type = 'expected',fit_emission='use_Uhats').mean()
 
     
     return cos,U_hat_one_hot
