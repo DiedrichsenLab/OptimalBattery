@@ -188,7 +188,7 @@ def eigenval_crit(G, center=True, offset=[1e-6, 1e-3, 1e-1]):
     return d
 
 def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000,n_tasks=4,seed=1): 
-    """ Builds a set of task-batteries and evalates them 
+    """ Builds a set of task-batteries and evaluates them 
     G_lib: second moment matrices of task-library
     strategy: 'random' or 'exhaustive'
     n_iter: number of iterations for random strategy
