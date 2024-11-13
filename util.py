@@ -90,14 +90,14 @@ def make_dataset(data, info, battery, n_repeats, random_seed=1):
     """
     Creates a dataset with multiple betas per task, updating condition and partition vectors,
     while handling repeated tasks with different betas for each occurrence.
-    
+
     Parameters:
     - data: numpy array of shape [voxels, conditions, subjects]
     - info: pandas DataFrame with 'cond_name' column
     - battery: list of task names (can include repeats)
     - n_repeats: number of betas to select per task
     - random_seed: int, optional random seed for reproducibility
-    
+
     Returns:
     - dataset: numpy array of shape [voxels, selected_conditions, subjects]
     - cond_v_train: numpy array of condition labels
@@ -105,11 +105,11 @@ def make_dataset(data, info, battery, n_repeats, random_seed=1):
     """
     if random_seed is not None:
         np.random.seed(random_seed)
-    
+
     # Convert battery from indices to names if necessary
     if isinstance(battery[0], (int, np.integer)):
         battery = info['cond_name'].iloc[battery].tolist()
-    
+
     indices, cond_v_train, part_v_train = [], [], []
     task_selected_betas = {}
     partition_numbers = list(range(1, n_repeats + 1))
@@ -135,7 +135,7 @@ def make_dataset(data, info, battery, n_repeats, random_seed=1):
         # Update condition and partition vectors for each selected beta
         cond_v_train.extend([condition_counter] * n_repeats)
         part_v_train.extend(partition_numbers)
-        
+
         condition_counter += 1
 
     # Convert vectors to numpy arrays and create the dataset
@@ -143,7 +143,7 @@ def make_dataset(data, info, battery, n_repeats, random_seed=1):
     part_v_train = np.array(part_v_train)
     dataset = data[:, indices, :]
 
-    return dataset, cond_v_train, part_v_train  
+    return dataset, cond_v_train, part_v_train
 
 def eigenval_crit(G, center=True, offset=[1e-6, 1e-3, 1e-1]):
     """Computes various criteria based on the eigenvalues and mutual information of a matrix G.
@@ -151,7 +151,7 @@ def eigenval_crit(G, center=True, offset=[1e-6, 1e-3, 1e-1]):
 
     N = G.shape[0]
     # Center the G matrix
-    if center: 
+    if center:
         H = np.eye(N) - np.ones((N, N)) / N
         Gs = H @ G @ H
     else:
@@ -163,7 +163,7 @@ def eigenval_crit(G, center=True, offset=[1e-6, 1e-3, 1e-1]):
 
     if center:
         l = l[:-1]  # Remove the last eigenvalue (should be zero after centering)
-    
+
     l[l < 0] = 0  # Remove negative eigenvalues
 
     l_2,_ = eigh(G)
@@ -178,17 +178,17 @@ def eigenval_crit(G, center=True, offset=[1e-6, 1e-3, 1e-1]):
     # Create a dictionary of criteria
     d = {
         'offset': offset,
-        'max_var': np.sum(lex, axis=1),
-        'max_var_2': np.sum(lex_2, axis=1),
+        'max_var': -np.sum(lex, axis=1),
+        'max_var_2': -np.sum(lex_2, axis=1),
         'min_est': np.sum(1 / lex, axis=1),
-        'log_det': np.sum(np.log(lex), axis=1),
+        'log_det': -np.sum(np.log(lex), axis=1),
         'eigenvalues':lex.tolist()
     }
-    
+
     return d
 
-def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000,n_tasks=4,seed=1): 
-    """ Builds a set of task-batteries and evaluates them 
+def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000,n_tasks=4,seed=1):
+    """ Builds a set of task-batteries and evaluates them
     G_lib: second moment matrices of task-library
     strategy: 'random' or 'exhaustive'
     n_iter: number of iterations for random strategy
@@ -201,7 +201,7 @@ def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000
     if strategy == 'random':
         comb = np.array([np.random.choice(n_lib_task, size=n_tasks, replace=True) for _ in range(n_iter)])
     elif strategy == 'exhaustive':
-        pass 
+        pass
     else:
         raise ValueError('Invalid strategy')
     for i in range(len(comb)):
@@ -217,7 +217,7 @@ def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000
         d['n_unique'] = [n_unique]*len(offs)
         D_list.append(pd.DataFrame(d))
     D = pd.concat(D_list)
-    return D 
+    return D
 
 def exhuastive_traditional_batteries(Vs, isolate_parcels, length=8):
     isolated_parcels = Vs[:, isolate_parcels]
@@ -225,14 +225,14 @@ def exhuastive_traditional_batteries(Vs, isolate_parcels, length=8):
     task_max_isolated = np.argmax(isolated_sums)
 
     other_task_indices = [i for i in range(Vs.shape[0]) if i != task_max_isolated]
-    
+
     task_batteries = []
     for task in other_task_indices:
         task_list = [task_max_isolated, task] * (length // 2)
         task_batteries.append(tuple(task_list))
-        
+
     return task_batteries
-    
+
 
 def traditional_battery(Vs, isolate_parcels, length=8):
     n_tasks, _ = Vs.shape
@@ -263,7 +263,7 @@ def traditional_battery(Vs, isolate_parcels, length=8):
                         'second_highest_activation': second_highest_activation
                     })
 
-    # Find the pairwise contrast with the maximum difference 
+    # Find the pairwise contrast with the maximum difference
     if contrast_results:
         best_contrast = max(contrast_results, key=lambda x: x['difference'])
         best_task1 = best_contrast['task1']
@@ -275,7 +275,7 @@ def traditional_battery(Vs, isolate_parcels, length=8):
 
 
 if __name__ == "__main__":
-    N = 8 
+    N = 8
     U = np.random.normal(0,1,(N,10))
     G = U @ U.T
     D = build_combinations(G, strategy='random',n_iter=100,n_tasks=4)
