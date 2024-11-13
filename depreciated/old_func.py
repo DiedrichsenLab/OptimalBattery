@@ -396,3 +396,20 @@ def make_U_basic(s=24, k=16, p=40, type='hard', seed=1):
         Us = Us / Us_sum  # Normalize to get probabilities 
 
     return Us
+
+
+
+def U_MSE(U_true, U_pred):
+    MSE = []
+    # if its only two dimensions then add a dimension
+    if len(U_true.shape) == 2:
+        U_true = U_true.reshape(1, U_true.shape[0], U_true.shape[1])
+        U_pred = U_pred.reshape(1, U_pred.shape[0], U_pred.shape[1])
+    elif len(U_true.shape) == 1:
+        U_true = U_true.reshape(1, U_true.shape[0])
+        U_pred = U_pred.reshape(1, U_pred.shape[0])
+    
+    for subject in range(U_true.shape[0]):
+        mse = np.mean((U_true[subject] - U_pred[subject])**2)
+        MSE.append(mse)
+    return np.mean(MSE)

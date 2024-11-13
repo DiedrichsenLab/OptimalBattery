@@ -1,44 +1,28 @@
 import numpy as np
-import pandas as pd
 import torch as pt
-import OptimalBattery.simulate as sim
 import OptimalBattery.estimate as et
 import HierarchBayesParcel.evaluation as hbpev
 import OptimalBattery.util as ut
-from HierarchBayesParcel.evaluation import calc_test_error,coserr
+from HierarchBayesParcel.evaluation import calc_test_error
 
-
-
-def U_MSE(U_true, U_pred):
-    MSE = []
-    # if its only two dimensions then add a dimension
-    if len(U_true.shape) == 2:
-        U_true = U_true.reshape(1, U_true.shape[0], U_true.shape[1])
-        U_pred = U_pred.reshape(1, U_pred.shape[0], U_pred.shape[1])
-    elif len(U_true.shape) == 1:
-        U_true = U_true.reshape(1, U_true.shape[0])
-        U_pred = U_pred.reshape(1, U_pred.shape[0])
-    
-    for subject in range(U_true.shape[0]):
-        mse = np.mean((U_true[subject] - U_pred[subject])**2)
-        MSE.append(mse)
-    return np.mean(MSE)
 
 def center_normalize(X,axis=0):
+    """Center and normalize the data along the specified axis."""
     X = X - X.mean(axis=axis, keepdims=True)
     X = X / np.linalg.norm(X, axis=axis, keepdims=True)
     return X
 
 def get_U_hat_one_hot(U_hat):
+    """Convert the estimated Us to one-hot encoding."""
     max_indices = np.argmax(U_hat, axis=0)
     U_hat_one_hot = np.zeros_like(U_hat)
     U_hat_one_hot[max_indices, np.arange(U_hat.shape[1])] = 1
     return U_hat_one_hot
 
 def percentage_correct_parcellation(U_true, U_pred):
+    """Compute the percentage of correctly classified voxels."""
     correct_voxels = np.sum(U_true * U_pred)
     total_voxels = U_true.shape[1]
-
     percentage = (correct_voxels / total_voxels) * 100
     return percentage
 
@@ -46,7 +30,6 @@ def percentage_correct_parcellation(U_true, U_pred):
 def percentage_correct_localization(U_true, U_pred):
     hits = np.sum(U_true * U_pred)
     false_positives = np.sum(U_pred * (1 - U_true))
-
     percentage = (hits / (hits + false_positives)) * 100
     if np.isnan(percentage):
         percentage = 0
@@ -62,6 +45,15 @@ def evaluate_single_simulation_multi(combination,
                                      Ytrue,Vr,Ur,
                                      n_iter=100,
                                      sig_e=0.04):
+    """Evaluate the parcellation performance for a single combination of tasks.
+    Args:
+        combination: The combination of tasks to evaluate
+        Ytrue: True tuning functions of all voxels across all tasks (generated using the fine 25 region parcellation)
+        Vr: The reduced task matrix for the regions you want to discover
+        Ur: The reduced parcellation (correct answer)
+        n_iter: Number of iterations to run
+        sig_e: Standard deviation of the noise to add to the data
+    """
     # Get the task subset indices and corresponding data
     task_subset_indices = list(combination)
 
@@ -79,7 +71,6 @@ def evaluate_single_simulation_multi(combination,
     
         #eval
         perc[i] = percentage_correct_parcellation(Ur, U_hat_one_hot)
-    
     return perc.mean()
 
 
@@ -98,24 +89,18 @@ def evaluate_dataframe_simulation_multi(D, Ytrue,Vr, Ur):
     # Get unique combinations
     unique_combinations = D['combination_tuple'].unique()
 
-    Us = []
     perc_dict= {}
-    cos_dict = {}
-
     # Loop over each unique combination
     for i, comb_tuple in enumerate(unique_combinations):
         if i % 1000 == 0:
             print(f"Processing combination: {i}")
-        perc,cos,U_hat_one_hot = evaluate_single_simulation_multi(comb_tuple,Ytrue,Vr, Ur)
+        perc = evaluate_single_simulation_multi(comb_tuple,Ytrue,Vr, Ur,sig_e=1)
         perc_dict[comb_tuple] = perc
-        cos_dict[comb_tuple] = cos
-        Us.append(U_hat_one_hot)
 
     
     # Map the computed cos_HBP values back to the DataFrame
     D['perc'] = D['combination_tuple'].map(perc_dict)    
-    D['cos'] = D['combination_tuple'].map(cos_dict)
-    return D,Us
+    return D
 
 def evaluate_single_simulation_localization(combination,YLib,VLib, U_true,estimation_method = 'OLS',parcel_to_evaluate = None):
     # Get the task subset indices and corresponding data
