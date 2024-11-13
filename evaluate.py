@@ -58,58 +58,62 @@ def prediction_error(ytest,vtest,U_hat):
     cos_err = np.mean(cosine_error_vox)
     return cos_err
 
-def evaluate_single_simulation_parcellation(combination,YLib,VLib, U_true,estimation_method = 'OLS'):
+def evaluate_single_simulation_multi(combination,
+                                     Ytrue,Vr,Ur,
+                                     n_iter=100,
+                                     sig_e=0.04):
     # Get the task subset indices and corresponding data
     task_subset_indices = list(combination)
 
-    V_subset = VLib[task_subset_indices,:]
+    V_subset = Vr[task_subset_indices,:]
     V_subset = center_normalize(V_subset,axis=0)
+    y_subset = Ytrue[task_subset_indices,:]
+    
+    perc = np.zeros((n_iter,))
+    for i in range(n_iter):
+        y = y_subset + np.random.normal(0, sig_e, y_subset.shape)
+        y_norm = center_normalize(y,axis=0)
 
-    y_subset = YLib[task_subset_indices, :]
-    y_subset = y_subset + np.random.normal(0, 0.04, y_subset.shape)
-    y_subset = center_normalize(y_subset,axis=0)
-
-    ytest = YLib + np.random.normal(0, 0.04, YLib.shape)
-    ytest = center_normalize(ytest,axis=0)
-    vtest = VLib
-    vtest = center_normalize(vtest,axis=0)
-
-    if estimation_method == 'OLS':
-        U_hat = et.estimate_Us_ols(y_subset, V_subset)
-        U_hat_one_hot = get_U_hat_one_hot(U_hat)
-    elif estimation_method == 'projection':
-        U_hat = et.estimate_Us_projection(y_subset, V_subset)
+        U_hat = et.estimate_Us_projection(y_norm, V_subset)
         U_hat_one_hot = get_U_hat_one_hot(U_hat)
     
-    #eval
-    perc = percentage_correct_parcellation(U_true=U_true, U_pred=U_hat_one_hot)
-    cos  = prediction_error(ytest,vtest,U_hat_one_hot)
+        #eval
+        perc[i] = percentage_correct_parcellation(Ur, U_hat_one_hot)
     
-    return perc,cos,U_hat_one_hot
+    return perc.mean()
 
 
-def evaluate_dataframe_simulation_parcellation(D, YLib,VLib, U_true,estimation_method = 'OLS'):
+def evaluate_dataframe_simulation_multi(D, Ytrue,Vr, Ur):
+    """ Evaluate the parcellation performance for each combination in the DataFrame D.
+
+        Args:
+            D: DataFrame containing the combinations to evaluate
+            Ytrue: True tuning functions of all voxels across all tasks (generated using the fine 25 region parcellation)
+            Vr: The reduced task matrix for the regions you want to discover
+            Ur: The reduced parcellation (correct answer)  
+            estimation_method: The method to estimate the parcellation
+        """
     # Create a new column with combinations as tuples to make them hashable
     D['combination_tuple'] = D['combination'].apply(lambda x: tuple(x)) 
     # Get unique combinations
     unique_combinations = D['combination_tuple'].unique()
 
     Us = []
-    perc_correct= {}
+    perc_dict= {}
     cos_dict = {}
 
     # Loop over each unique combination
     for i, comb_tuple in enumerate(unique_combinations):
         if i % 1000 == 0:
             print(f"Processing combination: {i}")
-        perc,cos,U_hat_one_hot = evaluate_single_simulation_parcellation(comb_tuple,YLib,VLib, U_true,estimation_method)
-        perc_correct[comb_tuple] = perc
+        perc,cos,U_hat_one_hot = evaluate_single_simulation_multi(comb_tuple,Ytrue,Vr, Ur)
+        perc_dict[comb_tuple] = perc
         cos_dict[comb_tuple] = cos
         Us.append(U_hat_one_hot)
 
     
     # Map the computed cos_HBP values back to the DataFrame
-    D['perc'] = D['combination_tuple'].map(perc_correct)    
+    D['perc'] = D['combination_tuple'].map(perc_dict)    
     D['cos'] = D['combination_tuple'].map(cos_dict)
     return D,Us
 
