@@ -35,11 +35,21 @@ def get_U_hat_one_hot(U_hat):
     U_hat_one_hot[max_indices, np.arange(U_hat.shape[1])] = 1
     return U_hat_one_hot
 
-def percentage_correct(U_true, U_pred):
+def percentage_correct_parcellation(U_true, U_pred):
     correct_voxels = np.sum(U_true * U_pred)
     total_voxels = U_true.shape[1]
-    
+
     percentage = (correct_voxels / total_voxels) * 100
+    return percentage
+
+
+def percentage_correct_localization(U_true, U_pred):
+    hits = np.sum(U_true * U_pred)
+    false_positives = np.sum(U_pred * (1 - U_true))
+
+    percentage = (hits / (hits + false_positives)) * 100
+    if np.isnan(percentage):
+        percentage = 0
     return percentage
 
 def prediction_error(ytest,vtest,U_hat):
@@ -72,7 +82,7 @@ def evaluate_single_simulation_parcellation(combination,YLib,VLib, U_true,estima
         U_hat_one_hot = get_U_hat_one_hot(U_hat)
     
     #eval
-    perc = percentage_correct(U_true=U_true, U_pred=U_hat_one_hot)
+    perc = percentage_correct_parcellation(U_true=U_true, U_pred=U_hat_one_hot)
     cos  = prediction_error(ytest,vtest,U_hat_one_hot)
     
     return perc,cos,U_hat_one_hot
@@ -102,6 +112,68 @@ def evaluate_dataframe_simulation_parcellation(D, YLib,VLib, U_true,estimation_m
     D['perc'] = D['combination_tuple'].map(perc_correct)    
     D['cos'] = D['combination_tuple'].map(cos_dict)
     return D,Us
+
+def evaluate_single_simulation_localization(combination,YLib,VLib, U_true,estimation_method = 'OLS',parcel_to_evaluate = None):
+    # Get the task subset indices and corresponding data
+    task_subset_indices = list(combination)
+
+    V_subset = VLib[task_subset_indices,:]
+    V_subset = center_normalize(V_subset,axis=0)
+
+    y_subset = YLib[task_subset_indices, :]
+    y_subset = y_subset + np.random.normal(0, 0.04, y_subset.shape)
+    y_subset = center_normalize(y_subset,axis=0)
+
+    # test task indices should be 20 to 24 if parcel index 4 for exmaple
+    task_start = parcel_to_evaluate * 5
+    task_end = task_start + 5
+    ytest = YLib[task_start:task_end, :]
+    ytest = YLib + np.random.normal(0, 0.04, YLib.shape)
+    ytest = center_normalize(ytest,axis=0)
+    vtest = VLib
+    vtest = VLib[task_start:task_end,parcel_to_evaluate]
+    vtest = center_normalize(vtest,axis=0)
+
+    if estimation_method == 'OLS':
+        U_hat = et.estimate_Us_ols(y_subset, V_subset)
+        U_hat_one_hot = get_U_hat_one_hot(U_hat)
+    elif estimation_method == 'projection':
+        U_hat = et.estimate_Us_projection(y_subset, V_subset)
+        U_hat_one_hot = get_U_hat_one_hot(U_hat)
+    
+    #eval
+    U_true_eval = U_true[parcel_to_evaluate,:].reshape(1,-1)
+    U_pred_eval = U_hat_one_hot[parcel_to_evaluate,:].reshape(1,-1)
+    perc = percentage_correct_localization(U_true=U_true_eval, U_pred=U_pred_eval)
+    cos  = prediction_error(ytest,vtest,U_hat_one_hot)
+    
+    return perc,cos,U_hat_one_hot
+
+def evaluate_dataframe_simulation_localization(D, YLib,VLib, U_true,estimation_method = 'OLS',parcel_to_evaluate = None):
+    # Create a new column with combinations as tuples to make them hashable
+    D['combination_tuple'] = D['combination'].apply(lambda x: tuple(x)) 
+    # Get unique combinations
+    unique_combinations = D['combination_tuple'].unique()
+
+    Us = []
+    perc_correct= {}
+    cos_dict = {}
+
+    # Loop over each unique combination
+    for i, comb_tuple in enumerate(unique_combinations):
+        if i % 1000 == 0:
+            print(f"Processing combination: {i}")
+        perc,cos,U_hat_one_hot = evaluate_single_simulation_localization(comb_tuple,YLib,VLib, U_true,estimation_method,parcel_to_evaluate=parcel_to_evaluate)
+        perc_correct[comb_tuple] = perc
+        cos_dict[comb_tuple] = cos
+        Us.append(U_hat_one_hot)
+
+    
+    # Map the computed cos_HBP values back to the DataFrame
+    D['perc'] = D['combination_tuple'].map(perc_correct)    
+    D['cos'] = D['combination_tuple'].map(cos_dict)
+    return D,Us
+
 
 
 def evaluate_single_real(combination, YLib,VLib,info,ytest, vtest,M_test,ar_model,parcels_to_evaluate,estimation_method = 'hbp'):
