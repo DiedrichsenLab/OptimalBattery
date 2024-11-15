@@ -41,9 +41,22 @@ def prediction_error(ytest,vtest,U_hat):
     cos_err = np.mean(cosine_error_vox)
     return cos_err
 
+def get_U_hat_one_hot_real(U_hat):
+    """Convert the estimated Us to one-hot encoding."""
+    if type(U_hat) == pt.Tensor:
+        U_hat = U_hat.detach().cpu().numpy()
+
+    U_hats = []
+    for i in range(len(U_hat)):
+        max_indices = np.argmax(U_hat[i], axis=0)
+        U_hat_one_hot = np.zeros_like(U_hat[i])
+        U_hat_one_hot[max_indices, np.arange(U_hat[i].shape[1])] = 1
+        U_hats.append(U_hat_one_hot)
+    return pt.tensor(np.stack(U_hats))
+
 def evaluate_single_simulation_multi(combination,
                                      Ytrue,Vr,Ur,
-                                     n_iter=100,
+                                     n_iter=10,
                                      sig_e=0.04):
     """Evaluate the parcellation performance for a single combination of tasks.
     Args:
@@ -74,7 +87,7 @@ def evaluate_single_simulation_multi(combination,
     return perc.mean()
 
 
-def evaluate_dataframe_simulation_multi(D, Ytrue,Vr, Ur):
+def evaluate_dataframe_simulation_multi(D, Ytrue,Vr, Ur,sig_e=1):
     """ Evaluate the parcellation performance for each combination in the DataFrame D.
 
         Args:
@@ -94,7 +107,7 @@ def evaluate_dataframe_simulation_multi(D, Ytrue,Vr, Ur):
     for i, comb_tuple in enumerate(unique_combinations):
         if i % 1000 == 0:
             print(f"Processing combination: {i}")
-        perc = evaluate_single_simulation_multi(comb_tuple,Ytrue,Vr, Ur,sig_e=1)
+        perc = evaluate_single_simulation_multi(comb_tuple,Ytrue,Vr, Ur,sig_e=sig_e)
         perc_dict[comb_tuple] = perc
 
     
@@ -203,7 +216,7 @@ def evaluate_single_real(combination, YLib,VLib,info,ytest, vtest,M_test,ar_mode
         HBP_data = center_normalize(HBP_data,axis=1)
 
         U_hat_HBP = et.estiamte_HBP_U(HBP_data, HBP_cond_vec, HBP_part_vec,ar_model)
-        U_hat_one_hot = get_U_hat_one_hot(U_hat_HBP)
+        U_hat_one_hot = get_U_hat_one_hot_real(U_hat_HBP)
 
         U_hat_HBP_eval = U_hat_one_hot[:,parcels_to_evaluate,:]
         if type(U_hat_HBP_eval) == np.ndarray:

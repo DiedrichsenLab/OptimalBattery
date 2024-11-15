@@ -145,7 +145,7 @@ def make_dataset(data, info, battery, n_repeats, random_seed=1):
 
     return dataset, cond_v_train, part_v_train  
 
-def eigenval_crit(G, center=True, offset=[1e-6, 1e-3, 1e-1]):
+def eigenval_crit(G, center=True):
     """Computes various criteria based on the eigenvalues and mutual information of a matrix G.
     Assumes that G is symmetric."""
 
@@ -164,30 +164,27 @@ def eigenval_crit(G, center=True, offset=[1e-6, 1e-3, 1e-1]):
     if center:
         l = l[:-1]  # Remove the last eigenvalue (should be zero after centering)
     
-    l[l < 0] = 0  # Remove negative eigenvalues
-
-    l_2,_ = eigh(G)
-    l_2 = l_2[::-1]
-
+    # l[l < 0] = 0  # Remove negative eigenvalues
     # Calculate expanded eigenvalues for numerical stability
-    off = np.array(offset).reshape(-1, 1)
-    lex = l + off  # Expanded eigenvalues, one row per offset
+    # off = np.array(offset).reshape(-1, 1)
 
-    lex_2 = l_2 + off
+
+    # only include positive eigenvalues
+    l = l[l > 1e-10]
+    lex = l
 
     # Create a dictionary of criteria
     d = {
-        'offset': offset,
-        'max_var': np.sum(lex, axis=1),
-        'max_var_2': np.sum(lex_2, axis=1),
-        'min_est': np.sum(1 / lex, axis=1),
-        'log_det': np.sum(np.log(lex), axis=1),
-        'eigenvalues':lex.tolist()
+        'variance': np.sum(lex),
+        'inverse_trace': - np.sum(1 / lex),
+        'log_det': np.sum(np.log(lex)),
+        'eigenvalues':[lex.tolist()],
+        'num_eigenvalues': len(lex)
     }
     
     return d
 
-def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000,n_tasks=4,seed=1): 
+def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1): 
     """ Builds a set of task-batteries and evalates them 
     G_lib: second moment matrices of task-library
     strategy: 'random' or 'exhaustive'
@@ -195,7 +192,6 @@ def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000
     """
     np.random.seed(seed)
     D_list = []
-    offs = offs
     n_lib_task = G_lib.shape[0]
 
     if strategy == 'random':
@@ -210,11 +206,11 @@ def build_combinations(G_lib, strategy='random',offs = [0.001,0.1,1],n_iter=1000
         has_Repeats = len(set(comb[i])) < len(comb[i])
         n_unique = len(set(comb[i]))
         # if n_unique < n_parcels: then skip the combination
-        d = eigenval_crit(G_lib[comb[i],:][:,comb[i]],center=True,offset=offs)
-        d['n_tasks'] = [len(comb[i])]*len(offs)
-        d['combination'] = [comb[i]]*len(offs)
-        d['has_repeats'] = [has_Repeats * 1]*len(offs)
-        d['n_unique'] = [n_unique]*len(offs)
+        d = eigenval_crit(G_lib[comb[i],:][:,comb[i]],center=True)
+        d['n_tasks'] = [len(comb[i])]
+        d['combination'] = [comb[i]]
+        d['has_repeats'] = [has_Repeats * 1]
+        d['n_unique'] = [n_unique]
         D_list.append(pd.DataFrame(d))
     D = pd.concat(D_list)
     return D 

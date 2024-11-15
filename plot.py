@@ -5,7 +5,7 @@ from matplotlib.ticker import FuncFormatter
 from matplotlib.colors import to_rgb, ListedColormap
 
 
-def plot_correlations(D, x_vars=['max_var'], y_vars=['log_det']):
+def plot_correlations(D, x_vars=['max_var'], y_vars=['log_det'],title = None):
     """
     Plots correlation between multiple x and y variable pairs at each unique offset.
     If there are multiple y_vars, it creates subplots in a row, one per y_var, with all x_vars on the same subplot.
@@ -62,9 +62,12 @@ def plot_correlations(D, x_vars=['max_var'], y_vars=['log_det']):
     axs[0].set_ylabel('correlation')
     fig.suptitle('Correlations at Different Offsets')
     fig.legend(loc='upper right', bbox_to_anchor=(1.1, 1))
+    if title:
+        fig.suptitle(title)
     plt.tight_layout()
     plt.show()
 
+    return
 
 def create_custom_colormap(base_colors, K_subparcels):
     """
