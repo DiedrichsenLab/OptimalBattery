@@ -54,7 +54,7 @@ def get_U_hat_one_hot_real(U_hat):
         U_hats.append(U_hat_one_hot)
     return pt.tensor(np.stack(U_hats))
 
-def evaluate_single_simulation_multi(combination,
+def evaluate_combination_simulation_multiregion(combination,
                                      Ytrue,Vr,Ur,
                                      n_iter=10,
                                      sig_e=0.04):
@@ -84,10 +84,12 @@ def evaluate_single_simulation_multi(combination,
     
         #eval
         perc[i] = percentage_correct_parcellation(Ur, U_hat_one_hot)
+
+
     return perc.mean()
 
 
-def evaluate_dataframe_simulation_multi(D, Ytrue,Vr, Ur,sig_e=1):
+def evaluate_dataframe_simulation_multiregion(D, Ytrue,Vr, Ur,sig_e=1):
     """ Evaluate the parcellation performance for each combination in the DataFrame D.
 
         Args:
@@ -107,7 +109,7 @@ def evaluate_dataframe_simulation_multi(D, Ytrue,Vr, Ur,sig_e=1):
     for i, comb_tuple in enumerate(unique_combinations):
         if i % 1000 == 0:
             print(f"Processing combination: {i}")
-        perc = evaluate_single_simulation_multi(comb_tuple,Ytrue,Vr, Ur,sig_e=sig_e)
+        perc = evaluate_combination_simulation_multiregion(comb_tuple,Ytrue,Vr, Ur,sig_e=sig_e)
         perc_dict[comb_tuple] = perc
 
     
@@ -115,66 +117,78 @@ def evaluate_dataframe_simulation_multi(D, Ytrue,Vr, Ur,sig_e=1):
     D['perc'] = D['combination_tuple'].map(perc_dict)    
     return D
 
-def evaluate_single_simulation_localization(combination,YLib,VLib, U_true,estimation_method = 'OLS',parcel_to_evaluate = None):
+def evaluate_combination_simulation_singleregion(combination,
+                                            Ytrue,Vr, Ur,
+                                            n_iter=100,
+                                            sig_e=0.04,
+                                            parcel_to_evaluate = None):
+    """Evaluate the localization performance for a single combination of tasks.
+    Args:
+        combination: The combination of tasks to evaluate
+        Ytrue: True tuning functions of all voxels across all tasks (generated using the fine 25 region parcellation)
+        Vr: The reduced task matrix for the regions you want to discover
+        Ur: The reduced parcellation (correct answer)
+        n_iter: Number of iterations to run
+        sig_e: Standard deviation of the noise to add to the data
+        parcel_to_evaluate: The parcel to evaluate the localization performance for
+    """
     # Get the task subset indices and corresponding data
     task_subset_indices = list(combination)
 
-    V_subset = VLib[task_subset_indices,:]
+    V_subset = Vr[task_subset_indices,:]
     V_subset = center_normalize(V_subset,axis=0)
+    y_subset = Ytrue[task_subset_indices,:]
 
-    y_subset = YLib[task_subset_indices, :]
-    y_subset = y_subset + np.random.normal(0, 0.04, y_subset.shape)
-    y_subset = center_normalize(y_subset,axis=0)
 
-    # test task indices should be 20 to 24 if parcel index 4 for exmaple
-    task_start = parcel_to_evaluate * 5
-    task_end = task_start + 5
-    ytest = YLib[task_start:task_end, :]
-    ytest = YLib + np.random.normal(0, 0.04, YLib.shape)
-    ytest = center_normalize(ytest,axis=0)
-    vtest = VLib
-    vtest = VLib[task_start:task_end,parcel_to_evaluate]
-    vtest = center_normalize(vtest,axis=0)
+    perc = np.zeros((n_iter,))
+    for i in range(n_iter):
+        y = y_subset + np.random.normal(0, sig_e, y_subset.shape)
+        y_norm = center_normalize(y,axis=0)
 
-    if estimation_method == 'OLS':
-        U_hat = et.estimate_Us_ols(y_subset, V_subset)
+        U_hat = et.estimate_Us_projection(y_norm, V_subset)
         U_hat_one_hot = get_U_hat_one_hot(U_hat)
-    elif estimation_method == 'projection':
-        U_hat = et.estimate_Us_projection(y_subset, V_subset)
-        U_hat_one_hot = get_U_hat_one_hot(U_hat)
-    
-    #eval
-    U_true_eval = U_true[parcel_to_evaluate,:].reshape(1,-1)
-    U_pred_eval = U_hat_one_hot[parcel_to_evaluate,:].reshape(1,-1)
-    perc = percentage_correct_localization(U_true=U_true_eval, U_pred=U_pred_eval)
-    cos  = prediction_error(ytest,vtest,U_hat_one_hot)
-    
-    return perc,cos,U_hat_one_hot
 
-def evaluate_dataframe_simulation_localization(D, YLib,VLib, U_true,estimation_method = 'OLS',parcel_to_evaluate = None):
+        Ur_eval = Ur[:,parcel_to_evaluate,:]
+        U_hat_one_hot_eval = U_hat_one_hot[:,parcel_to_evaluate,:]
+    
+        #eval
+        perc[i] = percentage_correct_localization(Ur_eval, U_hat_one_hot_eval)
+
+    
+
+    return perc.mean()
+    
+
+def evaluate_dataframe_simulation_singleregion(D,
+                                                Ytrue,Vr, Ur,
+                                                sig_e=1,
+                                                parcel_to_evaluate = None):
+    """ Evaluate the localization performance for each combination in the DataFrame D.
+
+        Args:
+            D: DataFrame containing the combinations to evaluate
+            Ytrue: True tuning functions of all voxels across all tasks (generated using the fine 25 region parcellation)
+            Vr: The reduced task matrix for the regions you want to discover
+            Ur: The reduced parcellation (correct answer)  
+            estimation_method: The method to estimate the parcellation
+    """
+
     # Create a new column with combinations as tuples to make them hashable
     D['combination_tuple'] = D['combination'].apply(lambda x: tuple(x)) 
     # Get unique combinations
     unique_combinations = D['combination_tuple'].unique()
 
-    Us = []
-    perc_correct= {}
-    cos_dict = {}
-
+    perc_dict= {}
     # Loop over each unique combination
     for i, comb_tuple in enumerate(unique_combinations):
         if i % 1000 == 0:
             print(f"Processing combination: {i}")
-        perc,cos,U_hat_one_hot = evaluate_single_simulation_localization(comb_tuple,YLib,VLib, U_true,estimation_method,parcel_to_evaluate=parcel_to_evaluate)
-        perc_correct[comb_tuple] = perc
-        cos_dict[comb_tuple] = cos
-        Us.append(U_hat_one_hot)
-
+        perc = evaluate_combination_simulation_singleregion(comb_tuple,Ytrue,Vr, Ur,sig_e=sig_e)
+        perc_dict[comb_tuple] = perc
     
     # Map the computed cos_HBP values back to the DataFrame
-    D['perc'] = D['combination_tuple'].map(perc_correct)    
-    D['cos'] = D['combination_tuple'].map(cos_dict)
-    return D,Us
+    D['perc'] = D['combination_tuple'].map(perc_dict)    
+    return D
 
 
 
