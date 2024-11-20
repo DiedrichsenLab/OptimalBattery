@@ -179,10 +179,10 @@ def custom_G(n_tasks=16, n_groups=4, group_size=4, target_corr=0.0004, variance_
     task_index = 0
 
     for group in range(n_groups):
-        variances = variance_factors
-
+        variances = variance_factors[group]
+    
         # Compute covariances based on desired correlation
-        covariances = target_corr * np.outer(variance_factors, variance_factors)
+        covariances = target_corr * np.outer(variance_factors[group], variance_factors[group])
         np.fill_diagonal(covariances, variances)
 
         # Place the block into G

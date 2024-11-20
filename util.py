@@ -168,6 +168,10 @@ def eigenval_crit(G, center=True):
     # Calculate expanded eigenvalues for numerical stability
     # off = np.array(offset).reshape(-1, 1)
 
+    l2,_ = eigh(G)
+    l2 = l2[::-1]
+    l2 = l2[l2 > 1e-10]
+
 
     # only include positive eigenvalues
     l = l[l > 1e-10]
@@ -176,6 +180,7 @@ def eigenval_crit(G, center=True):
     # Create a dictionary of criteria
     d = {
         'variance': np.sum(lex),
+        'variance_2': np.sum(l2),
         'inverse_trace': - np.sum(1 / lex),
         'log_det': np.sum(np.log(lex)),
         'eigenvalues':[lex.tolist()],
@@ -184,7 +189,7 @@ def eigenval_crit(G, center=True):
     
     return d
 
-def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1): 
+def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1,balanced_sampling_unique = None): 
     """ Builds a set of task-batteries and evalates them 
     G_lib: second moment matrices of task-library
     strategy: 'random' or 'exhaustive'
@@ -198,6 +203,20 @@ def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1):
         comb = np.array([np.random.choice(n_lib_task, size=n_tasks, replace=True) for _ in range(n_iter)])
     elif strategy == 'exhaustive':
         pass 
+    elif strategy == 'balanced':
+        comb = set()  
+        total_unique = len(balanced_sampling_unique)
+        iter_per_unique = n_iter // total_unique
+        for n_unique in balanced_sampling_unique:
+            for _ in range(iter_per_unique):
+                    unique_tasks = np.random.choice(n_lib_task, size=n_unique, replace=False)
+                    remaining = n_tasks - n_unique
+                    remaining_comb = np.random.choice(unique_tasks, size=remaining, replace=True)
+                    full_comb = np.concatenate([unique_tasks, remaining_comb])
+                    # sort the combination to avoid duplicates
+                    full_comb = np.sort(full_comb)
+                    comb.add(tuple(full_comb))
+        comb = list(comb)
     else:
         raise ValueError('Invalid strategy')
     for i in range(len(comb)):
@@ -268,6 +287,69 @@ def traditional_battery(Vs, isolate_parcels, length=8):
         # Make the battery
         tasks_list = [best_task1, best_task2] * (length // 2)
         return tuple(tasks_list)
+    
+def run_regression_for_unique(
+    df, x_variables, y_variable, n=130, random_state=42
+):
+    """
+    Runs a regression for each unique value of 'n_unique' and returns results.
+
+    Parameters:
+        df (pd.DataFrame): Input dataframe.
+        x_variables (list): List of column names to be used as predictors.
+        y_variable (str): Target variable column name.
+        n (int): Number of samples to select per unique value. # ensure you have enough
+        random_state (int): Random state for reproducibility.
+
+    Returns:
+        pd.DataFrame: DataFrame containing regression results for each unique value of 'n_unique'.
+    """
+    results_list = []
+    n_unique_counts = df['n_unique'].value_counts()
+    n_unique_filtered = n_unique_counts[n_unique_counts > n].index.sort_values()
+
+    for n_unique_val in n_unique_filtered:
+        df_single = df[df['n_unique'] == n_unique_val].sample(n=n, random_state=random_state)
+
+        X = df_single[x_variables]
+        y = df_single[y_variable].values
+
+        # Standardize X
+        X_mean = X.mean(axis=0)
+        X_std = X.std(axis=0)
+        X_standardized = (X - X_mean) / X_std
+
+        # Add intercept
+        ones = np.ones(shape=(X_standardized.shape[0], 1))
+        X_design = np.hstack([ones, X_standardized])
+
+        # OLS Regression
+        Betas = np.linalg.inv(X_design.T @ X_design) @ X_design.T @ y
+        intercept = Betas[0]
+        coefficients = Betas[1:]
+        y_pred = X_design @ Betas
+
+        # Calculate R-squared
+        residuals = y - y_pred
+        SS_res = np.sum(residuals ** 2)
+        SS_tot = np.sum((y - y.mean()) ** 2)
+        R_squared = 1 - (SS_res / SS_tot)
+
+        result = {
+            'n_unique': n_unique_val,
+            'intercept': intercept,
+            'R_squared': R_squared,
+        }
+
+        # Add coefficients for each variable
+        for i, var in enumerate(x_variables):
+            result[f'{var}_coef'] = coefficients[i]
+
+        results_list.append(result)
+
+    return pd.DataFrame(results_list)
+
+
 
 
 if __name__ == "__main__":
