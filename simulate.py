@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 
 def random_matrix_normal(G, R, make_exact=False, rng=None):
@@ -69,7 +68,6 @@ def find_best_V(G, R, num_iter=1000,rng=None):
         if total_deviation < min_deviation:
             min_deviation = total_deviation
             best_V = V
-            print(min_deviation)
 
 
     return best_V
