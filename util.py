@@ -66,11 +66,8 @@ def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1,rep
         pass 
     else:
         raise ValueError('Invalid strategy')
-    # make sure set comb
-    
+        
     for i in range(len(comb)):
-        # if i % 10000 == 0:
-        #     print(f'building{i}')
         n_unique = len(set(comb[i]))
         d = eigenval_crit(G_lib[comb[i],:][:,comb[i]],center=True)
         d['n_tasks'] = [len(comb[i])]
