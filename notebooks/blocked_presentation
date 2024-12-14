@@ -1,0 +1,91 @@
+import sys
+import numpy as np
+from numpy.linalg import inv,eig,eigh
+import PcmPy as pcm
+import pandas as pd
+from numpy import sqrt
+
+# These are the main functions
+def make_design_matrix(reg_id = [[1,2],[3,4],[5,6]],
+                       p_rest=0.2,
+                       T=100):
+    """ Make a design matrix with the conditions
+    indicated in reg_id and rest phase with probability p_rest"""
+     # Number of possible runs
+    num_part  = len(reg_id) # Number of tasks including rest (0)
+    part_v = np.kron(np.arange(num_part),np.ones((T)))
+    reg_ind = np.concatenate(reg_id)
+    # Get the partition index for the columns of the design matrix
+    part_ind = [np.ones(len(r))*i for i,r in enumerate(reg_id)]
+    part_ind = np.concatenate(part_ind)
+    # Start building the design matrix
+    X = np.zeros((T*num_part,reg_ind.shape[0]))
+    cv = []
+    # For each partition (run) find the number of available scans an allocate
+    for i in range(num_part):
+        num_cond = len(reg_id[i])
+        # Number of TR per condiiton depend on even number of TRs
+        lc = int((T-T*p_rest)//num_cond)
+        lr = T - lc * num_cond
+        # build the condition vector
+        ccvv = np.array(reg_id[i])
+        cond_v = np.kron(ccvv,np.ones((lc,)))
+        cond_v = np.concatenate((cond_v,np.zeros((lr,))))
+        cv.append(cond_v)
+        row=np.where(part_v==i)[0]
+        col=np.where(part_ind==i)[0]
+        X[np.ix_(row,col)]=pcm.matrix.indicator(cond_v,positive=True)
+    cond_v = np.concatenate(cv)
+    X=np.concatenate([X,pcm.indicator(part_v)],axis=1)
+    reg_ind = np.concatenate([reg_ind,np.zeros(num_part)])
+    # Use the first condition to get a measure of TR per condition
+    lc = (cond_v==1).sum()
+    lr = (cond_v==0).sum()
+    return X,cond_v,part_v,reg_ind,part_ind,lc,lr
+
+def var_contrasts(X,reg_ind):
+    """ Calculate the variance you would get for contrasts on beta-estimates
+    from a design matrix X the regressors indicating different conditions
+    We do this seperately for all contrast against rest
+    and all the pairwise contrasts between conditions.
+    """
+    conv_beta = inv(X.T@X)
+    # CI are the contrast against rest
+    CI = pcm.matrix.indicator(reg_ind,positive=True).T
+    CI = CI / CI.sum(axis=1,keepdims=True)
+    # CP are the pairwise contrast
+    CP = pcm.matrix.pairwise_contrast(reg_ind,positive=True)
+    var_i = np.diag(CI@conv_beta@CI.T)
+    var_p = np.diag(CP@conv_beta@CP.T)
+    return var_i,var_p
+
+def compare_designs(design=None,
+                    T=90,
+                    p_rest=[0.7,0.6,1/2,1/2.5,1/3,1/4,1/5,1/6,1/7,1/8,1/9,1/11,1/15]):
+    """ Compares the blocked (like HCP) and interspersed (like MDTB)
+    designs across a set of resting probabilities"""
+    if design is None:
+        design = []
+        design.append([[1,2],[3,4],[5,6]]) # Blocked design
+        design.append([[1,2,3,4,5,6]]*3) # Intersperse design
+    ci = np.zeros(15,dtype=bool)
+    ci[[0,9,14]]=True # THese are the within-run contrast
+    DF = pd.DataFrame()
+    for rp in p_rest:
+        for i,d in enumerate(design):
+            X,_,_,reg,_,lc,lr = make_design_matrix(d,rp,T)
+            vari,varp = var_contrasts(X,reg)
+            df = {'Design':[i],
+                  'length_rest':[lr],
+                  'p_rest':[lr/(T*len(d))],
+                  'length_cond':[lc],
+                  'std_vs_rest':sqrt(vari.mean()),
+                  'std_pairwise':sqrt(varp.mean()),
+                  'std_pairwisew':sqrt(varp[ci].mean()),
+                  'std_pairwiseb':sqrt(varp[~ci].mean())}
+            DF = pd.concat([DF,pd.DataFrame(df)],ignore_index=True)
+    return DF
+
+if __name__ == "__main__":
+    DF = compare_designs()
+    pass
