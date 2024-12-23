@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import seaborn as sb
 from numpy import sqrt
 
+instr_code = 90 # Instruction condition code
+
 def var_contrasts(X,reg_ind):
     """ Calculate the variance you would get for contrasts on beta-estimates
     from a design matrix X the regressors indicating different conditions
@@ -13,6 +15,7 @@ def var_contrasts(X,reg_ind):
     and all the pairwise contrasts between conditions.
     """
     conv_beta = inv(X.T@X)
+    reg_ind[reg_ind==instr_code] = 0
     # CI are the contrast against rest
     CI = pcm.matrix.indicator(reg_ind,positive=True).T
     CI = CI / CI.sum(axis=1,keepdims=True)
@@ -25,13 +28,15 @@ def var_contrasts(X,reg_ind):
 def make_design_matrix(reg_id=[[1, 2], [3, 4], [5, 6]],
                        p_rest=0.2,
                        T=100,
-                       instruction_time=0):  # Default: no instruction time
+                       instruction_TR=0):  # Default: no instruction time
     """Make a design matrix with the conditions indicated in reg_id,
     rest phases with probability p_rest, and optional instruction periods."""
+    
     num_part = len(reg_id)  # Number of runs
     part_v = np.kron(np.arange(num_part), np.ones((T,)))  # Run indices
-    if instruction_time > 0:
-        reg_id = [r + [90] for r in reg_id]  # Add instruction condition
+     # Add instruction condition to each run 
+    if instruction_TR > 0:
+        reg_id = [r + [instr_code] for r in reg_id] 
     reg_ind = np.concatenate(reg_id)
 
     # Get the partition index for the columns of the design matrix
@@ -42,22 +47,22 @@ def make_design_matrix(reg_id=[[1, 2], [3, 4], [5, 6]],
     cv = []
     for i in range(num_part):
         num_cond = len(reg_id[i])
-        if instruction_time > 0:
+        if instruction_TR > 0:
             num_reg = len(reg_id[i])
             num_cond = num_reg - 1
 
         # Deduct instruction TRs if instruction_time > 0
-        instruction_TRs = int(instruction_time) * num_cond
+        instruction_TRs = instruction_TR * num_cond
         lc = int((T - T * p_rest - instruction_TRs) // num_reg)
         lr = T - lc * num_cond - instruction_TRs
 
         # Build the condition vector
-        if instruction_time > 0:
+        if instruction_TR > 0:
             ccvv = np.array(reg_id[i][:-1])  # Task conditions
         else:
             ccvv = np.array(reg_id[i])
         cond_v = np.kron(ccvv, np.ones((lc,)))  # Task periods
-        cond_v = np.concatenate((cond_v, np.ones((instruction_TRs,)) * 90))  # Instruction periods
+        cond_v = np.concatenate((cond_v, np.ones((instruction_TRs,)) * instr_code))  # Instruction periods
         cond_v = np.concatenate((cond_v, np.zeros((lr,))))  # Rest periods
         cv.append(cond_v)
 
@@ -69,7 +74,7 @@ def make_design_matrix(reg_id=[[1, 2], [3, 4], [5, 6]],
     cond_v = np.concatenate(cv)
     X = np.concatenate([X, pcm.indicator(part_v)], axis=1)
     # remove the instruction regressor from the regressors
-    if instruction_time > 0:
+    if instruction_TR > 0:
         instruction_indices = np.where(reg_ind == 90)[0]
         reg_ind = np.delete(reg_ind, instruction_indices)
         # delete the corresponding columns from the design matrix and rows where the instruction was present
