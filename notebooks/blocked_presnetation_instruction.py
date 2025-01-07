@@ -73,14 +73,6 @@ def make_design_matrix(reg_id=[[1, 2], [3, 4], [5, 6]],
 
     cond_v = np.concatenate(cv)
     X = np.concatenate([X, pcm.indicator(part_v)], axis=1)
-    # remove the instruction regressor from the regressors
-    if instruction_TR > 0:
-        instruction_indices = np.where(reg_ind == 90)[0]
-        reg_ind = np.delete(reg_ind, instruction_indices)
-        # delete the corresponding columns from the design matrix and rows where the instruction was present
-        X = np.delete(X, instruction_indices, axis=1)
-        instruction_rows = np.where(cond_v == 90)[0]
-        X = np.delete(X, instruction_rows, axis=0)
     reg_ind = np.concatenate([reg_ind, np.zeros(num_part)])
 
     # Use the first condition to get a measure of TR per condition
@@ -94,6 +86,6 @@ def make_design_matrix(reg_id=[[1, 2], [3, 4], [5, 6]],
 # THis is the covariance matrix for the regressors
 # For an interspersed design
 design_i=[[1,2,3,4,5,6]]*3 # Intersperse design
-X2,_,_,reg2,_,_,_ = make_design_matrix(design_i,instruction_time=5)
+X2,_,_,reg2,_,_,_ = make_design_matrix(design_i,instruction_TR=5)
 conv_beta = inv(X2.T@X2)
 var_i,var_p = var_contrasts(X2,reg2)
