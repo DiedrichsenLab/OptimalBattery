@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 
 def random_matrix_normal(G, R, make_exact=False, rng=None):
@@ -69,7 +68,6 @@ def find_best_V(G, R, num_iter=1000,rng=None):
         if total_deviation < min_deviation:
             min_deviation = total_deviation
             best_V = V
-            print(min_deviation)
 
 
     return best_V
@@ -179,10 +177,10 @@ def custom_G(n_tasks=16, n_groups=4, group_size=4, target_corr=0.0004, variance_
     task_index = 0
 
     for group in range(n_groups):
-        variances = variance_factors
-
+        variances = variance_factors[group]
+    
         # Compute covariances based on desired correlation
-        covariances = target_corr * np.outer(variance_factors, variance_factors)
+        covariances = target_corr * np.outer(variance_factors[group], variance_factors[group])
         np.fill_diagonal(covariances, variances)
 
         # Place the block into G

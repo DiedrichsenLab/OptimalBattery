@@ -396,3 +396,169 @@ def make_U_basic(s=24, k=16, p=40, type='hard', seed=1):
         Us = Us / Us_sum  # Normalize to get probabilities 
 
     return Us
+
+
+
+def U_MSE(U_true, U_pred):
+    MSE = []
+    # if its only two dimensions then add a dimension
+    if len(U_true.shape) == 2:
+        U_true = U_true.reshape(1, U_true.shape[0], U_true.shape[1])
+        U_pred = U_pred.reshape(1, U_pred.shape[0], U_pred.shape[1])
+    elif len(U_true.shape) == 1:
+        U_true = U_true.reshape(1, U_true.shape[0])
+        U_pred = U_pred.reshape(1, U_pred.shape[0])
+    
+    for subject in range(U_true.shape[0]):
+        mse = np.mean((U_true[subject] - U_pred[subject])**2)
+        MSE.append(mse)
+    return np.mean(MSE)
+
+
+def center_normalize(X, axis=0):
+    """Center and normalize the data along the specified axis, ignoring NaNs."""
+    mean = np.nanmean(X, axis=axis, keepdims=True)
+    X = X - mean
+    norm = np.sqrt(np.nansum(X**2, axis=axis, keepdims=True))
+    norm = np.where(norm == 0, 1.0, norm) # needs review
+    X = X / norm
+    return X
+
+def percentage_correct_real_parcellation(U_true, U_pred):
+    """Compute the percentage of correctly classified voxels."""
+    percentages = []
+    for i in range(U_pred.shape[0]):
+        correct_voxels = np.sum(U_true * U_pred[i])
+        total_voxels = U_pred.shape[2]
+        percentage = (correct_voxels / total_voxels) * 100
+        percentages.append(percentage)
+
+
+    return np.mean(percentages)
+
+def percentage_correct_localization(U_true, U_pred):
+    hits = np.sum(U_true * U_pred)
+    false_positives = np.sum(U_pred * (1 - U_true))
+    percentage = (hits / (hits + false_positives)) * 100
+    if np.isnan(percentage):
+        percentage = 0
+    return percentage
+
+
+
+def evaluate_combination_simulation_singleregion(combination,
+                                            Ytrue,Vr, Ur,
+                                            n_iter=100,
+                                            sig_e=0.04,
+                                            parcel_to_evaluate = None):
+    """Evaluate the localization performance for a single combination of tasks.
+    Args:
+        combination: The combination of tasks to evaluate
+        Ytrue: True tuning functions of all voxels across all tasks (generated using the fine 25 region parcellation)
+        Vr: The reduced task matrix for the regions you want to discover
+        Ur: The reduced parcellation (correct answer)
+        n_iter: Number of iterations to run
+        sig_e: Standard deviation of the noise to add to the data
+        parcel_to_evaluate: The parcel to evaluate the localization performance for
+    """
+    Ur = Ur[np.newaxis,:,:]
+    # Get the task subset indices and corresponding data
+    task_subset_indices = list(combination)
+
+    V_subset = Vr[task_subset_indices,:]
+    V_subset = center_normalize(V_subset,axis=0)
+    y_subset = Ytrue[task_subset_indices,:]
+
+
+    perc = np.zeros((n_iter,))
+    for i in range(n_iter):
+        y = y_subset + np.random.normal(0, sig_e, y_subset.shape)
+        y_norm = center_normalize(y,axis=0)
+
+        U_hat = et.estimate_Us_projection(y_norm, V_subset)
+        U_hat_one_hot = get_U_hat_one_hot(U_hat)
+
+        Ur_eval = Ur[:,parcel_to_evaluate,:]
+        U_hat_one_hot_eval = U_hat_one_hot[:,parcel_to_evaluate,:]
+    
+        #eval
+        perc[i] = percentage_correct_localization(Ur_eval, U_hat_one_hot_eval)
+
+    
+
+    return perc.mean()
+    
+
+def evaluate_dataframe_simulation_singleregion(D,
+                                                Ytrue,Vr, Ur,
+                                                sig_e=1,
+                                                parcel_to_evaluate = None):
+    """ Evaluate the localization performance for each combination in the DataFrame D.
+
+        Args:
+            D: DataFrame containing the combinations to evaluate
+            Ytrue: True tuning functions of all voxels across all tasks (generated using the fine 25 region parcellation)
+            Vr: The reduced task matrix for the regions you want to discover
+            Ur: The reduced parcellation (correct answer)  
+            estimation_method: The method to estimate the parcellation
+    """
+
+    # Create a new column with combinations as tuples to make them hashable
+    D['combination_tuple'] = D['combination'].apply(lambda x: tuple(x)) 
+    # Get unique combinations
+    unique_combinations = D['combination_tuple'].unique()
+
+    perc_dict= {}
+    # Loop over each unique combination
+    for i, comb_tuple in enumerate(unique_combinations):
+        if i % 1000 == 0:
+            print(f"Processing combination: {i}")
+        perc = evaluate_combination_simulation_singleregion(comb_tuple,Ytrue,Vr, Ur,sig_e=sig_e,parcel_to_evaluate = parcel_to_evaluate)
+        perc_dict[comb_tuple] = perc
+    
+    # Map the computed cos_HBP values back to the DataFrame
+    D['perc'] = D['combination_tuple'].map(perc_dict)    
+    return D
+
+
+def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1,balanced_sampling_unique = None): 
+    """ Builds a set of task-batteries and evalates them 
+    G_lib: second moment matrices of task-library
+    strategy: 'random' or 'exhaustive'
+    n_iter: number of iterations for random strategy
+    """
+    np.random.seed(seed)
+    D_list = []
+    n_lib_task = G_lib.shape[0]
+
+    if strategy == 'random':
+        comb = np.array([np.random.choice(n_lib_task, size=n_tasks, replace=True) for _ in range(n_iter)])
+    elif strategy == 'exhaustive':
+        pass 
+    elif strategy == 'balanced':
+        comb = set()  
+        total_unique = len(balanced_sampling_unique)
+        iter_per_unique = n_iter // total_unique
+        for n_unique in balanced_sampling_unique:
+            for _ in range(iter_per_unique):
+                    unique_tasks = np.random.choice(n_lib_task, size=n_unique, replace=False)
+                    remaining = n_tasks - n_unique
+                    remaining_comb = np.random.choice(unique_tasks, size=remaining, replace=False)
+                    full_comb = np.concatenate([unique_tasks, remaining_comb])
+                    # sort the combination to avoid duplicates
+                    full_comb = np.sort(full_comb)
+                    comb.add(tuple(full_comb))
+        comb = list(comb)
+    else:
+        raise ValueError('Invalid strategy')
+    for i in range(len(comb)):
+        if i % 10000 == 0:
+            print(f'building{i}')
+        n_unique = len(set(comb[i]))
+        d = eigenval_crit(G_lib[comb[i],:][:,comb[i]],center=True)
+        d['n_tasks'] = [len(comb[i])]
+        d['combination'] = [comb[i]]
+        d['n_unique'] = [n_unique]
+        D_list.append(pd.DataFrame(d))
+    D = pd.concat(D_list)
+    return D 
