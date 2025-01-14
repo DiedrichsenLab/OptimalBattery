@@ -23,12 +23,12 @@ def eigenval_crit(G, center=True):
     # Compute eigenvalues and eigenvectors of both centered and uncentered G matrices
     l, _ = eigh(G)
     l = l[::-1]  # Reverse order
-    l = l[l > 1e-8]  # Remove very small eigenvalues
+    # l = l[l > 1e-8]  # Remove very small eigenvalues
 
     # mc= mean centered
     l_mc, _ = eigh(G_mc)
     l_mc = l_mc[::-1]  
-    l_mc = l_mc[l_mc > 1e-8]
+    # l_mc = l_mc[l_mc > 1e-8]
 
 
     # Create a dictionary of criteria
