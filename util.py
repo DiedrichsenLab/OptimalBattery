@@ -74,7 +74,7 @@ def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1,rep
         d['combination'] = [comb[i]]
         d['n_unique'] = [n_unique]
         D_list.append(pd.DataFrame(d))
-    D = pd.concat(D_list)
+    D = pd.concat(D_list,ignore_index=True)
     return D 
 
 
