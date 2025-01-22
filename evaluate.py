@@ -213,7 +213,7 @@ def evaluate_dataframe_real_multiregion(D,
     cos_dict = {}
     # Loop over each unique combination
     for i, comb_tuple in enumerate(unique_combinations):
-        if i % 100 == 0:
+        if i % 10 == 0:
             print(f"Processing combination: {i}")
         cos= real_evaluate_combination_multiregion(comb_tuple, YLib,VLib,ytest, vtest, indices = indices)
         cos_dict[comb_tuple] = cos

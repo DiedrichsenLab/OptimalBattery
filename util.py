@@ -20,30 +20,39 @@ def eigenval_crit(G, center=True):
     else:
         G_mc = G
 
-    # Compute eigenvalues and eigenvectors of both centered and uncentered G matrices
+    # Compute eigenvalues for both centered and uncentered G matrices
     l, _ = eigh(G)
     l = l[::-1]  # Reverse order
-    l = l[l > 1e-8]  # Remove very small eigenvalues
+    # l = l[l > 1e-8]  # Remove very small eigenvalues
+    l[l < 1e-12] = 1e-12
 
-    # mc= mean centered
     l_mc, _ = eigh(G_mc)
-    l_mc = l_mc[::-1]  
-    l_mc = l_mc[l_mc > 1e-8]
+    l_mc = l_mc[::-1]
+    # l_mc = l_mc[l_mc > 1e-8]
+    l_mc[l_mc < 1e-12] = 1e-12
+
+    log_test = np.sum(np.log(l))
+    #if log test is nan print
+    if log_test == np.nan:
+        print('log test is nan')
+        
 
 
     # Create a dictionary of criteria
     d = {
-        'variance': np.sum(l),
-        'variance_mc': np.sum(l_mc),
+        'variance': np.sum(l),  # Sum of uncentered eigenvalues
+        'variance_mc': np.sum(l_mc),  # Sum of mean-centered eigenvalues
         'inverse_trace': - np.sum(1 / l),
         'inverse_trace_mc': - np.sum(1 / l_mc),
         'log_det': np.sum(np.log(l)),
         'log_det_mc': np.sum(np.log(l_mc)),
-        'eigenvalues':[l_mc.tolist()],
+        'eigenvalues_pre': [l.tolist()],
+        'eigenvalues': [l_mc.tolist()],
         'num_eigenvalues': len(l_mc)
     }
     
     return d
+
 
 def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1,replacement=True): 
     """ Builds a set of task-batteries and evalates them 
