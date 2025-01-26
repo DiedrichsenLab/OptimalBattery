@@ -1,19 +1,43 @@
+"""
+Module for evaluating the performance of task batteries for both simulations and real data.
+Author: Bassel Arafat
+"""
+
 import numpy as np
 import OptimalBattery.estimate as et
 
 def center_data(X,axis =0):
+    """Center the data by subtracting the mean.
+    Args:
+        X: Data to center
+        axis: Axis along which to center the data
+    return:
+        X: Centered data
+    """
     mean = np.nanmean(X, axis=axis, keepdims=True)
     X = X - mean
     return X
 
 def normalize_data(X,axis = 0):
+    """Normalize the data by dividing by the norm.
+    Args:
+        X: Data to normalize
+        axis: Axis along which to normalize the data
+    return:
+        X: Normalized data
+    """
     norm = np.sqrt(np.nansum(X**2, axis=axis, keepdims=True))
     norm = np.where(norm == 0, 1.0, norm)
     X = X / norm
     return X
 
 def get_U_hat_one_hot(U_hat):
-    """Convert the estimated Us to one-hot encoding."""
+    """Convert the estimated Us to one-hot encoding
+    Args:
+        U_hat: Estimated Us
+    return:
+        U_hat_one_hot: One-hot encoding of the estimated Us
+    """
     if U_hat.ndim == 2:
         U_hat = U_hat[np.newaxis, :, :]
 
@@ -24,7 +48,13 @@ def get_U_hat_one_hot(U_hat):
     return U_hat_one_hot
 
 def sim_percentage_correct(U_true, U_pred):
-    """Compute the percentage of correctly classified voxels."""
+    """Compute the percentage of correctly classified voxels.
+    Args:
+        U_true: True Us
+        U_pred: Estimated Us
+    return:
+        percentage: Percentage of correctly classified voxels
+    """
     correct_voxels = np.sum(U_true * U_pred)
     total_voxels = U_true.shape[2]
     percentage = (correct_voxels / total_voxels) * 100
@@ -32,6 +62,14 @@ def sim_percentage_correct(U_true, U_pred):
 
 
 def sim_prediction_error(ytest,vtest,U_hat):
+    """Compute the prediction error for simulated data.
+    Args:
+        ytest: Test data
+        vtest: Test v vectors
+        U_hat: Estimated Us
+    return:
+        final_cos_err: Prediction error
+    """
     if U_hat.ndim == 2:
         U_hat = U_hat[np.newaxis,:,:]
     if ytest.ndim == 2:
@@ -46,7 +84,6 @@ def sim_prediction_error(ytest,vtest,U_hat):
     # normalize data
     ytest_normalized = ytest / ytest_norm_reshaped
 
-
     cos_err = np.zeros((U_hat.shape[0],))
     for i in range(U_hat.shape[0]):
         yhat = np.matmul(vtest_stand,U_hat[i])
@@ -57,6 +94,15 @@ def sim_prediction_error(ytest,vtest,U_hat):
     return final_cos_err
 
 def real_prediction_error(ytest,vtest,U_hat,indices = None):
+    """Compute the prediction error for real data.
+    Args:
+        ytest: Test data
+        vtest: Test v vectors
+        U_hat: Estimated Us
+        indices: The indices of the voxels to evaluate
+    return:
+        final_cos_err: Prediction error
+    """
     if U_hat.ndim == 2:
         U_hat = U_hat[np.newaxis,:,:]
     if ytest.ndim == 2:
@@ -92,6 +138,13 @@ def sim_evaluate_combination_multiregion(combination,
         Ur: The reduced parcellation (correct answer)
         n_iter: Number of iterations to run
         sig_e: Standard deviation of the noise to add to the data
+        vtest: Test v vectors
+        ytest: Test data
+
+    return:
+        cos_mean: Mean prediction error
+        perc_mean: Mean percentage of correctly classified voxels
+        perc_sem: Standard error of the mean of the percentage of correctly classified voxels
     """
     # Get the task subset indices and corresponding data
     task_subset_indices = list(combination)
@@ -135,6 +188,12 @@ def sim_evaluate_dataframe_multiregion(D,
             Vr: The reduced task matrix for the regions you want to discover
             Ur: The reduced parcellation (correct answer)  
             estimation_method: The method to estimate the parcellation
+            sig_e: Standard deviation of the noise to add to the data
+            vtest: Test v vectors
+            ytest: Test data
+
+    return:
+        D: DataFrame with the computed percentage of correctly classified voxels and prediction error
         """
     # Create a new column with combinations as tuples to make them hashable
     D['combination_tuple'] = D['combination'].apply(lambda x: tuple(x)) 
@@ -154,7 +213,6 @@ def sim_evaluate_dataframe_multiregion(D,
         cos_dict[comb_tuple] = cos
 
 
-    
     # Map the computed cos_HBP values back to the DataFrame
     D['perc'] = D['combination_tuple'].map(perc_dict)
     D['perc_sem'] = D['combination_tuple'].map(perc_sem_dict)
@@ -173,6 +231,8 @@ def real_evaluate_combination_multiregion(combination,
         ytest: The test data
         vtest: The test task matrix
         Indices: The indices of the voxels to evaluate 
+    return:
+        cos: Prediction error
     """
     # Get the task subset indices and corresponding data
     task_subset_indices = list(combination)
@@ -204,6 +264,8 @@ def evaluate_dataframe_real_multiregion(D,
                 ytest: The test data
                 vtest: The test task matrix
                 Indices: The indices of the voxels to evaluate
+    return:
+        D: DataFrame with the computed prediction error
         """
     # Create a new column with combinations as tuples to make them hashable
     D['combination_tuple'] = D['combination'].apply(lambda x: tuple(x)) 

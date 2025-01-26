@@ -1,3 +1,8 @@
+"""
+Module for estimating the parcellations using different methods
+Author: Bassel Arafat
+"""
+
 import numpy as np
 from HierarchBayesParcel.util import indicator
 import HierarchBayesParcel.emissions as em

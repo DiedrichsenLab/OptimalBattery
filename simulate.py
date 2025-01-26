@@ -1,3 +1,9 @@
+"""
+Module for function used in the simulation of the task-battery construction problem.
+Author: Bassel Arafat
+"""
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 

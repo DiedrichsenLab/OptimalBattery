@@ -1,6 +1,7 @@
-# Module for functions used for optimal battery construction
-# Author: Bassel Arafat
-# Date: Oct 1st 2024
+"""
+Module for optimal battery construction
+Author: Bassel Arafat
+"""
 
 import numpy as np
 import pandas as pd

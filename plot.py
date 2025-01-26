@@ -1,3 +1,8 @@
+"""
+Module for plotting 
+Author: Bassel Arafat
+"""
+
 import numpy as np
 from matplotlib.colors import to_rgb, ListedColormap
 
