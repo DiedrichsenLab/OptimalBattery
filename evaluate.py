@@ -127,7 +127,7 @@ def real_prediction_error(ytest,vtest,U_hat,indices = None):
 
 def sim_evaluate_combination_multiregion(combination,
                                      Ytrue,Vr,Ur,
-                                     n_iter=100,
+                                     n_iter=10,
                                      sig_e=0.04,
                                      vtest = None,ytest = None):
     """Evaluate the parcellation performance for a single combination of tasks.
