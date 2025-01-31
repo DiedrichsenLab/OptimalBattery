@@ -31,13 +31,7 @@ def eigenval_crit(G, center=True):
     l_mc = l_mc[::-1]
     # l_mc = l_mc[l_mc > 1e-8]
     l_mc[l_mc < 1e-12] = 1e-12
-
-    log_test = np.sum(np.log(l))
-    #if log test is nan print
-    if log_test == np.nan:
-        print('log test is nan')
         
-
 
     # Create a dictionary of criteria
     d = {

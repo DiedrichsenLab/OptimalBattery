@@ -121,7 +121,8 @@ def real_prediction_error(ytest,vtest,U_hat,indices = None):
         cos_err[i] = np.nanmean(cosine_error_vox)
     
     final_cos_err = np.nanmean(cos_err)
-    return final_cos_err
+    cos_std = np.nanstd(cos_err)
+    return final_cos_err, cos_std
 
 
 
@@ -213,7 +214,7 @@ def sim_evaluate_dataframe_multiregion(D,
         cos_dict[comb_tuple] = cos
 
 
-    # Map the computed cos_HBP values back to the DataFrame
+    # Map the computed values back to the DataFrame
     D['perc'] = D['combination_tuple'].map(perc_dict)
     D['perc_sem'] = D['combination_tuple'].map(perc_sem_dict)
     D['cos'] = D['combination_tuple'].map(cos_dict)
@@ -247,8 +248,8 @@ def real_evaluate_combination_multiregion(combination,
     U_hats = et.estimate_Us_projection(y_subset, V_subset)
     U_hat_one_hot = get_U_hat_one_hot(U_hats)
     
-    cos = real_prediction_error(ytest,vtest,U_hat_one_hot,indices = indices)
-    return cos
+    cos,cos_std = real_prediction_error(ytest,vtest,U_hat_one_hot,indices = indices)
+    return cos,cos_std
 
 
 def evaluate_dataframe_real_multiregion(D,
@@ -273,15 +274,19 @@ def evaluate_dataframe_real_multiregion(D,
     unique_combinations = D['combination_tuple'].unique()
 
     cos_dict = {}
+    cos_std_dict = {}
     # Loop over each unique combination
     for i, comb_tuple in enumerate(unique_combinations):
         if i % 10 == 0:
             print(f"Processing combination: {i}")
-        cos= real_evaluate_combination_multiregion(comb_tuple, YLib,VLib,ytest, vtest, indices = indices)
+        cos,cos_std= real_evaluate_combination_multiregion(comb_tuple, YLib,VLib,ytest, vtest, indices = indices)
         cos_dict[comb_tuple] = cos
+        cos_std_dict[comb_tuple] = cos_std
+
     
     # Map the computed cos values back to the DataFrame
     D['cos'] = D['combination_tuple'].map(cos_dict)
+    D['cos_std'] = D['combination_tuple'].map(cos_std_dict)
     return D
 
 
