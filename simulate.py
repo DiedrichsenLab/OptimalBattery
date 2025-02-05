@@ -177,37 +177,6 @@ def make_U_spatial(grid, centroids, K_main, K_subparcels):
     return U_true
 
 
-def custom_G(n_tasks=16, n_groups=4, group_size=4, target_corr=0.0004, variance_factors=[1.0, 0.75, 0.5, 0.25]):
-    " makes a task covariance matrix with a target correlation between tasks"
-    G = np.zeros((n_tasks, n_tasks))
-    task_index = 0
-
-    for group in range(n_groups):
-        variances = variance_factors[group]
-    
-        # Compute covariances based on desired correlation
-        covariances = target_corr * np.outer(variance_factors[group], variance_factors[group])
-        np.fill_diagonal(covariances, variances)
-
-        # Place the block into G
-        start, end = task_index, task_index + group_size
-        G[start:end, start:end] = covariances
-
-        task_index += group_size
-
-    return G
-
-def custom_R(K_total, group_size, base_parcel_correlation, sub_parcel_extra_correlation):
-    """
-    makes a parcel covariance matrix with a base correlation between main parcels and extra correlation within subparcels
-    """
-    R = np.full((K_total, K_total), base_parcel_correlation)
-    for i in range(0, K_total, group_size):
-        R[i:i+group_size, i:i+group_size] = base_parcel_correlation + sub_parcel_extra_correlation
-
-    np.fill_diagonal(R, 1)
-    return R
-
 if __name__=='__main__':
     test_produce_V()
     pass

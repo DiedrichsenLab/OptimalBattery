@@ -6,25 +6,25 @@ Author: Bassel Arafat
 import numpy as np
 import OptimalBattery.estimate as et
 
-def center_data(X,axis =0):
-    """Center the data by subtracting the mean.
+def center_matrix(X,axis =0):
+    """Center the matrix by subtracting the mean.
     Args:
-        X: Data to center
+        X: matrix to center
         axis: Axis along which to center the data
     return:
-        X: Centered data
+        X: Centered matrix
     """
     mean = np.nanmean(X, axis=axis, keepdims=True)
     X = X - mean
     return X
 
-def normalize_data(X,axis = 0):
-    """Normalize the data by dividing by the norm.
+def normalize_matrix(X,axis = 0):
+    """Normalize the matrix by dividing by the norm.
     Args:
-        X: Data to normalize
+        X: matrix to normalize
         axis: Axis along which to normalize the data
     return:
-        X: Normalized data
+        X: Normalized matrix
     """
     norm = np.sqrt(np.nansum(X**2, axis=axis, keepdims=True))
     norm = np.where(norm == 0, 1.0, norm)
@@ -47,7 +47,7 @@ def get_U_hat_one_hot(U_hat):
         U_hat_one_hot[subject, max_indices[subject], np.arange(U_hat.shape[2])] = 1
     return U_hat_one_hot
 
-def sim_percentage_correct(U_true, U_pred):
+def get_percentage_correct(U_true, U_pred): 
     """Compute the percentage of correctly classified voxels.
     Args:
         U_true: True Us
@@ -61,70 +61,45 @@ def sim_percentage_correct(U_true, U_pred):
     return percentage
 
 
-def sim_prediction_error(ytest,vtest,U_hat):
+def get_prediction_error(ytest,vtest,U_hat,indices = None):
     """Compute the prediction error for simulated data.
-    Args:
-        ytest: Test data
-        vtest: Test v vectors
-        U_hat: Estimated Us
-    return:
-        final_cos_err: Prediction error
-    """
-    if U_hat.ndim == 2:
-        U_hat = U_hat[np.newaxis,:,:]
-    if ytest.ndim == 2:
-        ytest = ytest[np.newaxis,:,:]
-    vtest_stand = vtest / np.sum(vtest**2,axis = 0)
-
-    # get norm of data across 2nd dimension
-    ytest_norm_2 = np.nansum(ytest**2,axis = 1)
-    ytest_norm = np.sqrt(ytest_norm_2)
-    ytest_norm_reshaped = ytest_norm[:,np.newaxis,:]
-
-    # normalize data
-    ytest_normalized = ytest / ytest_norm_reshaped
-
-    cos_err = np.zeros((U_hat.shape[0],))
-    for i in range(U_hat.shape[0]):
-        yhat = np.matmul(vtest_stand,U_hat[i])
-        cosine_error_vox = 1 - np.nansum(ytest_normalized[i] * yhat,axis = 0)
-        cos_err[i] = np.nanmean(cosine_error_vox)
-    
-    final_cos_err = np.nanmean(cos_err)
-    return final_cos_err
-
-def real_prediction_error(ytest,vtest,U_hat,indices = None):
-    """Compute the prediction error for real data.
     Args:
         ytest: Test data
         vtest: Test v vectors
         U_hat: Estimated Us
         indices: The indices of the voxels to evaluate
     return:
-        final_cos_err: Prediction error
+        avg_cos: Mean prediction error across subjects
+        cos_std: Standard deviation of the prediction error across subjects
     """
     if U_hat.ndim == 2:
         U_hat = U_hat[np.newaxis,:,:]
     if ytest.ndim == 2:
         ytest = ytest[np.newaxis,:,:]
-    vtest_stand = vtest / np.sum(vtest**2,axis = 0)
 
-    # get norm of data across 2nd dimension
-    ytest= center_data(ytest,axis = 1)
-    ytest = normalize_data(ytest,axis = 1)
-
+    #normalize vtest
+    vtest_normalized = normalize_matrix(vtest,axis = 0)
+    # center and normalize ytest
+    ytest_centered = center_matrix(ytest,axis = 1)
+    ytest_normalized = normalize_matrix(ytest_centered,axis = 1)
 
     cos_err = np.zeros((U_hat.shape[0],))
     for i in range(U_hat.shape[0]):
-        yhat = np.matmul(vtest_stand,U_hat[i])
-        cosine_error_vox = 1 - np.nansum(ytest[i][:,indices] * yhat[:,indices],axis = 0)
+        # get reconstructed y
+        yhat = np.matmul(vtest_normalized,U_hat[i])
+        if indices is not None:
+            cosine_error_vox = 1 - np.nansum(ytest_normalized[i][:, indices] * yhat[:, indices], axis=0)
+        else:
+            cosine_error_vox = 1 - np.nansum(ytest_normalized[i] * yhat, axis=0)
+        # mean across voxels within a subject
         cos_err[i] = np.nanmean(cosine_error_vox)
     
-    final_cos_err = np.nanmean(cos_err)
+    #avg across subjects
+    avg_cos = np.nanmean(cos_err)
+    # std across subjects
     cos_std = np.nanstd(cos_err)
-    return final_cos_err, cos_std
 
-
+    return avg_cos, cos_std
 
 def sim_evaluate_combination_multiregion(combination,
                                      Ytrue,Vr,Ur,
@@ -151,28 +126,27 @@ def sim_evaluate_combination_multiregion(combination,
     task_subset_indices = list(combination)
 
     V_subset = Vr[task_subset_indices,:]
-    V_subset = center_data(V_subset,axis=0)
-    V_subset = normalize_data(V_subset,axis=0)
+    V_subset = center_matrix(V_subset,axis=0)
+    V_subset = normalize_matrix(V_subset,axis=0)
     y_subset = Ytrue[task_subset_indices,:]
     
     perc = np.zeros((n_iter,))
     cos = np.zeros((n_iter,))
     for i in range(n_iter):
         y = y_subset + np.random.normal(0, sig_e, y_subset.shape)
-        y_norm = center_data(y,axis=0)
-        y_norm = normalize_data(y_norm,axis=0)
+        y_norm = center_matrix(y,axis=0)
+        y_norm = normalize_matrix(y_norm,axis=0)
 
         U_hat = et.estimate_Us_projection(y_norm, V_subset)
         U_hat_one_hot = get_U_hat_one_hot(U_hat)
     
         #eval
-        perc[i] = sim_percentage_correct(Ur, U_hat_one_hot)
-        cos[i] = sim_prediction_error(ytest,vtest,U_hat_one_hot)
+        perc[i] = get_percentage_correct(Ur, U_hat_one_hot)
+        cos[i],_ = get_prediction_error(ytest,vtest,U_hat_one_hot)
 
-    perc_mean = perc.mean()
-    perc_sem = perc.std(ddof=1) / np.sqrt(n_iter) 
-    cos_mean = cos.mean()
-
+    perc_mean = np.mean(perc)
+    perc_sem = np.std(perc)/ np.sqrt(n_iter) 
+    cos_mean = np.mean(cos)
 
     return  cos_mean, perc_mean,perc_sem
 
@@ -196,29 +170,19 @@ def sim_evaluate_dataframe_multiregion(D,
     return:
         D: DataFrame with the computed percentage of correctly classified voxels and prediction error
         """
-    # Create a new column with combinations as tuples to make them hashable
-    D['combination_tuple'] = D['combination'].apply(lambda x: tuple(x)) 
-    # Get unique combinations
-    unique_combinations = D['combination_tuple'].unique()
+    D_eval = D.copy()
+    D_eval['perc'] = None
+    D_eval['perc_sem'] = None
+    D_eval['cos'] = None
 
-    perc_dict= {}
-    perc_sem_dict = {}
-    cos_dict = {}
-    # Loop over each unique combination
-    for i, comb_tuple in enumerate(unique_combinations):
-        # if i % 10 == 0:
-        #     print(f"Processing combination: {i}")
-        cos,perc,perc_sem = sim_evaluate_combination_multiregion(comb_tuple,Ytrue,Vr, Ur,sig_e=sig_e,vtest = vtest,ytest = ytest)
-        perc_dict[comb_tuple] = perc
-        perc_sem_dict[comb_tuple] = perc_sem
-        cos_dict[comb_tuple] = cos
-
-
-    # Map the computed values back to the DataFrame
-    D['perc'] = D['combination_tuple'].map(perc_dict)
-    D['perc_sem'] = D['combination_tuple'].map(perc_sem_dict)
-    D['cos'] = D['combination_tuple'].map(cos_dict)
-    return D
+    for i in range(len(D)):
+        combination = D_eval['combination'].iloc[i]
+        cos,perc,perc_sem = sim_evaluate_combination_multiregion(combination,Ytrue,Vr, Ur,sig_e=sig_e,vtest = vtest,ytest = ytest)
+        
+        D_eval.loc[i, 'cos'] = cos
+        D_eval.loc[i, 'perc'] = perc
+        D_eval.loc[i, 'perc_sem'] = perc_sem
+    return D_eval
 
 def real_evaluate_combination_multiregion(combination,
                                            YLib,VLib,
@@ -238,21 +202,21 @@ def real_evaluate_combination_multiregion(combination,
     # Get the task subset indices and corresponding data
     task_subset_indices = list(combination)
     V_subset = VLib[task_subset_indices, :]
-    V_subset = center_data(V_subset,axis = 0)
-    V_subset = normalize_data(V_subset,axis = 0)
+    V_subset = center_matrix(V_subset,axis = 0)
+    V_subset = normalize_matrix(V_subset,axis = 0)
 
     y_subset = YLib[:,task_subset_indices, :]
-    y_subset = center_data(y_subset,axis = 1)
-    y_subset = normalize_data(y_subset,axis = 1)
+    y_subset = center_matrix(y_subset,axis = 1)
+    y_subset = normalize_matrix(y_subset,axis = 1)
 
     U_hats = et.estimate_Us_projection(y_subset, V_subset)
     U_hat_one_hot = get_U_hat_one_hot(U_hats)
     
-    cos,cos_std = real_prediction_error(ytest,vtest,U_hat_one_hot,indices = indices)
+    cos,cos_std = get_prediction_error(ytest,vtest,U_hat_one_hot,indices = indices)
     return cos,cos_std
 
 
-def evaluate_dataframe_real_multiregion(D,
+def real_evaluate_dataframe_multiregion(D,
                                          YLib,VLib,
                                          ytest, vtest,
                                          indices = None):
@@ -268,25 +232,22 @@ def evaluate_dataframe_real_multiregion(D,
     return:
         D: DataFrame with the computed prediction error
         """
-    # Create a new column with combinations as tuples to make them hashable
-    D['combination_tuple'] = D['combination'].apply(lambda x: tuple(x)) 
-    # Get unique combinations
-    unique_combinations = D['combination_tuple'].unique()
+    D_eval = D.copy()
+    D_eval['cos'] = None
+    D_eval['cos_std'] = None
 
-    cos_dict = {}
-    cos_std_dict = {}
-    # Loop over each unique combination
-    for i, comb_tuple in enumerate(unique_combinations):
+    for i in range(len(D)):
         if i % 10 == 0:
             print(f"Processing combination: {i}")
-        cos,cos_std= real_evaluate_combination_multiregion(comb_tuple, YLib,VLib,ytest, vtest, indices = indices)
-        cos_dict[comb_tuple] = cos
-        cos_std_dict[comb_tuple] = cos_std
+        combination = D_eval['combination'].iloc[i]
+        cos,cos_std= real_evaluate_combination_multiregion(combination, YLib,VLib,ytest, vtest, indices = indices)
+        D_eval.loc[i, 'cos'] = cos
+        D_eval.loc[i, 'cos_std'] = cos_std
+    return D_eval
 
-    
-    # Map the computed cos values back to the DataFrame
-    D['cos'] = D['combination_tuple'].map(cos_dict)
-    D['cos_std'] = D['combination_tuple'].map(cos_std_dict)
-    return D
 
+if __name__=='__main__':
+    U_hat = np.random.rand(3,10,6000)
+    U_hat_one = get_U_hat_one_hot(U_hat)
+    pass
 

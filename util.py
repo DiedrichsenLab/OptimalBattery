@@ -8,7 +8,6 @@ import pandas as pd
 from numpy.linalg import eigh
 
 
-
 def eigenval_crit(G, center=True):
     """Computes various criteria based on the eigenvalues and mutual information of a matrix G.
     Assumes that G is symmetric."""
@@ -65,9 +64,6 @@ def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1,rep
             candidate = tuple(sorted(np.random.choice(n_lib_task, size=n_tasks, replace=replacement)))
             comb.append(candidate)
         comb = list(set(comb))   
-
-    elif strategy == 'exhaustive':
-        pass 
     else:
         raise ValueError('Invalid strategy')
         
@@ -82,6 +78,17 @@ def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1,rep
     return D 
 
 def recenter_fmri_data(data , info ,task_column_name = 'cond_name',center_condition='rest'):
+    """
+    Recenter fMRI data by subtracting the 'rest' condition from each run
+    Parameters:
+        data(np.ndarray): fMRI data of shape (n_subjects, n_conditions, n_voxels)
+        info(pd.DataFrame): task information tsv
+        task_column_name(str): column name in info that contains task names
+        center_condition(str): name of the condition to center the data around
+    Returns:
+        processed_data(np.ndarray): recentered fMRI data
+        updated_info(pd.DataFrame): updated task information tsv
+    """
 
     n_subjects, n_conditions, n_voxels = data.shape
     if 'run' in info.columns:
@@ -89,7 +96,7 @@ def recenter_fmri_data(data , info ,task_column_name = 'cond_name',center_condit
     else:
         runs = [1]
 
-    # Find indices of 'rest' condition for the different runs
+    # Find indices of 'centering' condition for the different runs
     center_condition_indices= info[info[task_column_name] == center_condition].index
 
     # initlize data
@@ -132,31 +139,14 @@ def recenter_fmri_data(data , info ,task_column_name = 'cond_name',center_condit
 
     return processed_data, updated_info
 
-
-def max_value_distribution_analysis(df, num_batteries, num_iterations, eval_metric):
-    metrics = ['variance', 'variance_mc', 'inverse_trace', 'inverse_trace_mc', 'log_det', 'log_det_mc']
-    results = []
-
-    for _ in range(num_iterations):
-        # Randomly sample task batteries without replacement
-        sampled_df = df.sample(n=num_batteries, replace=False)
-
-        iteration_results = {}
-        for metric in metrics:
-            # Find the row with the highest value for the current metric
-            max_metric_row = sampled_df.loc[sampled_df[metric].idxmax()]
-            # Record the evaluation metric (e.g., 'cos') value
-            iteration_results[metric] = max_metric_row[eval_metric]
-
-        results.append(iteration_results)
-        
-    result_df = pd.DataFrame(results)
-
-    return result_df
-
 def translate_battery(info,battery_indices):
     """
-    Translate battery name to task name
+    Translate battery from indices to names
+    Parameters:
+        info(pd.DataFrame): task information tsv
+        battery_indices(np.ndarray): indices of tasks in the battery
+    Returns:
+        battery_names(np.ndarray): names of tasks in the battery
     """
     names = info['names'].unique()
     battery_names = names[battery_indices]
