@@ -5,6 +5,8 @@ Author: Bassel Arafat
 
 import numpy as np
 import OptimalBattery.estimate as et
+import torch
+
 
 def center_matrix(X,axis =0):
     """Center the matrix by subtracting the mean.
@@ -61,7 +63,7 @@ def get_percentage_correct(U_true, U_pred):
     return percentage
 
 
-def get_prediction_error(ytest,vtest,U_hat,indices = None):
+def get_prediction_error_numpy(ytest,vtest,U_hat,indices = None): # old implemntation but was a clear bottle neck in the evaluation framework
     """Compute the prediction error for simulated data.
     Args:
         ytest: Test data
@@ -98,6 +100,44 @@ def get_prediction_error(ytest,vtest,U_hat,indices = None):
     avg_cos = np.nanmean(cos_err)
     # std across subjects
     cos_std = np.nanstd(cos_err)
+
+    return avg_cos, cos_std
+
+def get_prediction_error_torch(ytest, vtest, U_hat, indices=None):
+    """Compute the prediction error using PyTorch (supports GPU for speedup because this was a bottleneck).
+    
+    Args:
+        ytest (ndarray): Test data (subjects,conditions, voxels).
+        vtest (ndarray): Test Vs
+        U_hat (ndarray): Estimated Us.
+        indices (list or None): Indices of the voxels to evaluate.
+        use_cuda (bool): Whether to use GPU.
+    
+    Returns:
+        avg_cos (float): Mean prediction error across subjects.
+        cos_std (float): Standard deviation of prediction error.
+    """
+    # Ensure correct dimensions (batching subjects if needed)
+    if U_hat.ndimension() == 2:
+        U_hat = U_hat.unsqueeze(0)  
+    if ytest.ndimension() == 2:
+        ytest = ytest.unsqueeze(0) 
+
+    # Compute yhat
+    yhat = torch.bmm(vtest.unsqueeze(0).expand(U_hat.shape[0], -1, -1), U_hat)
+
+    # Compute cosine error across all voxels
+    if indices is not None:
+        cosine_error_vox = 1 - torch.nansum(ytest[:, :, indices] * yhat[:, :, indices], dim=1)
+    else:
+        cosine_error_vox = 1 - torch.nansum(ytest * yhat, dim=1)
+
+    # compute mean error per subject
+    cos_err = torch.nanmean(cosine_error_vox, dim=1)
+
+    # compute final mean and standard deviation
+    avg_cos = torch.nanmean(cos_err).item()
+    cos_std = torch.std(cos_err).item()
 
     return avg_cos, cos_std
 
@@ -142,7 +182,7 @@ def sim_evaluate_combination_multiregion(combination,
     
         #eval
         perc[i] = get_percentage_correct(Ur, U_hat_one_hot)
-        cos[i],_ = get_prediction_error(ytest,vtest,U_hat_one_hot)
+        cos[i],_ = get_prediction_error_torch(ytest,vtest,U_hat_one_hot)
 
     perc_mean = np.mean(perc)
     perc_sem = np.std(perc)/ np.sqrt(n_iter) 
@@ -211,8 +251,11 @@ def real_evaluate_combination_multiregion(combination,
 
     U_hats = et.estimate_Us_projection(y_subset, V_subset)
     U_hat_one_hot = get_U_hat_one_hot(U_hats)
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    U_hat_one_hot = torch.tensor(U_hat_one_hot,dtype=torch.float32,device=device)
     
-    cos,cos_std = get_prediction_error(ytest,vtest,U_hat_one_hot,indices = indices)
+    cos,cos_std = get_prediction_error_torch(ytest,vtest,U_hat_one_hot,indices = indices)
     return cos,cos_std
 
 
@@ -236,6 +279,17 @@ def real_evaluate_dataframe_multiregion(D,
     D_eval['cos'] = None
     D_eval['cos_std'] = None
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    ytest = torch.tensor(ytest, dtype=torch.float32, device=device)
+    vtest = torch.tensor(vtest, dtype=torch.float32, device=device)
+
+    # Normalize vtest
+    vtest = vtest / torch.sqrt(torch.nansum(vtest**2, dim=0, keepdim=True))
+
+    # Center & Normalize ytest
+    ytest = ytest - torch.nanmean(ytest, dim=1, keepdim=True)
+    ytest = ytest / torch.sqrt(torch.nansum(ytest**2, dim=1, keepdim=True))
+
     for i in range(len(D)):
         if i % 10 == 0:
             print(f"Processing combination: {i}")
@@ -244,7 +298,6 @@ def real_evaluate_dataframe_multiregion(D,
         D_eval.loc[i, 'cos'] = cos
         D_eval.loc[i, 'cos_std'] = cos_std
     return D_eval
-
 
 if __name__=='__main__':
     U_hat = np.random.rand(3,10,6000)
