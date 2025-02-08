@@ -562,3 +562,44 @@ def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1,bal
         D_list.append(pd.DataFrame(d))
     D = pd.concat(D_list)
     return D 
+
+
+def get_prediction_error_numpy(ytest,vtest,U_hat,indices = None): # old implemntation but was a clear bottle neck in the evaluation framework
+    """Compute the prediction error for simulated data.
+    Args:
+        ytest: Test data
+        vtest: Test v vectors
+        U_hat: Estimated Us
+        indices: The indices of the voxels to evaluate
+    return:
+        avg_cos: Mean prediction error across subjects
+        cos_std: Standard deviation of the prediction error across subjects
+    """
+    if U_hat.ndim == 2:
+        U_hat = U_hat[np.newaxis,:,:]
+    if ytest.ndim == 2:
+        ytest = ytest[np.newaxis,:,:]
+
+    #normalize vtest
+    vtest_normalized = normalize_matrix(vtest,axis = 0)
+    # center and normalize ytest
+    ytest_centered = center_matrix(ytest,axis = 1)
+    ytest_normalized = normalize_matrix(ytest_centered,axis = 1)
+
+    cos_err = np.zeros((U_hat.shape[0],))
+    for i in range(U_hat.shape[0]):
+        # get reconstructed y
+        yhat = np.matmul(vtest_normalized,U_hat[i])
+        if indices is not None:
+            cosine_error_vox = 1 - np.nansum(ytest_normalized[i][:, indices] * yhat[:, indices], axis=0)
+        else:
+            cosine_error_vox = 1 - np.nansum(ytest_normalized[i] * yhat, axis=0)
+        # mean across voxels within a subject
+        cos_err[i] = np.nanmean(cosine_error_vox)
+    
+    #avg across subjects
+    avg_cos = np.nanmean(cos_err)
+    # std across subjects
+    cos_std = np.nanstd(cos_err)
+
+    return avg_cos, cos_std

@@ -7,7 +7,7 @@ Author: Bassel Arafat
 import numpy as np
 import matplotlib.pyplot as plt
 
-def random_matrix_normal(G, R, make_exact=False, rng=None):
+def random_matrix_normal(G, R, make_exact=False, rng=None): # not sure if this function is necessary anymore
     n_tasks = G.shape[0]
     n_parcels = R.shape[0]
 
@@ -39,7 +39,7 @@ def random_matrix_normal(G, R, make_exact=False, rng=None):
     return V
 
 
-def find_best_V(G, R, num_iter=1000,rng=None):
+def find_best_V(G, R, num_iter=1000,rng=None): # not sure if this function is necessary anymore
     """
     Finds the best V matrix that minimizes the deviation from the desired 
     row and column covariance matrices.
@@ -79,7 +79,7 @@ def find_best_V(G, R, num_iter=1000,rng=None):
     return best_V
 
 
-def test_produce_V(): 
+def test_produce_V(): # not sure if this function is necessary anymore
     """ Simple test whether matrix normal production works on average. 
     """
     N = 5
@@ -124,7 +124,7 @@ def test_produce_V():
     plt.show()
     pass 
 
-def make_U_spatial(grid, centroids, K_main, K_subparcels):
+def make_U_spatial(grid, centroids, K_main, K_subparcels): # ugly but works
     """
     Computes parcel labels for all pixels based on distances to centroids and divides them into subparcels.
     

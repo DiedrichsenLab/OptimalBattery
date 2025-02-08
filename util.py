@@ -23,12 +23,10 @@ def eigenval_crit(G, center=True):
     # Compute eigenvalues for both centered and uncentered G matrices
     l, _ = eigh(G)
     l = l[::-1]  # Reverse order
-    # l = l[l > 1e-8]  # Remove very small eigenvalues
-    l[l < 1e-12] = 1e-12
+    l[l < 1e-12] = 1e-12 # Set small eigenvalues to a threshold
 
     l_mc, _ = eigh(G_mc)
     l_mc = l_mc[::-1]
-    # l_mc = l_mc[l_mc > 1e-8]
     l_mc[l_mc < 1e-12] = 1e-12
         
 
@@ -40,8 +38,6 @@ def eigenval_crit(G, center=True):
         'inverse_trace_mc': - np.sum(1 / l_mc),
         'log_det': np.sum(np.log(l)),
         'log_det_mc': np.sum(np.log(l_mc)),
-        'eigenvalues_pre': [l.tolist()],
-        'eigenvalues': [l_mc.tolist()],
         'num_eigenvalues': len(l_mc)
     }
     
@@ -70,14 +66,13 @@ def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1,rep
     for i in range(len(comb)):
         n_unique = len(set(comb[i]))
         d = eigenval_crit(G_lib[comb[i],:][:,comb[i]],center=True)
-        d['n_tasks'] = [len(comb[i])]
         d['combination'] = [comb[i]]
         d['n_unique'] = [n_unique]
         D_list.append(pd.DataFrame(d))
     D = pd.concat(D_list)
     return D 
 
-def recenter_fmri_data(data , info ,task_column_name = 'cond_name',center_condition='rest'):
+def recenter_fmri_data(data , info ,task_column_name = 'cond_name',center_condition='rest'): # tested and works but needs review..
     """
     Recenter fMRI data by subtracting the 'rest' condition from each run
     Parameters:

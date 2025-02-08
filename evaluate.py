@@ -5,7 +5,7 @@ Author: Bassel Arafat
 
 import numpy as np
 import OptimalBattery.estimate as et
-import torch
+import torch as pt
 
 
 def center_matrix(X,axis =0):
@@ -16,7 +16,7 @@ def center_matrix(X,axis =0):
     return:
         X: Centered matrix
     """
-    mean = np.nanmean(X, axis=axis, keepdims=True)
+    mean = pt.nanmean(X, axis=axis, keepdims=True)
     X = X - mean
     return X
 
@@ -28,12 +28,12 @@ def normalize_matrix(X,axis = 0):
     return:
         X: Normalized matrix
     """
-    norm = np.sqrt(np.nansum(X**2, axis=axis, keepdims=True))
-    norm = np.where(norm == 0, 1.0, norm)
+    norm = pt.sqrt(pt.nansum(X**2, axis=axis, keepdims=True))
+    norm = pt.where(norm == 0, 1.0, norm)
     X = X / norm
     return X
 
-def get_U_hat_one_hot(U_hat):
+def get_U_hat_one_hot_np(U_hat):
     """Convert the estimated Us to one-hot encoding
     Args:
         U_hat: Estimated Us
@@ -45,8 +45,24 @@ def get_U_hat_one_hot(U_hat):
 
     max_indices = np.argmax(U_hat, axis=1)
     U_hat_one_hot = np.zeros_like(U_hat)
-    for subject in range(U_hat.shape[0]):
-        U_hat_one_hot[subject, max_indices[subject], np.arange(U_hat.shape[2])] = 1
+    subjects, parcels, voxels = U_hat.shape
+    U_hat_one_hot[np.arange(subjects)[:, None], max_indices, np.arange(voxels)] = 1
+    return U_hat_one_hot
+
+def get_U_hat_one_hot_pt(U_hat):
+    """Convert the estimated Us to one-hot encoding
+    Args:
+        U_hat: Estimated Us
+    return:
+        U_hat_one_hot: One-hot encoding of the estimated Us
+    """
+    if U_hat.ndim == 2:
+        U_hat = U_hat[pt.newaxis, :, :]
+
+    max_indices = pt.argmax(U_hat, axis=1)
+    U_hat_one_hot = pt.zeros_like(U_hat)
+    subjects, parcels, voxels = U_hat.shape
+    U_hat_one_hot[pt.arange(subjects)[:, None], max_indices, np.arange(voxels)] = 1
     return U_hat_one_hot
 
 def get_percentage_correct(U_true, U_pred): 
@@ -57,53 +73,13 @@ def get_percentage_correct(U_true, U_pred):
     return:
         percentage: Percentage of correctly classified voxels
     """
-    correct_voxels = np.sum(U_true * U_pred)
+    correct_voxels = pt.sum(U_true * U_pred)
     total_voxels = U_true.shape[2]
     percentage = (correct_voxels / total_voxels) * 100
     return percentage
 
 
-def get_prediction_error_numpy(ytest,vtest,U_hat,indices = None): # old implemntation but was a clear bottle neck in the evaluation framework
-    """Compute the prediction error for simulated data.
-    Args:
-        ytest: Test data
-        vtest: Test v vectors
-        U_hat: Estimated Us
-        indices: The indices of the voxels to evaluate
-    return:
-        avg_cos: Mean prediction error across subjects
-        cos_std: Standard deviation of the prediction error across subjects
-    """
-    if U_hat.ndim == 2:
-        U_hat = U_hat[np.newaxis,:,:]
-    if ytest.ndim == 2:
-        ytest = ytest[np.newaxis,:,:]
-
-    #normalize vtest
-    vtest_normalized = normalize_matrix(vtest,axis = 0)
-    # center and normalize ytest
-    ytest_centered = center_matrix(ytest,axis = 1)
-    ytest_normalized = normalize_matrix(ytest_centered,axis = 1)
-
-    cos_err = np.zeros((U_hat.shape[0],))
-    for i in range(U_hat.shape[0]):
-        # get reconstructed y
-        yhat = np.matmul(vtest_normalized,U_hat[i])
-        if indices is not None:
-            cosine_error_vox = 1 - np.nansum(ytest_normalized[i][:, indices] * yhat[:, indices], axis=0)
-        else:
-            cosine_error_vox = 1 - np.nansum(ytest_normalized[i] * yhat, axis=0)
-        # mean across voxels within a subject
-        cos_err[i] = np.nanmean(cosine_error_vox)
-    
-    #avg across subjects
-    avg_cos = np.nanmean(cos_err)
-    # std across subjects
-    cos_std = np.nanstd(cos_err)
-
-    return avg_cos, cos_std
-
-def get_prediction_error_torch(ytest, vtest, U_hat, indices=None):
+def get_prediction_error(ytest, vtest, U_hat, indices=None):
     """Compute the prediction error using PyTorch (supports GPU for speedup because this was a bottleneck).
     
     Args:
@@ -124,20 +100,20 @@ def get_prediction_error_torch(ytest, vtest, U_hat, indices=None):
         ytest = ytest.unsqueeze(0) 
 
     # Compute yhat
-    yhat = torch.bmm(vtest.unsqueeze(0).expand(U_hat.shape[0], -1, -1), U_hat)
+    yhat = pt.bmm(vtest.unsqueeze(0).expand(U_hat.shape[0], -1, -1), U_hat)
 
     # Compute cosine error across all voxels
     if indices is not None:
-        cosine_error_vox = 1 - torch.nansum(ytest[:, :, indices] * yhat[:, :, indices], dim=1)
+        cosine_error_vox = 1 - pt.nansum(ytest[:, :, indices] * yhat[:, :, indices], dim=1)
     else:
-        cosine_error_vox = 1 - torch.nansum(ytest * yhat, dim=1)
+        cosine_error_vox = 1 - pt.nansum(ytest * yhat, dim=1)
 
     # compute mean error per subject
-    cos_err = torch.nanmean(cosine_error_vox, dim=1)
+    cos_err = pt.nanmean(cosine_error_vox, dim=1)
 
     # compute final mean and standard deviation
-    avg_cos = torch.nanmean(cos_err).item()
-    cos_std = torch.std(cos_err).item()
+    avg_cos = pt.nanmean(cos_err).item()
+    cos_std = pt.std(cos_err).item()
 
     return avg_cos, cos_std
 
@@ -170,23 +146,23 @@ def sim_evaluate_combination_multiregion(combination,
     V_subset = normalize_matrix(V_subset,axis=0)
     y_subset = Ytrue[task_subset_indices,:]
     
-    perc = np.zeros((n_iter,))
-    cos = np.zeros((n_iter,))
+    perc = pt.zeros((n_iter,))
+    cos = pt.zeros((n_iter,))
     for i in range(n_iter):
-        y = y_subset + np.random.normal(0, sig_e, y_subset.shape)
+        y = y_subset + pt.random.normal(0, sig_e, y_subset.shape)
         y_norm = center_matrix(y,axis=0)
         y_norm = normalize_matrix(y_norm,axis=0)
 
         U_hat = et.estimate_Us_projection(y_norm, V_subset)
-        U_hat_one_hot = get_U_hat_one_hot(U_hat)
+        U_hat_one_hot = get_U_hat_one_hot_pt(U_hat)
     
         #eval
         perc[i] = get_percentage_correct(Ur, U_hat_one_hot)
-        cos[i],_ = get_prediction_error_torch(ytest,vtest,U_hat_one_hot)
+        cos[i],_ = get_prediction_error(ytest,vtest,U_hat_one_hot)
 
-    perc_mean = np.mean(perc)
-    perc_sem = np.std(perc)/ np.sqrt(n_iter) 
-    cos_mean = np.mean(cos)
+    perc_mean = pt.mean(perc)
+    perc_sem = pt.std(perc)/ pt.sqrt(n_iter) 
+    cos_mean = pt.mean(cos)
 
     return  cos_mean, perc_mean,perc_sem
 
@@ -250,12 +226,9 @@ def real_evaluate_combination_multiregion(combination,
     y_subset = normalize_matrix(y_subset,axis = 1)
 
     U_hats = et.estimate_Us_projection(y_subset, V_subset)
-    U_hat_one_hot = get_U_hat_one_hot(U_hats)
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    U_hat_one_hot = torch.tensor(U_hat_one_hot,dtype=torch.float32,device=device)
+    U_hat_one_hot = get_U_hat_one_hot_pt(U_hats)
     
-    cos,cos_std = get_prediction_error_torch(ytest,vtest,U_hat_one_hot,indices = indices)
+    cos,cos_std = get_prediction_error(ytest,vtest,U_hat_one_hot,indices = indices)
     return cos,cos_std
 
 
@@ -279,19 +252,21 @@ def real_evaluate_dataframe_multiregion(D,
     D_eval['cos'] = None
     D_eval['cos_std'] = None
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    ytest = torch.tensor(ytest, dtype=torch.float32, device=device)
-    vtest = torch.tensor(vtest, dtype=torch.float32, device=device)
+    device = pt.device("cuda" if pt.cuda.is_available() else "cpu")
+    ytest = pt.tensor(ytest, dtype=pt.float32, device=device)
+    vtest = pt.tensor(vtest, dtype=pt.float32, device=device)
+    YLib = pt.tensor(YLib, dtype=pt.float32, device=device)
+    VLib = pt.tensor(VLib, dtype=pt.float32, device=device)
 
     # Normalize vtest
-    vtest = vtest / torch.sqrt(torch.nansum(vtest**2, dim=0, keepdim=True))
+    vtest = normalize_matrix(vtest, axis=0)
 
     # Center & Normalize ytest
-    ytest = ytest - torch.nanmean(ytest, dim=1, keepdim=True)
-    ytest = ytest / torch.sqrt(torch.nansum(ytest**2, dim=1, keepdim=True))
+    ytest = center_matrix(ytest, axis=1)
+    ytest = normalize_matrix(ytest, axis=1)
 
     for i in range(len(D)):
-        if i % 10 == 0:
+        if i % 1000 == 0:
             print(f"Processing combination: {i}")
         combination = D_eval['combination'].iloc[i]
         cos,cos_std= real_evaluate_combination_multiregion(combination, YLib,VLib,ytest, vtest, indices = indices)
@@ -301,6 +276,6 @@ def real_evaluate_dataframe_multiregion(D,
 
 if __name__=='__main__':
     U_hat = np.random.rand(3,10,6000)
-    U_hat_one = get_U_hat_one_hot(U_hat)
+    U_hat_one = get_U_hat_one_hot_np(U_hat)
     pass
 
