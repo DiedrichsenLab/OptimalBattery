@@ -4,8 +4,9 @@ Author: Bassel Arafat
 """
 
 import numpy as np
-import OptimalBattery.estimate as et
 import torch as pt
+import OptimalBattery.estimate as et
+import OptimalBattery.util as ut
 
 
 def center_matrix(X,axis =0):
@@ -201,7 +202,7 @@ def sim_evaluate_dataframe_multiregion(D,
     return D_eval
 
 def real_evaluate_combination_multiregion(combination,
-                                           YLib,VLib,
+                                           YLib,info,VLib,
                                            ytest, vtest,
                                            indices = None):
     """Evaluate the parcellation performance for a single combination of tasks.
@@ -221,7 +222,7 @@ def real_evaluate_combination_multiregion(combination,
     V_subset = center_matrix(V_subset,axis = 0)
     V_subset = normalize_matrix(V_subset,axis = 0)
 
-    y_subset = YLib[:,task_subset_indices, :]
+    y_subset = ut.build_battery_dataset(YLib,info,task_subset_indices,n_repeats=1)
     y_subset = center_matrix(y_subset,axis = 1)
     y_subset = normalize_matrix(y_subset,axis = 1)
 
@@ -233,7 +234,7 @@ def real_evaluate_combination_multiregion(combination,
 
 
 def real_evaluate_dataframe_multiregion(D,
-                                         YLib,VLib,
+                                         YLib,info,VLib,
                                          ytest, vtest,
                                          indices = None):
     """ Evaluate the parcellation performance for each combination in the DataFrame D.
@@ -266,10 +267,10 @@ def real_evaluate_dataframe_multiregion(D,
     ytest = normalize_matrix(ytest, axis=1)
 
     for i in range(len(D)):
-        if i % 1000 == 0:
+        if i % 10 == 0:
             print(f"Processing combination: {i}")
         combination = D_eval['combination'].iloc[i]
-        cos,cos_std= real_evaluate_combination_multiregion(combination, YLib,VLib,ytest, vtest, indices = indices)
+        cos,cos_std= real_evaluate_combination_multiregion(combination, YLib,info,VLib,ytest,vtest, indices = indices)
         D_eval.loc[i, 'cos'] = cos
         D_eval.loc[i, 'cos_std'] = cos_std
     return D_eval
