@@ -210,9 +210,6 @@ def build_battery_dataset(YLib, info, combination, n_repeats=1):
     final_dataset = pt.mean(stacked_Y, axis=0)
     return final_dataset
 
-
-
-
 if __name__ == "__main__":
     N = 8 
     U = np.random.normal(0,1,(N,10))

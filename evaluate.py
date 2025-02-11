@@ -222,7 +222,7 @@ def real_evaluate_combination_multiregion(combination,
     V_subset = center_matrix(V_subset,axis = 0)
     V_subset = normalize_matrix(V_subset,axis = 0)
 
-    y_subset = ut.build_battery_dataset(YLib,info,task_subset_indices,n_repeats=1)
+    y_subset = ut.build_battery_dataset(YLib,info,task_subset_indices,n_repeats=3)
     y_subset = center_matrix(y_subset,axis = 1)
     y_subset = normalize_matrix(y_subset,axis = 1)
 
@@ -267,7 +267,7 @@ def real_evaluate_dataframe_multiregion(D,
     ytest = normalize_matrix(ytest, axis=1)
 
     for i in range(len(D)):
-        if i % 10 == 0:
+        if i % 1000 == 0:
             print(f"Processing combination: {i}")
         combination = D_eval['combination'].iloc[i]
         cos,cos_std= real_evaluate_combination_multiregion(combination, YLib,info,VLib,ytest,vtest, indices = indices)
