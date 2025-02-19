@@ -213,6 +213,7 @@ def real_evaluate_combination_multiregion(combination, combination_regressors,
     V_subset = center_matrix(V_subset,axis = 0)
     V_subset = normalize_matrix(V_subset,axis = 0)
 
+    # Build the actual data
     y_subset = average_regressors(YLib, combination_regressors)
     y_subset = center_matrix(y_subset,axis = 1)
     y_subset = normalize_matrix(y_subset,axis = 1)
