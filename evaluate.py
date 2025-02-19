@@ -33,21 +33,7 @@ def normalize_matrix(X,axis = 0):
     X = X / norm
     return X
 
-def get_U_hat_one_hot(U_hat):
-    """Convert the estimated Us to one-hot encoding
-    Args:
-        U_hat: Estimated Us
-    return:
-        U_hat_one_hot: One-hot encoding of the estimated Us
-    """
-    if U_hat.ndim == 2:
-        U_hat = U_hat[pt.newaxis, :, :]
 
-    max_indices = pt.argmax(U_hat, axis=1)
-    U_hat_one_hot = pt.zeros_like(U_hat)
-    subjects, parcels, voxels = U_hat.shape
-    U_hat_one_hot[pt.arange(subjects)[:, None], max_indices, pt.arange(voxels)] = 1
-    return U_hat_one_hot
 
 def get_percentage_correct(U_true, U_pred): 
     """Compute the percentage of correctly classified voxels.

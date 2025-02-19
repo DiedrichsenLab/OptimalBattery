@@ -664,3 +664,28 @@ def build_battery_dataset(YLib, info, combination, n_repeats=1):
     stacked_Y = pt.stack(Y_subset_list, axis=0)
     final_dataset = pt.mean(stacked_Y, axis=0)
     return final_dataset
+
+
+def get_largest_parcels_indices(data, Vs, ROI_mask):
+    """
+    Compute the voxel count for each parcel within the ROI across subjects.
+    
+    Args:
+        data (torch.Tensor): fMRI dataset for all subjects.
+        Vs (torch.Tensor): Functional Profile matrix for all parcels
+        ROI (torch.Tensor): Binary mask of the ROI
+    
+    Returns:
+        torch.Tensor: Ordered indices of parcels based on voxel count.
+    """
+    ROI_indices = pt.where(ROI_mask == 1)[0]
+    total_parcel_counts = pt.zeros(Vs.shape[1])
+    for subject_data in data:
+        data = subject_data[:, ROI_indices]
+        data_projected = estimate_Us_projection(data, Vs)
+        data_projected_onehot = ev.get_U_hat_one_hot(data_projected)[0]
+        total_parcel_counts += pt.sum(data_projected_onehot, axis=1)
+    
+    top_parcels = pt.argsort(total_parcel_counts, descending=True)
+    
+    return top_parcels
