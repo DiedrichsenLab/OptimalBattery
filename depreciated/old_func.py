@@ -603,3 +603,64 @@ def get_prediction_error_numpy(ytest,vtest,U_hat,indices = None): # old implemnt
     cos_std = np.nanstd(cos_err)
 
     return avg_cos, cos_std
+
+def build_battery_dataset(YLib, info, combination, n_repeats=1):
+    """
+    Constructs a dataset based on a task battery combination.
+    
+    Parameters:
+        YLib (numpy.ndarray): The full data array of shape (subjects, regressors, voxels).
+        info (pandas.DataFrame): Information about regressors.
+        combination (list): List of indices to include in battery dataset
+        n_repeats (int): how much data you want for that combination, default is 1 meaning just make one artificial run of the combination
+    
+    Returns:
+        final_dataset (numpy.ndarray): The constructed task battery dataset of shape (subjects, regressors, voxels).
+    """
+    # list to include n_repeats of the combination dataset (artificial runs)
+    Y_subset_list = []
+    total_runs = info['run'].nunique()
+
+    task_groups = info.groupby(['task_num_uni', 'cond_num'])
+    task_only_groups = info.groupby(['task_num_uni'])
+    
+    # to make sure no regressor is chosen twice across n_repeats
+    selected_indices = []
+    for _ in range(n_repeats):
+        Y_subset = []
+        
+        for idx in combination:
+            task_num = info.loc[idx, 'task_num_uni']
+            cond_num = info.loc[idx, 'cond_num']
+            
+           # Get regressor list for the 'task'
+            task_group = task_only_groups.get_group(task_num)
+            task_indices = task_group.index.tolist()
+            
+            # Get regressor list for the 'condition of interest'
+            condition_group = task_groups.get_group((task_num, cond_num))
+            condition_indices = condition_group.index.tolist()
+            
+            # Determine if it's a task or condition
+            num_task_regressors = len(task_indices) // total_runs  # if result is > 1, it's a task with multiple conditions
+            
+            # Never choose the same regressor twice
+            chosen_indices = []
+            while len(chosen_indices) < num_task_regressors:
+                chosen_idx = condition_indices[pt.randint(len(condition_indices), (1,)).item()]
+                if chosen_idx not in selected_indices and chosen_idx not in chosen_indices: #hasn't been chosen for the preview repeat and hasn't been chosen if it's a condition
+                    chosen_indices.append(chosen_idx)
+                    selected_indices.append(chosen_idx)
+
+            # if it's a 10s condition then average 3x10s to get 30s for example
+            averaged_vector = pt.mean(YLib[:,chosen_indices, :], axis=1)
+            Y_subset.append(averaged_vector)
+        
+        # make dataset for current repeat and append to the list
+        Y_subset = pt.stack(Y_subset, axis=1)  
+        Y_subset_list.append(Y_subset)
+    
+    # Average repeats
+    stacked_Y = pt.stack(Y_subset_list, axis=0)
+    final_dataset = pt.mean(stacked_Y, axis=0)
+    return final_dataset

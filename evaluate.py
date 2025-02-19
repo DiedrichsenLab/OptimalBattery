@@ -2,11 +2,10 @@
 Module for evaluating the performance of task batteries for both simulations and real data.
 Author: Bassel Arafat
 """
-
-import numpy as np
 import torch as pt
 import OptimalBattery.estimate as et
 import OptimalBattery.util as ut
+import numpy as np
 
 
 def center_matrix(X,axis =0):
@@ -34,23 +33,7 @@ def normalize_matrix(X,axis = 0):
     X = X / norm
     return X
 
-def get_U_hat_one_hot_np(U_hat):
-    """Convert the estimated Us to one-hot encoding
-    Args:
-        U_hat: Estimated Us
-    return:
-        U_hat_one_hot: One-hot encoding of the estimated Us
-    """
-    if U_hat.ndim == 2:
-        U_hat = U_hat[np.newaxis, :, :]
-
-    max_indices = np.argmax(U_hat, axis=1)
-    U_hat_one_hot = np.zeros_like(U_hat)
-    subjects, parcels, voxels = U_hat.shape
-    U_hat_one_hot[np.arange(subjects)[:, None], max_indices, np.arange(voxels)] = 1
-    return U_hat_one_hot
-
-def get_U_hat_one_hot_pt(U_hat):
+def get_U_hat_one_hot(U_hat):
     """Convert the estimated Us to one-hot encoding
     Args:
         U_hat: Estimated Us
@@ -63,7 +46,7 @@ def get_U_hat_one_hot_pt(U_hat):
     max_indices = pt.argmax(U_hat, axis=1)
     U_hat_one_hot = pt.zeros_like(U_hat)
     subjects, parcels, voxels = U_hat.shape
-    U_hat_one_hot[pt.arange(subjects)[:, None], max_indices, np.arange(voxels)] = 1
+    U_hat_one_hot[pt.arange(subjects)[:, None], max_indices, pt.arange(voxels)] = 1
     return U_hat_one_hot
 
 def get_percentage_correct(U_true, U_pred): 
@@ -111,12 +94,9 @@ def get_prediction_error(ytest, vtest, U_hat, indices=None):
 
     # compute mean error per subject
     cos_err = pt.nanmean(cosine_error_vox, dim=1)
+    cos_mean = pt.mean(cos_err)
 
-    # compute final mean and standard deviation
-    avg_cos = pt.nanmean(cos_err).item()
-    cos_std = pt.std(cos_err).item()
-
-    return avg_cos, cos_std
+    return cos_err, cos_mean
 
 def sim_evaluate_combination_multiregion(combination,
                                      Ytrue,Vr,Ur,
@@ -155,7 +135,7 @@ def sim_evaluate_combination_multiregion(combination,
         y_norm = normalize_matrix(y_norm,axis=0)
 
         U_hat = et.estimate_Us_projection(y_norm, V_subset)
-        U_hat_one_hot = get_U_hat_one_hot_pt(U_hat)
+        U_hat_one_hot = get_U_hat_one_hot(U_hat)
     
         #eval
         perc[i] = get_percentage_correct(Ur, U_hat_one_hot)
@@ -201,8 +181,33 @@ def sim_evaluate_dataframe_multiregion(D,
         D_eval.loc[i, 'perc_sem'] = perc_sem
     return D_eval
 
-def real_evaluate_combination_multiregion(combination,
-                                           YLib,info,VLib,
+
+def average_regressors(run_data, regressor_groups):
+    """
+    Computes the average of selected regressors efficiently using PyTorch.
+
+    Args:
+        run_data (torch.Tensor): Input tensor of shape (subjects, regressors, voxels).
+        regressor_groups (list of list of int): A list containing lists of regressor indices to be averaged.
+    Returns:
+        Ysubset (torch.Tensor): Averaged regressors of shape (subjects, number of tasks, voxels).
+    """
+    subjects, _, voxels = run_data.shape
+    num_groups = len(regressor_groups)
+    
+    # Pre-allocate output tensor
+    result = pt.empty((subjects, num_groups, voxels), dtype=run_data.dtype, device=run_data.device)
+    
+    # Compute the average for each group
+    for i, indices in enumerate(regressor_groups):
+        selected = run_data[:, indices, :]  # Gather the required regressors
+        result[:, i, :] = selected.mean(dim=1)  # Average across regressors
+    return result
+
+
+
+def real_evaluate_combination_multiregion(combination, combination_regressors,
+                                           YLib,VLib,
                                            ytest, vtest,
                                            indices = None):
     """Evaluate the parcellation performance for a single combination of tasks.
@@ -222,19 +227,19 @@ def real_evaluate_combination_multiregion(combination,
     V_subset = center_matrix(V_subset,axis = 0)
     V_subset = normalize_matrix(V_subset,axis = 0)
 
-    y_subset = ut.build_battery_dataset(YLib,info,task_subset_indices,n_repeats=3)
+    y_subset = average_regressors(YLib, combination_regressors)
     y_subset = center_matrix(y_subset,axis = 1)
     y_subset = normalize_matrix(y_subset,axis = 1)
 
     U_hats = et.estimate_Us_projection(y_subset, V_subset)
-    U_hat_one_hot = get_U_hat_one_hot_pt(U_hats)
+    U_hat_one_hot = get_U_hat_one_hot(U_hats)
     
-    cos,cos_std = get_prediction_error(ytest,vtest,U_hat_one_hot,indices = indices)
-    return cos,cos_std
+    cos_subjects,cos_mean = get_prediction_error(ytest,vtest,U_hat_one_hot,indices = indices)
+    return cos_subjects,cos_mean
 
 
 def real_evaluate_dataframe_multiregion(D,
-                                         YLib,info,VLib,
+                                         YLib,VLib,
                                          ytest, vtest,
                                          indices = None):
     """ Evaluate the parcellation performance for each combination in the DataFrame D.
@@ -250,14 +255,8 @@ def real_evaluate_dataframe_multiregion(D,
         D: DataFrame with the computed prediction error
         """
     D_eval = D.copy()
-    D_eval['cos'] = None
-    D_eval['cos_std'] = None
-
-    device = pt.device("cuda" if pt.cuda.is_available() else "cpu")
-    ytest = pt.tensor(ytest, dtype=pt.float32, device=device)
-    vtest = pt.tensor(vtest, dtype=pt.float32, device=device)
-    YLib = pt.tensor(YLib, dtype=pt.float32, device=device)
-    VLib = pt.tensor(VLib, dtype=pt.float32, device=device)
+    D_eval['cos_subjects'] = None
+    D_eval['cos_mean'] = None 
 
     # Normalize vtest
     vtest = normalize_matrix(vtest, axis=0)
@@ -270,13 +269,14 @@ def real_evaluate_dataframe_multiregion(D,
         if i % 1000 == 0:
             print(f"Processing combination: {i}")
         combination = D_eval['combination'].iloc[i]
-        cos,cos_std= real_evaluate_combination_multiregion(combination, YLib,info,VLib,ytest,vtest, indices = indices)
-        D_eval.loc[i, 'cos'] = cos
-        D_eval.loc[i, 'cos_std'] = cos_std
+        combination_regressors = D_eval['regressor_list'].iloc[i]
+        cos_subs, cos_mean= real_evaluate_combination_multiregion(combination, combination_regressors,YLib,VLib,ytest,vtest, indices = indices)
+        D_eval.at[i, 'cos_subjects'] = cos_subs.cpu().numpy().tolist()
+        D_eval.loc[i, 'cos_mean'] = cos_mean.item()
     return D_eval
 
 if __name__=='__main__':
-    U_hat = np.random.rand(3,10,6000)
-    U_hat_one = get_U_hat_one_hot_np(U_hat)
+    U_hat = pt.random.rand(3,10,6000)
+    U_hat_one = get_U_hat_one_hot(U_hat)
     pass
 

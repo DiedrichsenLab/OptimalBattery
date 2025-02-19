@@ -29,7 +29,8 @@ def eigenval_crit(G, center=True):
     l_mc, _ = eigh(G_mc)
     l_mc = l_mc[::-1]
     l_mc[l_mc < 1e-12] = 1e-12
-        
+
+
 
     # Create a dictionary of criteria
     d = {
@@ -39,7 +40,7 @@ def eigenval_crit(G, center=True):
         'inverse_trace_mc': - np.sum(1 / l_mc),
         'log_det': np.sum(np.log(l)),
         'log_det_mc': np.sum(np.log(l_mc)),
-        'num_eigenvalues': len(l_mc)
+        'num_eigenvalues': len(l_mc),
     }
     
     return d
@@ -53,19 +54,23 @@ def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1,rep
     """
     np.random.seed(seed)
     D_list = []
-    n_lib_task = G_lib.shape[0]
+    n_lib_task = G_lib.shape[0] - 1 # number of tasks excluding rest since its always added
+    rest_idx_tuple=(28,)
 
     comb = []
     if strategy == 'random':
         for _ in range(n_iter):
-            candidate = tuple(sorted(np.random.choice(n_lib_task, size=n_tasks, replace=replacement)))
+            candidate = tuple(sorted(np.random.choice(n_lib_task, size=n_tasks-1, replace=replacement)))
+            candidate = candidate + rest_idx_tuple
             comb.append(candidate)
         comb = list(set(comb))   
     else:
         raise ValueError('Invalid strategy')
         
     for i in range(len(comb)):
-        n_unique = len(set(comb[i]))
+        if i % 10000 == 0:
+            print(f'Evaluating combination {i} / {len(comb)}')
+        n_unique = len(set(comb[i])) + 1
         d = eigenval_crit(G_lib[comb[i],:][:,comb[i]],center=True)
         d['combination'] = [comb[i]]
         d['n_unique'] = [n_unique]
@@ -101,7 +106,6 @@ def recenter_fmri_data(data , info ,task_column_name = 'cond_name',center_condit
     for subject_idx in range(n_subjects):
         subject_data = data[subject_idx] 
         subject_recentered_data = []
-        updated_info = []
         
         # Subtract centering conition from each run
         for run in runs:
@@ -110,30 +114,18 @@ def recenter_fmri_data(data , info ,task_column_name = 'cond_name',center_condit
             else:
                 run_mask = np.ones(len(info), dtype=bool)
             run_data = subject_data[run_mask]
-            run_info = info[run_mask] 
              
             # Subtract centering condition from the run
             centering_cond_idx_run = center_condition_indices[0]
             rest_data = run_data[centering_cond_idx_run]
             adjusted_run_data = run_data - rest_data
 
-            # Remove 'rest' condition from the run's metadata
-            adjusted_run_info = run_info.drop(index=run_info.index[centering_cond_idx_run])
-
             # Append recentered run data and updated info
             subject_recentered_data.append(adjusted_run_data)
-            updated_info.append(adjusted_run_info)
 
         # Combine processed runs for the subject
         processed_data[subject_idx] = np.vstack(subject_recentered_data)
-        
-    # remove the rest condition from the data by removing center_condition_indices
-    processed_data = np.delete(processed_data,center_condition_indices,axis=1)
-
-    # Combine info across all subjects and runs
-    updated_info = pd.concat(updated_info, ignore_index=True)
-
-    return processed_data, updated_info
+    return processed_data
 
 def translate_battery(info,battery_indices):
     """
@@ -149,66 +141,84 @@ def translate_battery(info,battery_indices):
     return battery_names
 
 
-def build_battery_dataset(YLib, info, combination, n_repeats=1):
+def get_condition_indices(df):
     """
-    Constructs a dataset based on a task battery combination.
-    
+    Get condition indices from a dataframe and record the duration of each condition
     Parameters:
-        YLib (numpy.ndarray): The full data array of shape (subjects, regressors, voxels).
-        info (pandas.DataFrame): Information about regressors.
-        combination (list): List of indices to include in battery dataset
-        n_repeats (int): how much data you want for that combination, default is 1 meaning just make one artificial run of the combination
-    
+        df(pd.DataFrame): dataframe containing condition indices needs to include:
+            - 'cond_name': name of the condition
+            - 'run': run number
+            - 'task_name': name of the task
     Returns:
-        final_dataset (numpy.ndarray): The constructed task battery dataset of shape (subjects, regressors, voxels).
+        condition_indices(np.ndarray): condition indices
     """
-    # list to include n_repeats of the combination dataset (artificial runs)
-    Y_subset_list = []
-    total_runs = info['run'].nunique()
-
-    task_groups = info.groupby(['task_num_uni', 'cond_num'])
-    task_only_groups = info.groupby(['task_num_uni'])
+    unique_conditions = df['cond_name'].unique()
+    new_df = pd.DataFrame(columns=['cond_name', 'indices', 'duration'])
     
-    # to make sure no regressor is chosen twice across n_repeats
-    selected_indices = []
-    for _ in range(n_repeats):
-        Y_subset = []
-        
-        for idx in combination:
-            task_num = info.loc[idx, 'task_num_uni']
-            cond_num = info.loc[idx, 'cond_num']
-            
-           # Get regressor list for the 'task'
-            task_group = task_only_groups.get_group(task_num)
-            task_indices = task_group.index.tolist()
-            
-            # Get regressor list for the 'condition of interest'
-            condition_group = task_groups.get_group((task_num, cond_num))
-            condition_indices = condition_group.index.tolist()
-            
-            # Determine if it's a task or condition
-            num_task_regressors = len(task_indices) // total_runs  # if result is > 1, it's a task with multiple conditions
-            
-            # Never choose the same regressor twice
-            chosen_indices = []
-            while len(chosen_indices) < num_task_regressors:
-                chosen_idx = condition_indices[pt.randint(len(condition_indices), (1,)).item()]
-                if chosen_idx not in selected_indices and chosen_idx not in chosen_indices: #hasn't been chosen for the preview repeat and hasn't been chosen if it's a condition
-                    chosen_indices.append(chosen_idx)
-                    selected_indices.append(chosen_idx)
-
-            # if it's a 10s condition then average 3x10s to get 30s for example
-            averaged_vector = pt.mean(YLib[:,chosen_indices, :], axis=1)
-            Y_subset.append(averaged_vector)
-        
-        # make dataset for current repeat and append to the list
-        Y_subset = pt.stack(Y_subset, axis=1)  
-        Y_subset_list.append(Y_subset)
+    # Filter only the first run
+    first_run_df = df[df['run'] == df['run'].min()]
+    task_run_counts = first_run_df.groupby('task_name')['cond_name'].nunique()
+    duration_map = {1: 30, 2: 15, 3: 10}
     
-    # Average repeats
-    stacked_Y = pt.stack(Y_subset_list, axis=0)
-    final_dataset = pt.mean(stacked_Y, axis=0)
-    return final_dataset
+    # Populate the new dataframe
+    for condition in unique_conditions:
+        indices = df[df['cond_name'] == condition].index.tolist()
+        
+        # Identify task_name for the condition from the original dataframe
+        task_name = df[df['cond_name'] == condition]['task_name'].values[0]
+        num_conditions = task_run_counts.get(task_name, 1)
+        duration = duration_map.get(num_conditions, 30)
+        
+        new_row = {'cond_name': condition, 'indices': indices, 'duration': duration}
+        new_df = pd.concat([new_df, pd.DataFrame([new_row])], ignore_index=True)
+    
+    return new_df
+
+def build_combination_regressors(combination_df, condition_df, localizer_time=12):
+    """
+    Constructs a regressor list for each condition in the combination dataframe,
+    ensuring the total scanning time is distributed approximately equally across selected conditions. (with a 10 second difference in some cases)
+
+    Parameters:
+        combination_df (pd.DataFrame): DataFrame containing a 'combination' column with condition indices needs to include:
+            - 'combination': list of condition indices
+        condition_df (pd.DataFrame): DataFrame containing condition names, indices, and duration information needs to include:
+            - 'cond_name': name of the condition
+            - 'indices': indices of the condition
+            - 'duration': duration of the condition in seconds
+        localizer_time (int): Total duration in minutes for the selected regressors.
+
+    Returns:
+        pd.DataFrame: Updated condition_df with a 'regressor_list' column.
+    """
+    total_seconds = localizer_time * 60  # Convert minutes to seconds
+    updated_combination_df = combination_df.copy()
+    
+    dataframe_regressors = []
+    # Iterate over each row in the combination dataframe
+    for idx, row in combination_df.iterrows():
+        combination = list(row['combination'])
+        allocated_time_per_condition = total_seconds // len(combination)
+        
+        current_comb_regressors = []
+        
+        for cond_idx in combination:
+            condition_row = condition_df.iloc[cond_idx]
+            condition_indices = condition_row['indices']
+            condition_duration = condition_row['duration']
+            
+            # Determine how many regressors to sample based on required time
+            num_required = allocated_time_per_condition // condition_duration
+
+            np.random.seed(1)
+            chosen_regressors = np.random.choice(condition_indices, num_required, replace=False)
+            current_comb_regressors.append(list(chosen_regressors))
+        dataframe_regressors.append(current_comb_regressors)
+
+    # add the regressor list to the condition dataframe
+    updated_combination_df['regressor_list'] = dataframe_regressors
+            
+    return updated_combination_df
 
 if __name__ == "__main__":
     N = 8 

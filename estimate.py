@@ -5,6 +5,7 @@ Author: Bassel Arafat
 
 import torch as pt
 import numpy as np
+import OptimalBattery.evaluate as ev
 
 ######################### Parcellation Estimation #########################
 
@@ -38,74 +39,52 @@ def estimate_Us_projection(Y,V):
 def get_Vs(data, parcellation, ROI, parcel_list=None):
     """
     Compute Vs matrix by averaging data within the given parcels.
-    
     If parcel_list is None, it selects all parcels in the ROI.
 
     Parameters:
-        data (np.ndarray): fMRI data of shape (n_subjects, n_conditions, n_voxels).
-        parcellation (np.ndarray): Parcellation indices of shape (n_voxels,).
-        ROI (np.ndarray): Binary mask (0s and 1s) of shape (n_voxels,).
+        data (torch.Tensor): fMRI data of shape (n_subjects, n_conditions, n_voxels).
+        parcellation (torch.Tensor): Parcellation indices of shape (n_voxels,).
+        ROI (torch.Tensor): Binary mask (0s and 1s) of shape (n_voxels,).
         parcel_list (list, optional): List of parcel indices to include. If None, selects all parcels in ROI.
 
     Returns:
-        Vs (np.ndarray): Averaged values for each condition within selected parcels, shape (n_conditions, n_selected_parcels).
+        Vs (torch.Tensor): Averaged values for each condition within selected parcels, shape (n_conditions, n_selected_parcels).
         selected_parcels (list): List of selected parcel indices.
     """
-    avg_data = np.mean(data, axis=0)  # Average across subjects
-    ROI_voxels = np.where(ROI == 1)[0]  # Get voxel indices in ROI
+    avg_data = data.mean(dim=0)  # Average across subjects
+    ROI_voxels = pt.where(ROI == 1)[0]
     
-    # If no parcel_list is given, use all parcels in ROI
+    # Select all unique parcels in ROI if parcel_list is not provided
     if parcel_list is None:
-        parcel_list = np.unique(parcellation[ROI_voxels])
+        parcel_list = pt.unique(parcellation[ROI_voxels]).tolist()
 
-    Vs = np.array([
-        avg_data[:, np.intersect1d(np.where(parcellation == p)[0], ROI_voxels)].mean(axis=1)
-        for p in parcel_list
-    ]).T
+    Vs = pt.stack([
+        avg_data[:, pt.tensor(np.intersect1d(pt.where(parcellation == p)[0].cpu().numpy(), ROI_voxels.cpu().numpy()), device=avg_data.device)].mean(dim=1)
+        for p in parcel_list], dim=1)
 
-    return Vs, parcel_list  
-
-
-def get_training_Vs(data, parcellation, ROI, n_parcels=None):
-    """
-    Compute Vs using top n_parcels based on mean activation or all parcels if n_parcels is None.
-
-    Parameters:
-        data (np.ndarray): fMRI data of shape (n_subjects, n_conditions, n_voxels).
-        parcellation (np.ndarray): Parcellation indices of shape (n_voxels,).
-        ROI (np.ndarray): Binary mask (0s and 1s) of shape (n_voxels,).
-        n_parcels (int, optional): Number of top parcels to use. If None, uses all parcels in ROI.
-
-    Returns:
-        Vs (np.ndarray): Averaged values for each condition within selected parcels, shape (n_conditions, n_selected_parcels).
-        selected_parcels (list): List of selected parcel indices.
-    """
-    # Compute Vs for all parcels in ROI
-    Vs, all_parcels = get_Vs(data, parcellation, ROI)  
-
-    # Select top n_parcels based on mean activation
-    if n_parcels is not None:  
-        mean_activations = Vs.mean(axis=0)  
-        top_indices = np.argsort(mean_activations)[::-1][:n_parcels]
-        Vs = Vs[:, top_indices]
-        selected_parcels = [all_parcels[i] for i in top_indices]  # Get corresponding parcel indices
-    else:
-        selected_parcels = all_parcels  # or just use all parcels
-
-    return Vs, selected_parcels
-
-def get_testing_Vs(data, parcellation, ROI, selected_parcels):
-    """
-    Compute Vs using selected_parcels based on training data.
-
-    Parameters:
-        data (np.ndarray): fMRI data of shape (n_subjects, n_conditions, n_voxels).
-        parcellation (np.ndarray): Parcellation indices of shape (n_voxels,).
-        ROI (np.ndarray): Binary mask (0s and 1s) of shape (n_voxels,).
-        selected_parcels (list): List of selected parcel indices.
-
-    Returns:
-        Vs (np.ndarray): Averaged values for each condition within selected parcels, shape (n_conditions, n_selected_parcels).
-    """
-    Vs, _ = get_Vs(data, parcellation, ROI, parcel_list=selected_parcels)  # Use selected_parcels from training data
     return Vs
+
+
+def get_largest_parcels(data, Vs, ROI_mask):
+    """
+    Compute the voxel count for each parcel within the ROI across subjects.
+    
+    Args:
+        data (torch.Tensor): fMRI dataset for all subjects.
+        Vs (torch.Tensor): Functional Profile matrix for all parcels
+        ROI (torch.Tensor): Binary mask of the ROI
+    
+    Returns:
+        torch.Tensor: Ordered indices of parcels based on voxel count.
+    """
+    ROI_indices = pt.where(ROI_mask == 1)[0]
+    total_parcel_counts = pt.zeros(Vs.shape[1])
+    for subject_data in data:
+        data = subject_data[:, ROI_indices]
+        data_projected = estimate_Us_projection(data, Vs)
+        data_projected_onehot = ev.get_U_hat_one_hot(data_projected)[0]
+        total_parcel_counts += pt.sum(data_projected_onehot, axis=1)
+    
+    top_parcels = pt.argsort(total_parcel_counts, descending=True)
+    
+    return top_parcels
