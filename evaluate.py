@@ -6,34 +6,7 @@ import torch as pt
 import OptimalBattery.estimate as et
 import OptimalBattery.util as ut
 import numpy as np
-
-
-def center_matrix(X,axis =0):
-    """Center the matrix by subtracting the mean.
-    Args:
-        X: matrix to center
-        axis: Axis along which to center the data
-    return:
-        X: Centered matrix
-    """
-    mean = pt.nanmean(X, axis=axis, keepdims=True)
-    X = X - mean
-    return X
-
-def normalize_matrix(X,axis = 0):
-    """Normalize the matrix by dividing by the norm.
-    Args:
-        X: matrix to normalize
-        axis: Axis along which to normalize the data
-    return:
-        X: Normalized matrix
-    """
-    norm = pt.sqrt(pt.nansum(X**2, axis=axis, keepdims=True))
-    norm = pt.where(norm == 0, 1.0, norm)
-    X = X / norm
-    return X
-
-
+import construct as ct
 
 def get_percentage_correct(U_true, U_pred): 
     """Compute the percentage of correctly classified voxels.
@@ -167,100 +140,76 @@ def sim_evaluate_dataframe_multiregion(D,
         D_eval.loc[i, 'perc_sem'] = perc_sem
     return D_eval
 
-
-def average_regressors(run_data, regressor_groups):
-    """
-    Computes the average of selected regressors efficiently using PyTorch.
-
-    Args:
-        run_data (torch.Tensor): Input tensor of shape (subjects, regressors, voxels).
-        regressor_groups (list of list of int): A list containing lists of regressor indices to be averaged.
-    Returns:
-        Ysubset (torch.Tensor): Averaged regressors of shape (subjects, number of tasks, voxels).
-    """
-    subjects, _, voxels = run_data.shape
-    num_groups = len(regressor_groups)
-    
-    # Pre-allocate output tensor
-    result = pt.empty((subjects, num_groups, voxels), dtype=run_data.dtype, device=run_data.device)
-    
-    # Compute the average for each group
-    for i, indices in enumerate(regressor_groups):
-        selected = run_data[:, indices, :]  # Gather the required regressors
-        result[:, i, :] = selected.mean(dim=1)  # Average across regressors
-    return result
-
-
-
-def real_evaluate_combination_multiregion(combination, combination_regressors,
-                                           YLib,VLib,
-                                           ytest, vtest,
-                                           indices = None):
-    """Evaluate the parcellation performance for a single combination of tasks.
-    Args:
-        combination: The combination of tasks to evaluate
-        YLib: The data for all tasks
-        VLib: Activity profiles for regions of interest
-        ytest: The test data
-        vtest: The test task matrix
-        Indices: The indices of the voxels to evaluate 
-    return:
-        cos: Prediction error
-    """
-    # Get the task subset indices and corresponding data
-    task_subset_indices = list(combination)
-    V_subset = VLib[task_subset_indices, :]
-    V_subset = center_matrix(V_subset,axis = 0)
-    V_subset = normalize_matrix(V_subset,axis = 0)
-
-    # Build the actual data
-    y_subset = average_regressors(YLib, combination_regressors)
-    y_subset = center_matrix(y_subset,axis = 1)
-    y_subset = normalize_matrix(y_subset,axis = 1)
-
-    U_hats = et.estimate_Us_projection(y_subset, V_subset)
-    U_hat_one_hot = get_U_hat_one_hot(U_hats)
-    
-    cos_subjects,cos_mean = get_prediction_error(ytest,vtest,U_hat_one_hot,indices = indices)
-    return cos_subjects,cos_mean
-
-
-def real_evaluate_dataframe_multiregion(D,
-                                         YLib,VLib,
-                                         ytest, vtest,
-                                         indices = None):
+def evluate_dataframe(D,condition_df,
+                        YLib,VLib,
+                        Ytest, Vtest,
+                        indices = None):
     """ Evaluate the parcellation performance for each combination in the DataFrame D.
     
             Args:
                 D: DataFrame containing the combinations to evaluate
-                YLib: The data for all tasks
-                VLib: Activity profiles for regions of interest
-                ytest: The test data
-                vtest: The test task matrix
-                Indices: The indices of the voxels to evaluate
+                condition_df: dataframe that contains how long each condition is and it's indices
+                YLib: The training data (all tasks all voxels) (subjects, conditions x repitions, voxels)
+                VLib: Activity profiles for training data (tasks,parcels)
+                Ytest: The test data (all tasks all voxels) (subjects, conditions, voxels)
+                Vtest: Activity profiles for test data (tasks,parcels)
+                indices: The indices of the voxels to evaluate in
     return:
         D: DataFrame with the computed prediction error
         """
-    D_eval = D.copy()
-    D_eval['cos_subjects'] = None
-    D_eval['cos_mean'] = None 
+    D['cos_subjects'] = None
+    D['cos_mean'] = None
 
-    # Normalize vtest
-    vtest = normalize_matrix(vtest, axis=0)
+    # Center & Normalize vtest
+    Vtest = ut.center_matrix(Vtest, axis=0)
+    Vtest = ut.normalize_matrix(Vtest, axis=0)
 
     # Center & Normalize ytest
-    ytest = center_matrix(ytest, axis=1)
-    ytest = normalize_matrix(ytest, axis=1)
+    Ytest = ut.center_matrix(Ytest, axis=1)
+    Ytest = ut.normalize_matrix(Ytest, axis=1)
 
     for i in range(len(D)):
         if i % 1000 == 0:
             print(f"Processing combination: {i}")
-        combination = D_eval['combination'].iloc[i]
-        combination_regressors = D_eval['regressor_list'].iloc[i]
-        cos_subs, cos_mean= real_evaluate_combination_multiregion(combination, combination_regressors,YLib,VLib,ytest,vtest, indices = indices)
-        D_eval.at[i, 'cos_subjects'] = cos_subs.cpu().numpy().tolist()
-        D_eval.loc[i, 'cos_mean'] = cos_mean.item()
-    return D_eval
+        # Get the combination
+        combination = D['combination'].iloc[i]
+        combination = list(combination)
+
+        # construct the regressors
+        combination_regressors = ct.build_combination_regressors(combination, condition_df,localizer_time=8)
+
+        # build the actual artificial localizer data
+        YLib_subset = ct.average_regressors(YLib, combination_regressors)
+        YLib_subset = ut.center_matrix(YLib_subset, axis=1)
+        YLib_subset = ut.normalize_matrix(YLib_subset, axis=1)
+
+        # get the Vs for the combination
+        VLib_subset = VLib[combination, :]
+        VLib_subset = ut.center_matrix(VLib_subset, axis=0)
+        VLib_subset = ut.normalize_matrix(VLib_subset, axis=0)
+
+        # Build the parcellation
+        U_hats = et.estimate_Us(YLib_subset, VLib_subset,method='correlation',hard= True)
+
+        # evaluate the parcellation
+        cos_subs, cos_mean = get_prediction_error(Ytest, Vtest, U_hats, indices=indices)
+        D.at[i, 'cos_subjects'] = cos_subs.cpu().numpy().tolist()
+        D.loc[i, 'cos_mean'] = cos_mean.item()
+    return D
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    
 
 if __name__=='__main__':
     U_hat = pt.random.rand(3,10,6000)

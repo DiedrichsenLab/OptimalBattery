@@ -243,3 +243,16 @@ def custom_R(K_total, group_size, base_parcel_correlation, sub_parcel_extra_corr
 
     np.fill_diagonal(R, 1)
     return R
+
+def translate_battery(info,battery_indices):
+    """
+    Translate battery from indices to names
+    Parameters:
+        info(pd.DataFrame): task information tsv
+        battery_indices(np.ndarray): indices of tasks in the battery
+    Returns:
+        battery_names(np.ndarray): names of tasks in the battery
+    """
+    names = info['names'].unique()
+    battery_names = names[battery_indices]
+    return battery_names

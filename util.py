@@ -1,82 +1,34 @@
 """
-Module for optimal battery construction
+Module for utility functions
 Author: Bassel Arafat
 """
-
-import numpy as np
-import pandas as pd
-from numpy.linalg import eigh
 import torch as pt
+import numpy as np
 
-
-def eigenval_crit(G, center=True):
-    """Computes various criteria based on the eigenvalues and mutual information of a matrix G.
-    Assumes that G is symmetric."""
-
-    N = G.shape[0]
-    # Center the G matrix
-    if center: 
-        H = np.eye(N) - np.ones((N, N)) / N
-        G_mc = H @ G @ H
-    else:
-        G_mc = G
-
-    # Compute eigenvalues for both centered and uncentered G matrices
-    l, _ = eigh(G)
-    l = l[::-1]  # Reverse order
-    l[l < 1e-12] = 1e-12 # Set small eigenvalues to a threshold
-
-    l_mc, _ = eigh(G_mc)
-    l_mc = l_mc[::-1]
-    l_mc[l_mc < 1e-12] = 1e-12
-
-
-
-    # Create a dictionary of criteria
-    d = {
-        'variance': np.sum(l),  # Sum of uncentered eigenvalues
-        'variance_mc': np.sum(l_mc),  # Sum of mean-centered eigenvalues
-        'inverse_trace': - np.sum(1 / l),
-        'inverse_trace_mc': - np.sum(1 / l_mc),
-        'log_det': np.sum(np.log(l)),
-        'log_det_mc': np.sum(np.log(l_mc)),
-        'num_eigenvalues': len(l_mc),
-    }
-    
-    return d
-
-
-def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1,replacement=True): 
-    """ Builds a set of task-batteries and evalates them 
-    G_lib: second moment matrices of task-library
-    strategy: 'random' or 'exhaustive'
-    n_iter: number of iterations for random strategy
+def center_matrix(X,axis =0):
+    """Center the matrix by subtracting the mean.
+    Args:
+        X: matrix to center
+        axis: Axis along which to center the data
+    return:
+        X: Centered matrix
     """
-    np.random.seed(seed)
-    D_list = []
-    n_lib_task = G_lib.shape[0] - 1 # number of tasks excluding rest since its always added
-    rest_idx_tuple=(28,)
+    mean = pt.nanmean(X, axis=axis, keepdims=True)
+    X = X - mean
+    return X
 
-    comb = []
-    if strategy == 'random':
-        for _ in range(n_iter):
-            candidate = tuple(sorted(np.random.choice(n_lib_task, size=n_tasks-1, replace=replacement)))
-            candidate = candidate + rest_idx_tuple
-            comb.append(candidate)
-        comb = list(set(comb))   
-    else:
-        raise ValueError('Invalid strategy')
-        
-    for i in range(len(comb)):
-        if i % 10000 == 0:
-            print(f'Evaluating combination {i} / {len(comb)}')
-        n_unique = len(set(comb[i])) + 1
-        d = eigenval_crit(G_lib[comb[i],:][:,comb[i]],center=True)
-        d['combination'] = [comb[i]]
-        d['n_unique'] = [n_unique]
-        D_list.append(pd.DataFrame(d))
-    D = pd.concat(D_list)
-    return D 
+def normalize_matrix(X,axis = 0):
+    """Normalize the matrix by dividing by the norm.
+    Args:
+        X: matrix to normalize
+        axis: Axis along which to normalize the data
+    return:
+        X: Normalized matrix
+    """
+    norm = pt.sqrt(pt.nansum(X**2, axis=axis, keepdims=True))
+    norm = pt.where(norm == 0, 1.0, norm)
+    X = X / norm
+    return X
 
 def recenter_fmri_data(data , info ,task_column_name = 'cond_name',center_condition='rest'): # tested and works but needs review..
     """
@@ -126,103 +78,3 @@ def recenter_fmri_data(data , info ,task_column_name = 'cond_name',center_condit
         # Combine processed runs for the subject
         processed_data[subject_idx] = np.vstack(subject_recentered_data)
     return processed_data
-
-def translate_battery(info,battery_indices):
-    """
-    Translate battery from indices to names
-    Parameters:
-        info(pd.DataFrame): task information tsv
-        battery_indices(np.ndarray): indices of tasks in the battery
-    Returns:
-        battery_names(np.ndarray): names of tasks in the battery
-    """
-    names = info['names'].unique()
-    battery_names = names[battery_indices]
-    return battery_names
-
-
-def get_condition_indices(df):
-    """
-    Get condition indices from a dataframe and record the duration of each condition
-    Parameters:
-        df(pd.DataFrame): dataframe containing condition indices needs to include:
-            - 'cond_name': name of the condition
-            - 'run': run number
-            - 'task_name': name of the task
-    Returns:
-        condition_indices(np.ndarray): condition indices
-    """
-    unique_conditions = df['cond_name'].unique()
-    new_df = pd.DataFrame(columns=['cond_name', 'indices', 'duration'])
-    
-    # Filter only the first run
-    first_run_df = df[df['run'] == df['run'].min()]
-    task_run_counts = first_run_df.groupby('task_name')['cond_name'].nunique()
-    duration_map = {1: 30, 2: 15, 3: 10}
-    
-    # Populate the new dataframe
-    for condition in unique_conditions:
-        indices = df[df['cond_name'] == condition].index.tolist()
-        
-        # Identify task_name for the condition from the original dataframe
-        task_name = df[df['cond_name'] == condition]['task_name'].values[0]
-        num_conditions = task_run_counts.get(task_name, 1)
-        duration = duration_map.get(num_conditions, 30)
-        
-        new_row = {'cond_name': condition, 'indices': indices, 'duration': duration}
-        new_df = pd.concat([new_df, pd.DataFrame([new_row])], ignore_index=True)
-    
-    return new_df
-
-def build_combination_regressors(combination_df, condition_df, localizer_time=12):
-    """
-    Constructs a regressor list for each condition in the combination dataframe,
-    ensuring the total scanning time is distributed approximately equally across selected conditions. (with a 10 second difference in some cases)
-
-    Parameters:
-        combination_df (pd.DataFrame): DataFrame containing a 'combination' column with condition indices needs to include:
-            - 'combination': list of condition indices
-        condition_df (pd.DataFrame): DataFrame containing condition names, indices, and duration information needs to include:
-            - 'cond_name': name of the condition
-            - 'indices': indices of the condition
-            - 'duration': duration of the condition in seconds
-        localizer_time (int): Total duration in minutes for the selected regressors.
-
-    Returns:
-        pd.DataFrame: Updated condition_df with a 'regressor_list' column.
-    """
-    total_seconds = localizer_time * 60  # Convert minutes to seconds
-    updated_combination_df = combination_df.copy()
-    
-    dataframe_regressors = []
-    # Iterate over each row in the combination dataframe
-    for idx, row in combination_df.iterrows():
-        combination = list(row['combination'])
-        allocated_time_per_condition = total_seconds // len(combination)
-        
-        current_comb_regressors = []
-        
-        for cond_idx in combination:
-            condition_row = condition_df.iloc[cond_idx]
-            condition_indices = condition_row['indices']
-            condition_duration = condition_row['duration']
-            
-            # Determine how many regressors to sample based on required time
-            num_required = allocated_time_per_condition // condition_duration
-
-            np.random.seed(1)
-            chosen_regressors = np.random.choice(condition_indices, num_required, replace=False)
-            current_comb_regressors.append(list(chosen_regressors))
-        dataframe_regressors.append(current_comb_regressors)
-
-    # add the regressor list to the condition dataframe
-    updated_combination_df['regressor_list'] = dataframe_regressors
-            
-    return updated_combination_df
-
-if __name__ == "__main__":
-    N = 8 
-    U = np.random.normal(0,1,(N,10))
-    G = U @ U.T
-    D = build_combinations(G, strategy='random',n_iter=100,n_tasks=4)
-    pass
