@@ -94,8 +94,7 @@ def compute_baseline(results_df):
     )
     return df
 
-
-def plot_results(aggregated_results_df, baseline_aggregated_df):
+def plot_results(aggregated_results_df, baseline_aggregated_df, y_min=None, y_max=None):
     """Generates line plots comparing metrics and baseline across n_task and n_parcel."""
     unique_n_parcel = aggregated_results_df["n_parcel"].unique()
     num_plots = len(unique_n_parcel)
@@ -121,9 +120,13 @@ def plot_results(aggregated_results_df, baseline_aggregated_df):
         ax.set_xlabel("Number of Tasks")
         ax.set_ylabel("Average Cos error")
         ax.legend(title="Metric")
+
+        # Set y-axis limits if provided
+        if y_min is not None and y_max is not None:
+            ax.set_ylim(y_min, y_max)
     
     for i in range(num_plots, len(axes)):
         fig.delaxes(axes[i])
-    
+
     plt.tight_layout()
     plt.show()
