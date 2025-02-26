@@ -6,6 +6,12 @@ Author: Bassel Arafat
 
 import numpy as np
 import matplotlib.pyplot as plt
+import OptimalBattery.util as ut
+import OptimalBattery.estimate as et
+import OptimalBattery.evaluate as ev
+import torch as pt
+
+device = pt.device("cuda" if pt.cuda.is_available() else "cpu")
 
 def random_matrix_normal(G, R, make_exact=False, rng=None): # not sure if this function is necessary anymore
     n_tasks = G.shape[0]
@@ -176,6 +182,69 @@ def make_U_spatial(grid, centroids, K_main, K_subparcels): # ugly but works
     
     return U_true
 
+def get_percentage_correct(U_true, U_pred): 
+    """Compute the percentage of correctly classified voxels.
+    Args:
+        U_true: True Us
+        U_pred: Estimated Us
+    return:
+        percentage: Percentage of correctly classified voxels
+    """
+    correct_voxels = pt.sum(U_true * U_pred)
+    total_voxels = U_true.shape[2]
+    percentage = (correct_voxels / total_voxels) * 100
+    return percentage
+
+def evluate_dataframe_simulation(D,
+                            YLib,VLib,n_iter,
+                            noise,U_true,method):
+    """ Evaluate the parcellation performance for each combination in the DataFrame D.
+    
+            Args:
+                D: DataFrame containing the combinations to evaluate
+                condition_df: dataframe that contains how long each condition is and it's indices
+                YLib: The training data (all tasks all voxels) (subjects, conditions x repitions, voxels)
+                VLib: Activity profiles for training data (tasks,parcels)
+                n_iter: Number of iterations to run the simulation for each task battery (calculating percentage correct each time 
+                and averaging the results) -  this is to get a more stable estimate of the percentage correct
+                noise: The noise level to add to battery data
+                U_true: The true parcellation matrix (parcels, voxels) (ground truth)
+
+    return:
+        D: DataFrame with the computed percentage of correct voxels classified
+        """
+    D['percent_correct'] = None
+
+
+    for i in range(len(D)):
+        if i % 1000 == 0:
+            print(f"Processing combination: {i}")
+        # Get the combination
+        combination = D['combination'].iloc[i]
+        combination = list(combination)
+
+        # get the Vs for the combination
+        VLib_subset = VLib[combination, :]
+        VLib_subset = ut.center_matrix(VLib_subset, axis=0)
+        VLib_subset = ut.normalize_matrix(VLib_subset, axis=0)
+
+        perc_correct_li = []
+        for j in range(n_iter):
+            YLib_subset = YLib[:,combination,:]
+            YLib_subset = YLib_subset + pt.normal(0,noise,YLib_subset.shape,device=device)
+            YLib_subset = ut.center_matrix(YLib_subset, axis=1)
+            YLib_subset = ut.normalize_matrix(YLib_subset, axis=1)
+
+            # Build the parcellation
+            U_hats = et.estimate_Us(YLib_subset, VLib_subset,method=method,hard= True)
+
+            # evaluate the parcellation
+            perc_correct = get_percentage_correct(U_true, U_hats)
+            perc_correct_li.append(perc_correct.item())
+
+        perc_correct = np.mean(perc_correct_li)
+        D.loc[i, 'percent_correct'] = perc_correct.item()
+    return D
 
 if __name__=='__main__':
     test_produce_V()

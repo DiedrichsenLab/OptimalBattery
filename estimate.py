@@ -6,32 +6,54 @@ Author: Bassel Arafat
 import torch as pt
 import numpy as np
 import OptimalBattery.evaluate as ev
+import OptimalBattery.util as ut
 
 ######################### Parcellation Estimation #########################
+def estimate_Us(Y, V, method='correlation', alpha=1e-3, hard=False):
+    """
+    Estimate U_hat using different projection methods: 'correlation', 'ols', or 'ridge'.
 
-def estimate_Us(Y,V,method = 'correlation', hard = False):
-    """
-    get U_hat using projection
     Args:
-        Y: Individual fMRI data (n_subjects,n_tasks, n_voxels)
-        V: Functional Profile (n_tasks, n_parcels)
-        method: 'correlation' or 'ols'
-        hard: If True, returns one-hot encoding of the projection
+        Y (torch.Tensor): fMRI data of shape (n_subjects, n_tasks, n_voxels)
+        V (torch.Tensor): Functional profile of shape (n_tasks, n_parcels)
+        method (str): Choice of {'correlation', 'ols', 'ridge'}
+        alpha (float): Regularization for ridge (ignored unless method == 'ridge')
+        hard (bool): If True, returns one-hot assignment for each voxel to one parcel
+
     Returns:
-        U_hats: Individual parcellations (n_subjects, n_parcels, n_voxels)
+        U_hats (torch.Tensor): 
+          If hard=False, shape = (n_subjects, n_parcels, n_voxels) with continuous weights
+          If hard=True,  shape = (n_subjects, n_parcels, n_voxels) with 0/1 assignments
     """
+    # 1) Compute weights depending on method
     if method == 'correlation':
-        U_hats= V.T @ Y
+        # correlation ~ (V^T @ Y)
+        U_hats = V.T @ Y
+
     elif method == 'ols':
-        pt.linalg.inv(V.T @ V) @ V.T @ Y
+        # OLS: (V^T V)^(-1) V^T @ Y
+        A = V.T @ V
+        A_inv = pt.linalg.inv(A)
+        U_hats = A_inv @ (V.T @ Y)
+
+    elif method == 'ridge':
+        # Ridge: (V^T V + alpha*I)^(-1) V^T @ Y
+        A = V.T @ V
+        alpha_eye = pt.eye(A.shape[0], device=A.device) * alpha
+        A_inv = pt.linalg.inv(A + alpha_eye)
+        U_hats = A_inv @ (V.T @ Y)
     else:
-        raise ValueError('Invalid method')
+        raise ValueError(f"Invalid method")
+
+    # 2) Return continuous or hard assignments
     if hard:
-        max_indices = pt.argmax(U_hats, axis=1)
-        U_hats = pt.zeros_like(U_hats)
-        U_hats.scatter_(1, max_indices[:, None, :], 1)
-    
-    return U_hats # k, p
+        max_indices = pt.argmax(U_hats, dim=1)  # (n_subjects, n_voxels)
+        U_hard = pt.zeros_like(U_hats)
+        U_hard.scatter_(1, max_indices.unsqueeze(1), 1)
+        return U_hard
+
+    return U_hats
+
 
 ######################### V estimation #####################################
 

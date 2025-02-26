@@ -48,12 +48,12 @@ def eigenval_crit(G, center=True):
     
     return d
 
-def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1,replacement=True,rest_idx=28): 
+def build_combinations(G_lib, strategy='random',n_batteries=1000,n_tasks=4,seed=1,replacement=True,rest_idx=None): 
     """ Builds a set of task-batteries and evalates them 
     Parameters:
         G_lib(np.ndarray): Second moment matrix
         strategy(str): Strategy for building combinations
-        n_iter(int): Number of batteries to build
+        n_batteries(int): Number of batteries to build
         n_tasks(int): Number of tasks in the battery
         seed(int): Random seed
         replacement(bool): Whether to sample with replacement
@@ -65,13 +65,19 @@ def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1,rep
     np.random.seed(seed)
     # deal with having rest in every combination
     n_lib_task = G_lib.shape[0] - 1 # number of tasks excluding rest since its always added
-    rest_idx_tuple=(rest_idx,)
+    if rest_idx is not None:
+        rest_idx_tuple=(rest_idx,)
+    else:
+        rest_idx_tuple = ()
 
     D_list = []
     comb = []
     if strategy == 'random':
-        for _ in range(n_iter):
-            candidate = tuple(sorted(np.random.choice(n_lib_task, size=n_tasks-1, replace=replacement)))
+        for _ in range(n_batteries):
+            if rest_idx is None:
+                candidate = tuple(sorted(np.random.choice(n_lib_task, size=n_tasks, replace=replacement)))
+            else:
+                candidate = tuple(sorted(np.random.choice(n_lib_task, size=n_tasks-1, replace=replacement)))
             candidate = candidate + rest_idx_tuple # add rest to the combination
             comb.append(candidate)
         comb = list(set(comb))   
@@ -151,7 +157,6 @@ def build_combination_regressors(combination, condition_df, localizer_time=12):
         num_required = allocated_time_per_condition // condition_duration
 
         # Randomly sample regressors from the condition
-        np.random.seed(1)
         chosen_regressors = np.random.choice(condition_indices, num_required, replace=False)
         comb_regressors.append(list(chosen_regressors))
 
@@ -171,13 +176,13 @@ def average_regressors(run_data, regressor_groups):
     num_groups = len(regressor_groups)
     
     # Pre-allocate output tensor
-    result = pt.empty((subjects, num_groups, voxels), dtype=run_data.dtype, device=run_data.device)
+    Ysubset = pt.empty((subjects, num_groups, voxels), dtype=run_data.dtype, device=run_data.device)
     
     # Compute the average for each group
     for i, indices in enumerate(regressor_groups):
         selected = run_data[:, indices, :]  # Gather the required regressors
-        result[:, i, :] = selected.mean(dim=1)  # Average across regressors
-    return result
+        Ysubset[:, i, :] = selected.mean(dim=1)  # Average across regressors
+    return Ysubset
 
 if __name__ == "__main__":
     N = 8 
