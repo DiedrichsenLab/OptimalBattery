@@ -9,18 +9,17 @@ import numpy as np
 import construct as ct
 
 def get_prediction_error(ytest, vtest, U_hat, indices=None):
-    """Compute the prediction error using PyTorch (supports GPU for speedup because this was a bottleneck).
+    """Compute the prediction error using
     
     Args:
         ytest (ndarray): Test data (subjects,conditions, voxels).
         vtest (ndarray): Test Vs
         U_hat (ndarray): Estimated Us.
         indices (list or None): Indices of the voxels to evaluate.
-        use_cuda (bool): Whether to use GPU.
     
     Returns:
-        avg_cos (float): Mean prediction error across subjects.
-        cos_std (float): Standard deviation of prediction error.
+        cos_err (ndarray): Cosine error per subject.
+        cos_mean (ndarray): Mean cosine error across all subjects.
     """
     # Ensure correct dimensions (batching subjects if needed)
     if U_hat.ndimension() == 2:
