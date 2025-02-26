@@ -57,6 +57,8 @@ def evluate_dataframe(D,condition_df,
                 Ytest: The test data (all tasks all voxels) (subjects, conditions, voxels)
                 Vtest: Activity profiles for test data (tasks,parcels)
                 indices: The indices of the voxels to evaluate in
+                method: The method to use for estimating the Us
+                localizer_time: The scanning time of the localizers in seconds
     return:
         D: DataFrame with the computed prediction error
         """
