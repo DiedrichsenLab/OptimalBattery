@@ -50,7 +50,7 @@ def estimate_Us(Y, V, method='correlation', alpha=1e-3, hard=False):
         max_indices = pt.argmax(U_hats, dim=1)  # (n_subjects, n_voxels)
         U_hard = pt.zeros_like(U_hats)
         U_hard.scatter_(1, max_indices.unsqueeze(1), 1)
-        return U_hard
+        U_hats = U_hard
 
     return U_hats
 
