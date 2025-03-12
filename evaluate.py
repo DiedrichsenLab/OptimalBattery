@@ -42,10 +42,11 @@ def get_prediction_error(ytest, vtest, U_hat, indices=None):
 
     return cos_err, cos_mean
 
+
 def evluate_dataframe(D,condition_df,
                         YLib,VLib,
                         Ytest, Vtest,
-                        indices = None,method='correlation',hard = True,localizer_time=8):
+                        indices = None,method='correlation',hard = True,alpha =1e-3,localizer_time=8):
     """ Evaluate the parcellation performance for each combination in the DataFrame D.
     
             Args:
@@ -93,7 +94,7 @@ def evluate_dataframe(D,condition_df,
         VLib_subset = ut.normalize_matrix(VLib_subset, axis=0)
 
         # Build the parcellation
-        U_hats = et.estimate_Us(YLib_subset, VLib_subset,method,hard= hard)
+        U_hats = et.estimate_Us(YLib_subset, VLib_subset,method,hard= hard,alpha=alpha)
 
         # evaluate the parcellation
         cos_subs, cos_mean = get_prediction_error(Ytest, Vtest, U_hats, indices=indices)

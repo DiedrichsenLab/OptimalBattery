@@ -246,6 +246,63 @@ def evluate_dataframe_simulation(D,
         D.loc[i, 'percent_correct'] = perc_correct.item()
     return D
 
+def evluate_dataframe_simulation(D, YLib, VLib, n_iter, noise, U_true, method, noise_method='fixed'):
+    """ Evaluate the parcellation performance for each combination in the DataFrame D.
+    
+    Args:
+        D: DataFrame containing the combinations to evaluate
+        YLib: The training data (subjects, conditions x repetitions, voxels)
+        VLib: Activity profiles for training data (tasks, parcels)
+        n_iter: Number of iterations to run the simulation for each task battery
+        noise: The base noise level to add to battery data
+        U_true: The true parcellation matrix (parcels, voxels)
+        method: Method used for parcellation estimation
+        noise_method: If 'weighted', noise increases with the number of tasks
+
+    Returns:
+        D: DataFrame with the computed percentage of correct voxels classified
+    """
+    D['percent_correct'] = None
+
+    for i in range(len(D)):
+        if i % 1000 == 0:
+            print(f"Processing combination: {i}")
+
+        combination = list(D['combination'].iloc[i])
+        n_task = len(combination)
+
+        # Apply weighted noise if specified
+        if noise_method == 'weighted':
+            weighted_noise = noise * (np.sqrt(n_task))  # Scale by sqrt of task count
+        else:
+            weighted_noise = noise  # Default noise level
+
+        # Normalize VLib subset
+        VLib_subset = VLib[combination, :]
+        VLib_subset = ut.center_matrix(VLib_subset, axis=0)
+        VLib_subset = ut.normalize_matrix(VLib_subset, axis=0)
+
+        perc_correct_li = []
+        for j in range(n_iter):
+            # Add noise based on the weighted or fixed method
+            YLib_subset = YLib[:, combination, :]
+            YLib_subset = YLib_subset + pt.normal(0, weighted_noise, YLib_subset.shape, device=device)
+            YLib_subset = ut.center_matrix(YLib_subset, axis=1)
+            YLib_subset = ut.normalize_matrix(YLib_subset, axis=1)
+
+            # Build the parcellation
+            U_hats = et.estimate_Us(YLib_subset, VLib_subset, method=method, hard=True)
+
+            # Evaluate the parcellation
+            perc_correct = get_percentage_correct(U_true, U_hats)
+            perc_correct_li.append(perc_correct.item())
+
+        # Store the averaged percentage correct
+        D.loc[i, 'percent_correct'] = np.mean(perc_correct_li)
+
+    return D
+
+
 if __name__=='__main__':
     test_produce_V()
     pass
