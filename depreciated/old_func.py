@@ -689,3 +689,120 @@ def get_largest_parcels_indices(data, Vs, ROI_mask):
     top_parcels = pt.argsort(total_parcel_counts, descending=True)
     
     return top_parcels
+
+def random_matrix_normal(G, R, make_exact=False, rng=None): # not sure if this function is necessary anymore
+    n_tasks = G.shape[0]
+    n_parcels = R.shape[0]
+
+    if rng is None:
+        rng = np.random.default_rng()
+    else:
+        rng = rng
+    V = rng.standard_normal((n_tasks, n_parcels))
+
+    if make_exact:
+        P_row = np.linalg.inv(V @ V.T)
+        L_row = np.linalg.cholesky(P_row)
+        Vs = L_row.T @ V  
+    else:
+        Vs = V
+
+    lam, eV = np.linalg.eigh(G)
+    lam[lam < 1e-15] = 0
+    lam = np.sqrt(lam)
+    chol_G = eV * lam.reshape((1, eV.shape[1]))
+
+    lam, eV = np.linalg.eigh(R)
+    lam[lam < 1e-15] = 0
+    lam = np.sqrt(lam)
+    chol_R = eV * lam.reshape((1, eV.shape[1]))
+    V = chol_G @ Vs @ chol_R.T
+    # V =Vs @ chol_R.T
+
+    return V
+
+
+def find_best_V(G, R, num_iter=1000,rng=None): # not sure if this function is necessary anymore
+    """
+    Finds the best V matrix that minimizes the deviation from the desired 
+    row and column covariance matrices.
+    
+    Parameters:
+        G (np.ndarray): Desired row covariance matrix.
+        R (np.ndarray): Desired column covariance matrix.
+        num_iter (int): Number of iterations to try generating V.
+
+    Returns:
+        np.ndarray: The V matrix with the lowest deviation from the desired covariances.
+    """
+    min_deviation = float('inf')
+    best_V = None
+
+    for i in range(num_iter):
+        # Generate a random V matrix with desired properties
+        V = random_matrix_normal(G, R, make_exact=True,rng = rng)
+        
+        # Compute the row and column covariance matrices of V
+        Rs = V @ V.T
+        Cs = V.T @ V
+        
+        # Calculate deviations using nested summations
+        dev_R = np.sqrt(np.sum(np.sum((Rs - G) ** 2, axis=1), axis=0))
+        dev_C = np.sqrt(np.sum(np.sum((Cs - R) ** 2, axis=1), axis=0))
+        
+        # Calculate the total deviation
+        total_deviation = dev_R + dev_C
+        
+        # Update best_V if the current total deviation is the lowest found
+        if total_deviation < min_deviation:
+            min_deviation = total_deviation
+            best_V = V
+
+
+    return best_V
+
+
+def test_produce_V(): # not sure if this function is necessary anymore
+    """ Simple test whether matrix normal production works on average. 
+    """
+    N = 5
+    num_iter = 1000
+    R = np.random.normal(0,1,(N,N))
+    C = np.random.normal(0,1,(N,N))
+    cov_R = R @ R.T / N
+    cov_C = C @ C.T / N 
+
+    V = np.zeros((num_iter, N, N)) 
+    for i in range(num_iter):
+        V[i] = random_matrix_normal(cov_R, cov_C, make_exact=True)
+
+    Rs = V@V.transpose([0,2,1])
+    Cs = V.transpose([0,2,1])@V
+    fig = plt.figure()
+
+    # Plot mean covariance matrices 
+    plt.subplot(3,2,1)
+    plt.imshow(cov_R)
+    plt.title('Row desired')
+    plt.colorbar()
+    plt.subplot(3,2,2)
+    plt.imshow(Rs.mean(axis=0)/N)
+    plt.title('Row produced')
+    plt.colorbar()
+    plt.subplot(3,2,3)
+    plt.imshow(cov_C)
+    plt.title('Col desired')
+    plt.colorbar()
+    plt.subplot(3,2,4)
+    plt.imshow(Cs.mean(axis=0)/N)
+    plt.title('Col produced')
+    plt.colorbar()
+    # Plot deviation from desired covariance structure
+    dev_R = np.sqrt(np.sum(np.sum((Rs - cov_R)**2,axis=2),axis=1))
+    dev_C = np.sqrt(np.sum(np.sum((Cs - cov_C)**2,axis=2),axis=1))
+    plt.subplot(3,2,5)
+    plt.scatter(dev_R,dev_C)
+    plt.xlabel('Row deviation')
+    plt.ylabel('Col deviation')
+    plt.show()
+    pass 
