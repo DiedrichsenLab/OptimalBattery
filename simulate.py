@@ -75,6 +75,27 @@ def get_percentage_correct(U_true, U_pred):
     percentage = (correct_voxels / total_voxels) * 100
     return percentage
 
+
+def get_dice_coefficient(U_true, U_pred):
+    """
+    Compute Dice coefficient
+    
+    Args:
+        U_true (Tensor): True Us)
+        U_pred (Tensor): Estimated Us
+    Returns:
+        mean_dice (float): Average Dice across all parcels
+    """
+
+    intersection = (U_true * U_pred).sum(dim=1) 
+    size_true = U_true.sum(dim=1)               
+    size_pred = U_pred.sum(dim=1)          
+
+    dice_scores = (2 * intersection ) / (size_true + size_pred )  
+    mean_dice = dice_scores.mean().item()
+    return mean_dice
+
+
 def evluate_dataframe_simulation(D, YLib, VLib, n_iter, noise, U_true, method, noise_method='fixed',max_n_task = 16):
     """ Evaluate the parcellation performance for each combination in the DataFrame D.
     
@@ -91,7 +112,8 @@ def evluate_dataframe_simulation(D, YLib, VLib, n_iter, noise, U_true, method, n
     Returns:
         D: DataFrame with the computed percentage of correct voxels classified
     """
-    D['percent_correct'] = None
+    D.loc[:, 'percent_correct'] = None
+
 
     for i in range(len(D)):
         if i % 1000 == 0:

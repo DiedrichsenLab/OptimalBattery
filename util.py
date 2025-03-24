@@ -13,7 +13,10 @@ def center_matrix(X,axis =0):
     return:
         X: Centered matrix
     """
-    mean = pt.nanmean(X, axis=axis, keepdims=True)
+    if type(X) == np.ndarray:
+        mean = np.nanmean(X, axis=axis, keepdims=True)
+    else:
+        mean = pt.nanmean(X, axis=axis, keepdims=True)
     X = X - mean
     return X
 
@@ -25,8 +28,12 @@ def normalize_matrix(X,axis = 0):
     return:
         X: Normalized matrix
     """
-    norm = pt.sqrt(pt.nansum(X**2, axis=axis, keepdims=True))
-    norm = pt.where(norm == 0, 1.0, norm)
+    if type(X) == np.ndarray:
+        norm = np.sqrt(np.nansum(X**2, axis=axis, keepdims=True))
+        norm = np.where(norm == 0, 1.0, norm)
+    else:
+        norm = pt.sqrt(pt.nansum(X**2, axis=axis, keepdims=True))
+        norm = pt.where(norm == 0, 1.0, norm)
     X = X / norm
     return X
 
