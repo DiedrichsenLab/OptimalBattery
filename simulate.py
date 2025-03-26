@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import OptimalBattery.util as ut
 import OptimalBattery.estimate as et
 import OptimalBattery.evaluate as ev
+import OptimalBattery.construct as ct
 import torch as pt
 
 device = pt.device("cuda" if pt.cuda.is_available() else "cpu")
@@ -152,6 +153,66 @@ def evluate_dataframe_simulation(D, YLib, VLib, n_iter, noise, U_true, method, n
         D.loc[i, 'percent_correct'] = np.mean(perc_correct_li)
 
     return D
+
+
+
+def sim_connectivity(num_task_lib = 32,
+                     n_parcels = 5,
+                     n_voxels_y = 100,
+                     battery_sizes = [3,4,6,8,10,14,18,24,28], 
+                     n_batteries = 50000,
+                     seed = None): 
+    """ Single simulation for the connectivity estimation. 
+    """
+
+    # Make new task battery 
+    if seed is not None:
+        rng= np.random.default_rng(seed=seed)
+    else: 
+        rng= np.random.default_rng()
+    V_lib = rng.normal(0,1,(num_task_lib, n_parcels))
+    V_lib = V_lib - V_lib.mean(axis=0,keepdims=True) 
+    G_lib = V_lib @ V_lib.T
+
+    W_true = rng.normal(0,1,(n_parcels, n_voxels_y))
+
+ 
+    metrics = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc']
+    max_n_task = max(battery_sizes)
+    
+    # Number of batteries to compile for each size 
+    for n_task in battery_sizes:
+        print(f"Processing battery size: {n_task}")
+
+        # Generate possible battery combinations for current battery size and evaluate each battery
+        D = ct.build_combinations(G_lib, strategy='random',n_batteries=n_batteries,n_tasks=n_task,replacement=False)
+
+        for metric in metrics:
+            
+            D_best = ct.choose_battery(D,metric) 
+            top_comb = D_best['combination'].values[0]         
+            xtrain = V_lib[top_comb,:]
+            xtrain = ut.center_matrix(xtrain,axis=0)
+
+            # 
+            ytrain = xtrain @ W_true + rng.normal(0,noise_sd,(num_task_lib,n_voxels_y))
+            ytrain = ut.center_matrix(ytrain,axis=0)
+            conn_model = getattr(model, 'L2regression')(1000)
+
+            # Fit model, correlate with original weights
+            conn_model.fit(xtrain, ytrain)
+            coef= conn_model.coef_
+            coef_flat = coef.flatten()
+            W_flat = W.flatten()
+            corrcoef_matrix = np.corrcoef(coef_flat, W_flat)
+            pearson_corr = corrcoef_matrix[0, 1]
+
+            D_ev = pd.DataFrame()
+            D_ev['iteration'] = [i]
+            D_ev['n_task'] = [n_task]
+            D_ev['metric'] = [metric]
+            D_ev['correlation'] = pearson_corr
+            results_df = pd.concat([results_df,D_ev],axis=0)
 
 
 if __name__=='__main__':

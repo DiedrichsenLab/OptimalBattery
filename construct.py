@@ -94,6 +94,20 @@ def build_combinations(G_lib, strategy='random',n_batteries=1000,n_tasks=4,seed=
     D = D.reset_index(drop=True)
     return D 
 
+
+def choose_combination(D,metric):
+    """  choose the best battery based on some metric"""
+    # sample random battery
+    rng = np.random.default_rng()
+    index = rng.integers(0,D.shape[0])
+    if metric == 'random':
+        D_best = D.iloc[[index]]
+    else:
+        D_best = D.iloc[[D[metric].idxmax()]]
+        D_best = D_best.reset_index(drop=True)
+    return D_best
+
+
 def get_condition_indices(df):
     """
     Get condition indices from a dataframe and record the duration of each condition
