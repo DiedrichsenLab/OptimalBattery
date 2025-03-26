@@ -16,7 +16,7 @@ import OptimalBattery.estimate as es
 import OptimalBattery.construct as ct
 import OptimalBattery.plot as plot
 
-battery_sizes = [3,4,6,8,10,14,16]
+battery_sizes = [3,4,5,6,7,8,10,14,16,20,24]
 rois = {
     'Dorsolateral_PFC': ['9-46d', '46', '9a', 'a9-46v', 'p9-46v', '9p', 'IFJa', 'IFJp', 'IFSp', 'IFSa'],
     'Parietal_Multisensory': ['LIPv', 'LIPd', 'VIP', 'MIP', 'AIP', '7PC', '7AL', '7Am'],
@@ -136,5 +136,5 @@ for roi_name , parcels in rois.items():
 final_results_df = pd.concat(all_results, ignore_index=True)
 
 # Save the results
-final_results_df.to_csv(f'{base_dir}/OptimalBattery/Eval_tsvs/Cortical_rois.tsv', sep='\t', index=False)
+final_results_df.to_csv(f'{base_dir}/OptimalBattery/Eval_tsvs/real_cortex_parcellation.tsv', sep='\t', index=False)
 
