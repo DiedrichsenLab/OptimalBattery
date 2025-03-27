@@ -25,6 +25,9 @@ def estimate_Us(Y, V, method='correlation', alpha=1e-3, hard=False):
           If hard=False, shape = (n_subjects, n_parcels, n_voxels) with continuous weights
           If hard=True,  shape = (n_subjects, n_parcels, n_voxels) with 0/1 assignments
     """
+    # check if Y is 2 dimensional
+    if len(Y.shape) == 2:
+        Y = Y.unsqueeze(0)
     # 1) Compute weights depending on method
     if method == 'correlation':
         # correlation ~ (V^T @ Y)

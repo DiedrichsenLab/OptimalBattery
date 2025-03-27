@@ -43,7 +43,7 @@ def get_prediction_error(ytest, vtest, U_hat, indices=None):
     return cos_err, cos_mean
 
 
-def evluate_dataframe(D,condition_df,
+def evluate_dataframe_parcellation(D,condition_df,
                         YLib,VLib,
                         Ytest, Vtest,
                         indices = None,method='correlation',hard = True,alpha =1e-3,localizer_time=8):

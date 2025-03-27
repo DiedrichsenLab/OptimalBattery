@@ -9,6 +9,9 @@ import OptimalBattery.estimate as et
 import OptimalBattery.evaluate as ev
 import OptimalBattery.construct as ct
 import torch as pt
+import cortico_cereb_connectivity.model as model
+import pandas as pd
+
 
 device = pt.device("cuda" if pt.cuda.is_available() else "cpu")
 def make_U_spatial(grid, centroids, K_main, K_subparcels): # ugly but works
@@ -71,6 +74,12 @@ def get_percentage_correct(U_true, U_pred):
     return:
         percentage: Percentage of correctly classified voxels
     """
+    # if its two dimensional, add a dimension
+    if len(U_true.shape) == 2:
+        U_true = U_true.unsqueeze(0)
+    if len(U_pred.shape) == 2:
+        U_pred = U_pred.unsqueeze(0)
+
     correct_voxels = pt.sum(U_true * U_pred)
     total_voxels = U_true.shape[2]
     percentage = (correct_voxels / total_voxels) * 100
@@ -87,6 +96,10 @@ def get_dice_coefficient(U_true, U_pred):
     Returns:
         mean_dice (float): Average Dice across all parcels
     """
+    if len(U_true.shape) == 2:
+        U_true = U_true.unsqueeze(0)
+    if len(U_pred.shape) == 2:
+        U_pred = U_pred.unsqueeze(0)
 
     intersection = (U_true * U_pred).sum(dim=1) 
     size_true = U_true.sum(dim=1)               
@@ -96,71 +109,175 @@ def get_dice_coefficient(U_true, U_pred):
     mean_dice = dice_scores.mean().item()
     return mean_dice
 
-
-def evluate_dataframe_simulation(D, YLib, VLib, n_iter, noise, U_true, method, noise_method='fixed',max_n_task = 16):
-    """ Evaluate the parcellation performance for each combination in the DataFrame D.
+def get_weighted_noise_variance(n_task, max_n_task, noise):
+    """Compute the noise level based on the number of tasks in the battery.
     
     Args:
-        D: DataFrame containing the combinations to evaluate
-        YLib: The training data (subjects, conditions x repetitions, voxels)
-        VLib: Activity profiles for training data (tasks, parcels)
-        n_iter: Number of iterations to run the simulation for each task battery
-        noise: The base noise level to add to battery data
-        U_true: The true parcellation matrix (parcels, voxels)
-        method: Method used for parcellation estimation
-        noise_method: If 'weighted', noise increases with the number of tasks
-
+        n_task: Number of tasks in the battery
+        max_n_task: Maximum battery size
+        noise: Base noise level
+    
     Returns:
-        D: DataFrame with the computed percentage of correct voxels classified
+        weighted_noise: Noise level based on the number of tasks
     """
-    D.loc[:, 'percent_correct'] = None
+    return np.sqrt(noise * (n_task / max_n_task))
 
+def find_single_contrast(Vs, regionA, regionB):
+    """ Find the task that maximizes the difference between regionA and regionB """
+    difference = Vs[:, regionA -1] - Vs[:, regionB-1]
+    sorted_idx = pt.argsort(difference) 
 
-    for i in range(len(D)):
-        if i % 1000 == 0:
-            print(f"Processing combination: {i}")
+    min_idx = sorted_idx[0].item()
+    max_idx = sorted_idx[-1].item()
 
-        combination = list(D['combination'].iloc[i])
-        n_task = len(combination)
+    return [max_idx, min_idx]
 
-        # Apply weighted noise if specified
-        if noise_method == 'weighted':
-            weighted_noise = np.sqrt(noise * (n_task / max_n_task))
-        elif noise_method == 'fixed':
-            weighted_noise = noise  # Default noise level
+def make_thresholded_contrast(task1, task2, threshold):
+    """gets the contrast between two tasks and thresholds it"""
+    contrast_data = task1 - task2
+    thresholded_data = pt.zeros_like(contrast_data)
+    percentile = pt.quantile(contrast_data, threshold)
+    thresholded_data[contrast_data >= percentile] = 1
 
-        # Normalize VLib subset
-        VLib_subset = VLib[combination, :]
-        VLib_subset = ut.center_matrix(VLib_subset, axis=0)
-        VLib_subset = ut.normalize_matrix(VLib_subset, axis=0)
+    # make one hot
+    thresholded_data = pt.nn.functional.one_hot(thresholded_data.long(), num_classes=2).T
+    return thresholded_data
 
-        perc_correct_li = []
-        for j in range(n_iter):
-            # Add noise based on the weighted or fixed method
-            YLib_subset = YLib[:, combination, :]
-            YLib_subset = YLib_subset + pt.normal(0, weighted_noise, YLib_subset.shape, device=device)
-            YLib_subset = ut.center_matrix(YLib_subset, axis=1)
-            YLib_subset = ut.normalize_matrix(YLib_subset, axis=1)
+def sim_single_contrast(num_task_lib = 100,
+                        n_parcels = 5,
+                        U_true = None,
+                        base_noise = 5,
+                        max_battery_size = 28,
+                        thresholds = [0.1, 0.2, 0.3, 0.4, 0.5],
+                        U_true_collapsed = None,
+                        seed = None):
+    """ Single simulation for the single contrast evaluation."""
+
+     # Make new task battery 
+    if seed is not None:
+        rng= np.random.default_rng(seed=seed)
+    else: 
+        rng= np.random.default_rng()
+    V_lib = rng.normal(0,1,(num_task_lib, n_parcels))
+    V_lib = V_lib - V_lib.mean(axis=0,keepdims=True)
+    V_lib = pt.tensor(V_lib, device=device, dtype=pt.float64)
+
+    # get the single contrast
+    max_idx, min_idx = find_single_contrast(V_lib, 5, 4)
+    combination = [max_idx, min_idx]
+
+    # get the V localizer
+    V_localizer = V_lib[combination,:]
+    # is cenering and normalizing necessary?
+    # V_localizer = ut.center_matrix(V_localizer,axis=0)
+    # V_localizer = ut.normalize_matrix(V_localizer,axis=0)
+
+    # get the data for the parcellation estimation and add noise
+    Y_localizer = V_localizer @ U_true
+    weighted_noise_variance = get_weighted_noise_variance(2, max_battery_size, base_noise)
+    noise = rng.normal(0,weighted_noise_variance,Y_localizer.shape)
+    noise = pt.tensor(noise, dtype=pt.float64, device=Y_localizer.device)
+    Y_localizer = Y_localizer + noise
+    # is cenering and normalizing necessary?
+    # Y_localizer = ut.center_matrix(Y_localizer,axis=0)
+    # Y_localizer = ut.normalize_matrix(Y_localizer,axis=0)
+
+    results_df = pd.DataFrame()
+    for threshold in thresholds:
+        # get the thresholded contrast
+        thresholded_contrast = make_thresholded_contrast(Y_localizer[0,:], Y_localizer[1,:], threshold)
+
+        # Evaluate the contrast
+        accuracy = get_dice_coefficient(U_true_collapsed, thresholded_contrast)
+
+        D_ev = pd.DataFrame()
+        D_ev['threshold'] = [threshold]
+        D_ev['accuracy'] = accuracy
+        results_df = pd.concat([results_df,D_ev],axis=0)
+
+    return results_df
+                        
+
+def sim_parcellation(num_task_lib = 100,
+                     n_parcels = 5,
+                     U_true = None,
+                     battery_sizes = [3,4,6,8,10,14,18,24,28],
+                     n_batteries = 50000,
+                     base_noise = 5,
+                     collapsed_U_true = None,
+                     seed = None):
+    # Make new task battery 
+    if seed is not None:
+        rng= np.random.default_rng(seed=seed)
+    else: 
+        rng= np.random.default_rng()
+    V_lib = rng.normal(0,1,(num_task_lib, n_parcels))
+    V_lib = V_lib - V_lib.mean(axis=0,keepdims=True) 
+    G_lib = V_lib @ V_lib.T
+    # ensure tensor
+    V_lib = pt.tensor(V_lib, device=device, dtype=pt.float64)  
+
+    # constants
+    metrics = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc']
+    max_battery_size = max(battery_sizes)
+
+    results_df =pd.DataFrame()
+    for n_task in battery_sizes:
+        print(f"Processing battery size: {n_task}")
+        # Generate possible battery combinations for current battery size and calculate eigenmetrics
+        D = ct.build_combinations(G_lib=G_lib, strategy='random',n_batteries=n_batteries,n_tasks=n_task,replacement=False,rest_idx=None)
+        for metric in metrics:
+            # Find the best battery for the metric
+            D_best = ct.choose_combination(D,metric) 
+            top_comb = D_best['combination'].values[0]
+
+            # get the V battery
+            V_battery = V_lib[top_comb,:]
+            V_battery = ut.center_matrix(V_battery,axis=0)
+            V_battery = ut.normalize_matrix(V_battery,axis=0)
+
+            # get the data for the parcellation estimation and add noise
+            Y_battery = V_battery @ U_true
+            weighted_noise_variance = get_weighted_noise_variance(n_task, max_battery_size, base_noise)
+            noise = rng.normal(0,weighted_noise_variance,Y_battery.shape)
+            noise = pt.tensor(noise, dtype=pt.float64, device=Y_battery.device)
+            Y_battery = Y_battery + noise
+            Y_battery = ut.center_matrix(Y_battery,axis=0)
+            Y_battery = ut.normalize_matrix(Y_battery,axis=0)
+
 
             # Build the parcellation
-            U_hats = et.estimate_Us(YLib_subset, VLib_subset, method=method, hard=True)
+            U_hats = et.estimate_Us(Y_battery, V_battery, method='correlation', hard=True)
+
+            # This is for the single region analysis (optional argument to collapsee the parcellation into two regions)
+            if collapsed_U_true is not None:
+                # get the first 4 parcels and sum them
+                everything_else = U_hats[:, :4, :].sum(dim=1, keepdim=True)
+                # get the last parcel (target parcel)
+                parcel_of_interest = U_hats[:, 4:, :]
+                U_hats = pt.cat([everything_else, parcel_of_interest], dim=1)  
 
             # Evaluate the parcellation
-            perc_correct = get_percentage_correct(U_true, U_hats)
-            perc_correct_li.append(perc_correct.item())
+            if collapsed_U_true is not None:
+                accuracy = get_dice_coefficient(collapsed_U_true, U_hats)
+            else:
+                accuracy = get_dice_coefficient(U_true, U_hats)
 
-        # Store the averaged percentage correct
-        D.loc[i, 'percent_correct'] = np.mean(perc_correct_li)
+            D_ev = pd.DataFrame()
+            D_ev['n_task'] = [n_task]
+            D_ev['metric'] = [metric]
+            D_ev['accuracy'] = accuracy
+            results_df = pd.concat([results_df,D_ev],axis=0)
 
-    return D
+    return results_df
 
-
-
-def sim_connectivity(num_task_lib = 32,
+def sim_connectivity(num_task_lib = 100,
                      n_parcels = 5,
                      n_voxels_y = 100,
                      battery_sizes = [3,4,6,8,10,14,18,24,28], 
                      n_batteries = 50000,
+                     base_noise = 5,
+                     ridge_alpha = 1000,
                      seed = None): 
     """ Single simulation for the connectivity estimation. 
     """
@@ -175,44 +292,51 @@ def sim_connectivity(num_task_lib = 32,
     G_lib = V_lib @ V_lib.T
 
     W_true = rng.normal(0,1,(n_parcels, n_voxels_y))
-
  
     metrics = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc']
     max_n_task = max(battery_sizes)
     
-    # Number of batteries to compile for each size 
+    results_df = pd.DataFrame()
     for n_task in battery_sizes:
         print(f"Processing battery size: {n_task}")
 
-        # Generate possible battery combinations for current battery size and evaluate each battery
+        # Generate possible battery combinations for current battery size and calculate eigenmetrics
         D = ct.build_combinations(G_lib, strategy='random',n_batteries=n_batteries,n_tasks=n_task,replacement=False)
 
         for metric in metrics:
-            
-            D_best = ct.choose_battery(D,metric) 
-            top_comb = D_best['combination'].values[0]         
-            xtrain = V_lib[top_comb,:]
-            xtrain = ut.center_matrix(xtrain,axis=0)
+            # Find the best battery for the metric
+            D_best = ct.choose_combination(D,metric) 
+            top_comb = D_best['combination'].values[0]   
 
-            # 
-            ytrain = xtrain @ W_true + rng.normal(0,noise_sd,(num_task_lib,n_voxels_y))
-            ytrain = ut.center_matrix(ytrain,axis=0)
-            conn_model = getattr(model, 'L2regression')(1000)
+            # get the x for the connectivity estimation      
+            data_x = V_lib[top_comb,:]
+            data_x = ut.center_matrix(data_x,axis=0)
 
-            # Fit model, correlate with original weights
-            conn_model.fit(xtrain, ytrain)
+            # get the y for the connectivity estimation (add weighted noise)
+            weighted_noise_variance = get_weighted_noise_variance(n_task, max_n_task, base_noise)
+            data_y = data_x @ W_true
+            data_y = data_y + rng.normal(0,weighted_noise_variance,data_y.shape)
+            data_y = ut.center_matrix(data_y,axis=0)
+
+            # fit the model
+            conn_model = getattr(model, 'L2regression')(ridge_alpha)
+            conn_model.fit(data_x, data_y)
+
+            # get the estimated W and correlate with W_true
             coef= conn_model.coef_
-            coef_flat = coef.flatten()
-            W_flat = W.flatten()
-            corrcoef_matrix = np.corrcoef(coef_flat, W_flat)
+            W_hat_flat = coef.flatten()
+            W_true_flat = W_true.flatten()
+
+            corrcoef_matrix = np.corrcoef(W_hat_flat, W_true_flat)
             pearson_corr = corrcoef_matrix[0, 1]
 
             D_ev = pd.DataFrame()
-            D_ev['iteration'] = [i]
             D_ev['n_task'] = [n_task]
             D_ev['metric'] = [metric]
             D_ev['correlation'] = pearson_corr
             results_df = pd.concat([results_df,D_ev],axis=0)
+
+    return results_df
 
 
 if __name__=='__main__':
