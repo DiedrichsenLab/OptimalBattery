@@ -101,9 +101,9 @@ def get_dice_coefficient(U_true, U_pred):
     if len(U_pred.shape) == 2:
         U_pred = U_pred.unsqueeze(0)
 
-    intersection = (U_true * U_pred).sum(dim=1) 
-    size_true = U_true.sum(dim=1)               
-    size_pred = U_pred.sum(dim=1)          
+    intersection = (U_true * U_pred).sum(dim=2) 
+    size_true = U_true.sum(dim=2)               
+    size_pred = U_pred.sum(dim=2)          
 
     dice_scores = (2 * intersection ) / (size_true + size_pred )  
     mean_dice = dice_scores.mean().item()
@@ -161,13 +161,15 @@ def sim_single_contrast(num_task_lib = 100,
     V_lib = rng.normal(0,1,(num_task_lib, n_parcels))
     V_lib = V_lib - V_lib.mean(axis=0,keepdims=True)
     V_lib = pt.tensor(V_lib, device=device, dtype=pt.float64)
-
+    
     # get the single contrast
     max_idx, min_idx = find_single_contrast(V_lib, 5, 4)
     combination = [max_idx, min_idx]
 
     # get the V localizer
     V_localizer = V_lib[combination,:]
+    V_localizer = ut.center_matrix(V_localizer,axis=0)
+    V_localizer = ut.normalize_matrix(V_localizer,axis=0)
 
     # get the data for the parcellation estimation and add noise
     Y_localizer = V_localizer @ U_true
@@ -222,7 +224,7 @@ def sim_parcellation(num_task_lib = 100,
     for n_task in battery_sizes:
         print(f"Processing battery size: {n_task}")
         # Generate possible battery combinations for current battery size and calculate eigenmetrics
-        D = ct.build_combinations(G_lib=G_lib, strategy='random',n_batteries=n_batteries,n_tasks=n_task,replacement=False,rest_idx=None)
+        D = ct.build_combinations(G_lib=G_lib, strategy='random',n_batteries=n_batteries,n_tasks=n_task,replacement=False,rest_idx=None,seed=seed)
         for metric in metrics:
             # Find the best battery for the metric
             D_best = ct.choose_combination(D,metric) 
@@ -230,7 +232,7 @@ def sim_parcellation(num_task_lib = 100,
 
             # get the V battery
             V_battery = V_lib[top_comb,:]
-            V_battery = ut.center_matrix(V_battery,axis=0)
+            V_battery = ut.center_matrix(V_battery,axis=0) 
             V_battery = ut.normalize_matrix(V_battery,axis=0)
 
             # get the data for the parcellation estimation and add noise
@@ -252,7 +254,8 @@ def sim_parcellation(num_task_lib = 100,
                 everything_else = U_hats[:, :4, :].sum(dim=1, keepdim=True)
                 # get the last parcel (target parcel)
                 parcel_of_interest = U_hats[:, 4:, :]
-                U_hats = pt.cat([everything_else, parcel_of_interest], dim=1)  
+                U_hats = pt.cat([everything_else, parcel_of_interest], dim=1)
+ 
 
             # Evaluate the parcellation
             if collapsed_U_true is not None:
