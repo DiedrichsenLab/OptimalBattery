@@ -168,9 +168,6 @@ def sim_single_contrast(num_task_lib = 100,
 
     # get the V localizer
     V_localizer = V_lib[combination,:]
-    # is cenering and normalizing necessary?
-    # V_localizer = ut.center_matrix(V_localizer,axis=0)
-    # V_localizer = ut.normalize_matrix(V_localizer,axis=0)
 
     # get the data for the parcellation estimation and add noise
     Y_localizer = V_localizer @ U_true
