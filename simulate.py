@@ -314,7 +314,7 @@ def sim_connectivity(num_task_lib = 100,
                      battery_sizes = [3,4,6,8,10,14,18,24,28],
                      n_batteries = 100,
                      base_noise = 5,
-                     ridge_alpha = 0.1,
+                     ridge_alpha = 1000,
                      seed = None):
     """ Single simulation for the connectivity estimation.
     """
