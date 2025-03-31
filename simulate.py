@@ -143,6 +143,40 @@ def make_thresholded_contrast(task1, task2, threshold):
     thresholded_data = pt.nn.functional.one_hot(thresholded_data.long(), num_classes=2).T
     return thresholded_data
 
+def collapse_U(U, target_parcel_idx):
+    """
+    Collapse the U matrix into two parcels: one for the target parcel and one for everything else.
+
+    Args:
+        U (Tensor): Shape (n_sub, K, P) or (K, P):
+            - n_sub: number of subjects
+            - K: number of parcels
+            - P: number of voxels
+        target_parcel (int): Index of the parcel to isolate
+
+    Returns:
+        Tensor: Collapsed U of shape (n_sub, 2, P) or (2, P)
+    """
+    # if 2d make 3d
+    added_batch_dim = False
+    if U.dim() == 2:
+        U = U.unsqueeze(0)
+        added_batch_dim = True
+
+    # select the target and non-target parcels
+    target = U[:, target_parcel_idx:target_parcel_idx+1, :]
+    rest = pt.cat([U[:, :target_parcel_idx, :], U[:, target_parcel_idx+1:, :]], dim=1)
+    rest_sum = rest.sum(dim=1, keepdim=True)
+
+    # combine
+    U_collapsed = pt.cat([rest_sum, target], dim=1)
+
+    # Remove batch dim if original input was 2D
+    if added_batch_dim:
+        U_collapsed = U_collapsed.squeeze(0)
+
+    return U_collapsed
+
 def sim_single_contrast(num_task_lib = 100,
                         n_parcels = 5,
                         U_true = None,
@@ -150,6 +184,7 @@ def sim_single_contrast(num_task_lib = 100,
                         max_battery_size = 28,
                         thresholds = [0.1, 0.2, 0.3, 0.4, 0.5],
                         U_true_collapsed = None,
+                        n_sim = 50,
                         seed = None):
     """ Single simulation for the single contrast evaluation."""
 
@@ -158,41 +193,44 @@ def sim_single_contrast(num_task_lib = 100,
         rng= np.random.default_rng(seed=seed)
     else:
         rng= np.random.default_rng()
-    V_lib = rng.normal(0,1,(num_task_lib, n_parcels))
-    V_lib = V_lib - V_lib.mean(axis=0,keepdims=True)
-    V_lib = pt.tensor(V_lib, device=device, dtype=pt.float64)
-
-    # get the single contrast
-    max_idx, min_idx = find_single_contrast(V_lib, 5, 4)
-    combination = [max_idx, min_idx]
-
-    # get the V localizer
-    V_localizer = V_lib[combination,:]
-    V_localizer = ut.center_matrix(V_localizer,axis=0)
-    V_localizer = ut.normalize_matrix(V_localizer,axis=0)
-
-    # get the data for the parcellation estimation and add noise
-    Y_localizer = V_localizer @ U_true
-    weighted_noise_std = get_weighted_noise_std(2, max_battery_size, base_noise)
-    noise = rng.normal(0,weighted_noise_std,Y_localizer.shape)
-    noise = pt.tensor(noise, dtype=pt.float64, device=Y_localizer.device)
-    Y_localizer = Y_localizer + noise
-    # is cenering and normalizing necessary?
-    # Y_localizer = ut.center_matrix(Y_localizer,axis=0)
-    # Y_localizer = ut.normalize_matrix(Y_localizer,axis=0)
-
+    
     results_df = pd.DataFrame()
-    for threshold in thresholds:
-        # get the thresholded contrast
-        thresholded_contrast = make_thresholded_contrast(Y_localizer[0,:], Y_localizer[1,:], threshold)
+    for n in range(n_sim):
 
-        # Evaluate the contrast
-        accuracy = get_dice_coefficient(U_true_collapsed, thresholded_contrast)
+        V_lib = rng.normal(0,1,(num_task_lib, n_parcels))
+        V_lib = V_lib - V_lib.mean(axis=0,keepdims=True)
+        V_lib = pt.tensor(V_lib, device=device, dtype=pt.float64)
 
-        D_ev = pd.DataFrame()
-        D_ev['threshold'] = [threshold]
-        D_ev['accuracy'] = accuracy
-        results_df = pd.concat([results_df,D_ev],axis=0)
+        # get the single contrast
+        max_idx, min_idx = find_single_contrast(V_lib, 5, 4)
+        combination = [max_idx, min_idx]
+
+        # get the V localizer
+        V_localizer = V_lib[combination,:]
+        V_localizer = ut.center_matrix(V_localizer,axis=0)
+        V_localizer = ut.normalize_matrix(V_localizer,axis=0)
+
+        # get the data for the parcellation estimation and add noise
+        Y_localizer = V_localizer @ U_true
+        weighted_noise_std = get_weighted_noise_std(2, max_battery_size, base_noise)
+        noise = rng.normal(0,weighted_noise_std,Y_localizer.shape)
+        noise = pt.tensor(noise, dtype=pt.float64, device=Y_localizer.device)
+        Y_localizer = Y_localizer + noise
+        # is cenering and normalizing necessary?
+        # Y_localizer = ut.center_matrix(Y_localizer,axis=0)
+        # Y_localizer = ut.normalize_matrix(Y_localizer,axis=0)
+
+        for threshold in thresholds:
+            # get the thresholded contrast
+            thresholded_contrast = make_thresholded_contrast(Y_localizer[0,:], Y_localizer[1,:], threshold)
+
+            # Evaluate the contrast
+            accuracy = get_dice_coefficient(U_true_collapsed, thresholded_contrast)
+
+            D_ev = pd.DataFrame()
+            D_ev['threshold'] = [threshold]
+            D_ev['accuracy'] = accuracy
+            results_df = pd.concat([results_df,D_ev],axis=0)
 
     return results_df
 
@@ -253,12 +291,7 @@ def sim_parcellation(num_task_lib = 100,
 
                 # This is for the single region analysis (optional argument to collapsee the parcellation into two regions)
                 if collapsed_U_true is not None:
-                    # get the first 4 parcels and sum them
-                    everything_else = U_hats[:, :4, :].sum(dim=1, keepdim=True)
-                    # get the last parcel (target parcel)
-                    parcel_of_interest = U_hats[:, 4:, :]
-                    U_hats = pt.cat([everything_else, parcel_of_interest], dim=1)
-
+                    U_hats = collapse_U(U_hats, target_parcel_idx=4)
 
                 # Evaluate the parcellation
                 if collapsed_U_true is not None:
