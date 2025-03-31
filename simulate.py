@@ -201,20 +201,16 @@ def sim_parcellation(num_task_lib = 100,
                      n_parcels = 5,
                      U_true = None,
                      battery_sizes = [3,4,6,8,10,14,18,24,28],
-                     n_batteries = 50000,
+                     n_batteries = 100,
                      base_noise = 2,
                      collapsed_U_true = None,
+                     n_sim = 50,
                      seed = None):
     # Make new task battery
     if seed is not None:
         rng= np.random.default_rng(seed=seed)
     else:
         rng= np.random.default_rng()
-    V_lib = rng.normal(0,1,(num_task_lib, n_parcels))
-    V_lib = V_lib - V_lib.mean(axis=0,keepdims=True)
-    G_lib = V_lib @ V_lib.T
-    # ensure tensor
-    V_lib = pt.tensor(V_lib, device=device, dtype=pt.float64)
 
     # constants
     metrics = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc']
@@ -223,51 +219,58 @@ def sim_parcellation(num_task_lib = 100,
     results_df =pd.DataFrame()
     for n_task in battery_sizes:
         print(f"Processing battery size: {n_task}")
-        # Generate possible battery combinations for current battery size and calculate eigenmetrics
-        D = ct.build_combinations(G_lib=G_lib, strategy='random',n_batteries=n_batteries,n_tasks=n_task,replacement=False,rest_idx=None,seed=seed)
-        for metric in metrics:
-            # Find the best battery for the metric
-            D_best = ct.choose_combination(D,metric)
-            top_comb = D_best['combination'].values[0]
+        for n in range(n_sim):
+            V_lib = rng.normal(0,1,(num_task_lib, n_parcels))
+            V_lib = V_lib - V_lib.mean(axis=0,keepdims=True)
+            G_lib = V_lib @ V_lib.T
+            # ensure tensor
+            V_lib = pt.tensor(V_lib, device=device, dtype=pt.float64)
 
-            # get the V battery
-            V_battery = V_lib[top_comb,:]
-            V_battery = ut.center_matrix(V_battery,axis=0)
-            V_battery = ut.normalize_matrix(V_battery,axis=0)
+            # Generate possible battery combinations for current battery size and calculate eigenmetrics
+            D = ct.build_combinations(G_lib=G_lib, strategy='random',n_batteries=n_batteries,n_tasks=n_task,replacement=False,rest_idx=None,seed=seed)
+            for metric in metrics:
+                # Find the best battery for the metric
+                D_best = ct.choose_combination(D,metric)
+                top_comb = D_best['combination'].values[0]
 
-            # get the data for the parcellation estimation and add noise
-            Y_battery = V_battery @ U_true
-            weighted_noise_std = get_weighted_noise_std(n_task, max_battery_size, base_noise)
-            noise = rng.normal(0,weighted_noise_std,Y_battery.shape)
-            noise = pt.tensor(noise, dtype=pt.float64, device=Y_battery.device)
-            Y_battery = Y_battery + noise
-            Y_battery = ut.center_matrix(Y_battery,axis=0)
-            Y_battery = ut.normalize_matrix(Y_battery,axis=0)
+                # get the V battery
+                V_battery = V_lib[top_comb,:]
+                V_battery = ut.center_matrix(V_battery,axis=0)
+                V_battery = ut.normalize_matrix(V_battery,axis=0)
 
-
-            # Build the parcellation
-            U_hats = et.estimate_Us(Y_battery, V_battery, method='correlation', hard=True)
-
-            # This is for the single region analysis (optional argument to collapsee the parcellation into two regions)
-            if collapsed_U_true is not None:
-                # get the first 4 parcels and sum them
-                everything_else = U_hats[:, :4, :].sum(dim=1, keepdim=True)
-                # get the last parcel (target parcel)
-                parcel_of_interest = U_hats[:, 4:, :]
-                U_hats = pt.cat([everything_else, parcel_of_interest], dim=1)
+                # get the data for the parcellation estimation and add noise
+                Y_battery = V_battery @ U_true
+                weighted_noise_std = get_weighted_noise_std(n_task, max_battery_size, base_noise)
+                noise = rng.normal(0,weighted_noise_std,Y_battery.shape)
+                noise = pt.tensor(noise, dtype=pt.float64, device=Y_battery.device)
+                Y_battery = Y_battery + noise
+                Y_battery = ut.center_matrix(Y_battery,axis=0)
+                Y_battery = ut.normalize_matrix(Y_battery,axis=0)
 
 
-            # Evaluate the parcellation
-            if collapsed_U_true is not None:
-                accuracy = get_dice_coefficient(collapsed_U_true, U_hats)
-            else:
-                accuracy = get_dice_coefficient(U_true, U_hats)
+                # Build the parcellation
+                U_hats = et.estimate_Us(Y_battery, V_battery, method='correlation', hard=True)
 
-            D_ev = pd.DataFrame()
-            D_ev['n_task'] = [n_task]
-            D_ev['metric'] = [metric]
-            D_ev['accuracy'] = accuracy
-            results_df = pd.concat([results_df,D_ev],axis=0)
+                # This is for the single region analysis (optional argument to collapsee the parcellation into two regions)
+                if collapsed_U_true is not None:
+                    # get the first 4 parcels and sum them
+                    everything_else = U_hats[:, :4, :].sum(dim=1, keepdim=True)
+                    # get the last parcel (target parcel)
+                    parcel_of_interest = U_hats[:, 4:, :]
+                    U_hats = pt.cat([everything_else, parcel_of_interest], dim=1)
+
+
+                # Evaluate the parcellation
+                if collapsed_U_true is not None:
+                    accuracy = get_dice_coefficient(collapsed_U_true, U_hats)
+                else:
+                    accuracy = get_dice_coefficient(U_true, U_hats)
+
+                D_ev = pd.DataFrame()
+                D_ev['n_task'] = [n_task]
+                D_ev['metric'] = [metric]
+                D_ev['accuracy'] = accuracy
+                results_df = pd.concat([results_df,D_ev],axis=0)
 
     return results_df
 
@@ -289,8 +292,11 @@ def sim_connectivity(num_task_lib = 100,
     else:
         rng= np.random.default_rng()
 
-    results_df = pd.DataFrame()
+    # constants
+    metrics = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc']
+    max_n_task = max(battery_sizes)
 
+    results_df = pd.DataFrame()
     for n_task in battery_sizes:
         print(f"Processing battery size: {n_task}")
 
@@ -299,11 +305,8 @@ def sim_connectivity(num_task_lib = 100,
             V_lib = V_lib - V_lib.mean(axis=0,keepdims=True)
             G_lib = V_lib @ V_lib.T
 
+            # sample the connectivity weights from a normal
             W_true = rng.normal(0,1,(n_parcels, n_voxels_y))
-
-            metrics = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc']
-            max_n_task = max(battery_sizes)
-
 
             # Generate possible battery combinations for current battery size and calculate eigenmetrics
             D = ct.build_combinations(G_lib, strategy='random',n_batteries=n_batteries,n_tasks=n_task,replacement=False)
@@ -328,7 +331,7 @@ def sim_connectivity(num_task_lib = 100,
                 conn_model.fit(data_x, data_y)
 
                 # get the estimated W and correlate with W_true
-                coef= conn_model.coef_.T # transpose to get the right shape
+                coef= conn_model.coef_.T
 
                 corrcoef_matrix = np.corrcoef(coef.flatten(), W_true.flatten())
                 pearson_corr = corrcoef_matrix[0, 1]
