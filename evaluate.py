@@ -6,26 +6,26 @@ import torch as pt
 import OptimalBattery.estimate as et
 import OptimalBattery.util as ut
 import numpy as np
-import construct as ct
+import OptimalBattery.construct as ct
 
 def get_prediction_error(ytest, vtest, U_hat, indices=None):
     """Compute the prediction error using
-    
+
     Args:
         ytest (ndarray): Test data (subjects,conditions, voxels).
         vtest (ndarray): Test Vs
         U_hat (ndarray): Estimated Us.
         indices (list or None): Indices of the voxels to evaluate.
-    
+
     Returns:
         cos_err (ndarray): Cosine error per subject.
         cos_mean (ndarray): Mean cosine error across all subjects.
     """
     # Ensure correct dimensions (batching subjects if needed)
     if U_hat.ndimension() == 2:
-        U_hat = U_hat.unsqueeze(0)  
+        U_hat = U_hat.unsqueeze(0)
     if ytest.ndimension() == 2:
-        ytest = ytest.unsqueeze(0) 
+        ytest = ytest.unsqueeze(0)
 
     # Compute yhat
     yhat = pt.matmul(vtest, U_hat)
@@ -48,7 +48,7 @@ def evluate_dataframe_parcellation(D,condition_df,
                         Ytest, Vtest,
                         indices = None,method='correlation',hard = True,alpha =1e-3,localizer_time=8):
     """ Evaluate the parcellation performance for each combination in the DataFrame D.
-    
+
             Args:
                 D: DataFrame containing the combinations to evaluate
                 condition_df: dataframe that contains how long each condition is and it's indices
@@ -101,7 +101,7 @@ def evluate_dataframe_parcellation(D,condition_df,
         D.at[i, 'cos_subjects'] = cos_subs.cpu().numpy().tolist()
         D.loc[i, 'cos_mean'] = cos_mean.item()
     return D
-    
+
 
 if __name__=='__main__':
     U_hat = pt.random.rand(3,10,6000)
