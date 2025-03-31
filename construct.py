@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from numpy.linalg import eigh
 import torch as pt
+import PcmPy as pcm
 
 def eigenval_crit(G, center=True):
     """Computes various criteria based on the eigenvalues and mutual information of a matrix G.
@@ -48,7 +49,7 @@ def eigenval_crit(G, center=True):
     
     return d
 
-def build_combinations(G_lib, strategy='random',n_batteries=1000,n_tasks=4,seed=1,replacement=True,rest_idx=None): 
+def build_combinations(G_lib, strategy='random',n_batteries=1000,n_tasks=4,seed=None,replacement=True,rest_idx=None): 
     """ Builds a set of task-batteries and evalates them 
     Parameters:
         G_lib(np.ndarray): Second moment matrix
@@ -92,7 +93,25 @@ def build_combinations(G_lib, strategy='random',n_batteries=1000,n_tasks=4,seed=
         D_list.append(pd.DataFrame(d))
     D = pd.concat(D_list)
     D = D.reset_index(drop=True)
-    return D 
+    return D
+
+def get_G(data,n_cond = 29,n_part = 16):
+    """get the crossvalided covariance matrix of the data across all subjects"""
+
+    # make conditiion and partition vectors
+    cond_vec = np.tile(np.arange(1, n_cond + 1), n_part)
+    part_vec = np.repeat(np.arange(1, n_part + 1), n_cond)
+
+    # calculate G per subject and average across subjects
+    Gs_list = []
+    for i in range(data.shape[0]):
+        Gs,_ = pcm.util.est_G_crossval(data[i] , cond_vec, part_vec)
+        Gs_list.append(Gs)
+
+    Gs_list = np.stack(Gs_list, 0)
+    G_Lib = np.mean(Gs_list, axis=0)
+
+    return G_Lib
 
 
 def choose_combination(D,metric):
@@ -178,24 +197,33 @@ def build_combination_regressors(combination, condition_df, localizer_time=12):
 
 def average_regressors(run_data, regressor_groups):
     """
-    Computes the average of selected regressors efficiently using PyTorch.
+    Computes the average of selected regressors.
 
     Args:
-        run_data (torch.Tensor): Input tensor of shape (subjects, regressors, voxels).
+        run_data : Input tensor of shape (subjects, regressors, voxels).
         regressor_groups (list of list of int): A list containing lists of regressor indices to be averaged.
     Returns:
-        Ysubset (torch.Tensor): Averaged regressors of shape (subjects, number of tasks, voxels).
+        Ysubset : Averaged regressors of shape (subjects, number of tasks, voxels).
     """
+
     subjects, _, voxels = run_data.shape
     num_groups = len(regressor_groups)
     
-    # Pre-allocate output tensor
-    Ysubset = pt.empty((subjects, num_groups, voxels), dtype=run_data.dtype, device=run_data.device)
-    
-    # Compute the average for each group
-    for i, indices in enumerate(regressor_groups):
-        selected = run_data[:, indices, :]  # Gather the required regressors
-        Ysubset[:, i, :] = selected.mean(dim=1)  # Average across regressors
+    if type(run_data) is pt.Tensor:
+        # initialize
+        Ysubset = pt.empty((subjects, num_groups, voxels), dtype=run_data.dtype, device=run_data.device)
+        # Compute the average for each group
+        for i, indices in enumerate(regressor_groups):
+            selected = run_data[:, indices, :]  # Gather the required regressors
+            Ysubset[:, i, :] = selected.mean(dim=1)  # Average across regressors
+    else:
+        # initialize
+        Ysubset = np.zeros((subjects, num_groups, voxels))
+        # Compute the average for each group
+        for i, indices in enumerate(regressor_groups):
+            selected = run_data[:, indices, :]  # Gather the required regressors
+            Ysubset[:, i, :] = np.nanmean(selected, axis=1)  # Average the selected regressors
+
     return Ysubset
 
 if __name__ == "__main__":
