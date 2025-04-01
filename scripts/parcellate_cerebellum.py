@@ -48,13 +48,13 @@ nettekoven_parcellation = atlas.read_data(model_name)
 # Load data
 MDTB_dataset = DataSetMDTB(f'{func_fus_dir}/MDTB')
 
-data_mdtb_s2_run,info_mdtb_2_run  =MDTB_dataset.get_data(space=space,ses_id='ses-s2',type='CondRun')
+data_mdtb_s2_run,info_mdtb_2_run  =MDTB_dataset.get_data(space=space,ses_id='ses-s1',type='CondRun')
 data_mdtb_s2_run[np.isnan(data_mdtb_s2_run)] = 0
 
-data_mdtb_s2_all,info_mdtb_2_all  =MDTB_dataset.get_data(space=space,ses_id='ses-s2',type='CondAll')
+data_mdtb_s2_all,info_mdtb_2_all  =MDTB_dataset.get_data(space=space,ses_id='ses-s1',type='CondAll')
 data_mdtb_s2_all[np.isnan(data_mdtb_s2_all)] = 0
 
-data_mdtb_s1_all,info_mdtb_1_all  =MDTB_dataset.get_data(space=space,ses_id='ses-s1',type='CondAll')
+data_mdtb_s1_all,info_mdtb_1_all  =MDTB_dataset.get_data(space=space,ses_id='ses-s2',type='CondAll')
 data_mdtb_s1_all[np.isnan(data_mdtb_s1_all)] = 0
 
 data_mdtb_s2_run = ut.recenter_fmri_data(data_mdtb_s2_run,info_mdtb_2_run,task_column_name='cond_name',center_condition='rest')
@@ -73,17 +73,7 @@ for roi_name , parcels in rois.items():
     ROI_indices = np.where(ROI_mask)[0]
 
     # get the G matrix
-    cond_vec = np.tile(np.arange(1, 32 + 1), 16)
-    part_vec = np.repeat(np.arange(1, 16 + 1), 32)
-    Gs_list = []
-    E_list = []
-    for i in range(data_mdtb_s2_run.shape[0]):
-        Gs,E = pcm.util.est_G_crossval(data_mdtb_s2_run[i][:,ROI_indices] , cond_vec, part_vec)
-        Gs_list.append(Gs)
-        E_list.append(E)
-
-    Gs_list = np.stack(Gs_list, 0)
-    G_Lib = np.mean(Gs_list, axis=0)
+    G_Lib = ct.get_G(data= data_mdtb_s2_run[:,:,ROI_indices],n_cond=29,n_part=16)
 
     # make variables torch
     device = pt.device('cuda' if pt.cuda.is_available() else 'cpu')
@@ -105,24 +95,28 @@ for roi_name , parcels in rois.items():
 
     n_parcels = full_vs_train.shape[1]
 
-    VLib = full_vs_train[:,:]
-    Vtest = full_vs_test[:,:]
-
-    for n_task in battery_sizes:
-        print(f'Processing {n_task} tasks')
-        D = ct.build_combinations(G_Lib, strategy='random',n_batteries=10000,n_tasks=n_task,seed=1,replacement=False,rest_idx=31)
-
-        D_ev = ev.evluate_dataframe( D = D, condition_df= condition_df, YLib= data_train,
-                                    VLib= VLib, Ytest= data_test, Vtest= Vtest,indices=ROI_indices,method='correlation')
-        D_ev['roi'] = roi_name
-        D_ev['parcels'] = [str(parcels)] * len(D_ev)
-        D_ev['n_parcel'] = len(parcels)
-        D_ev['n_task'] = n_task
+    D = ev.real_parcellation(G_Lib,condition_df,
+                        data_train,data_test,
+                        full_vs_train,full_vs_test,
+                        evaluation_indices = ROI_indices,
+                        battery_sizes = [3,4,5,6,7,8,9,10,14,16],
+                        metrics  = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],
+                        n_batteries = 20000,
+                        n_iter=20,
+                        rest_idx = 28,
+                        localizer_duration=8)
+    
+    D['roi'] = roi_name
+    D['parcels'] = ', '.join(parcels)
+    D['n_parcel'] = len(parcels)
         
-        all_results.append(D_ev)
+    all_results.append(D)
 
 # Concatenate all results into a single DataFrame
 final_results_df = pd.concat(all_results, ignore_index=True)
 
 # Save the results
-final_results_df.to_csv(f'{base_dir}/OptimalBattery/Eval_tsvs/real_cerebellum_parcellation.tsv', sep='\t', index=False)
+save_dir = os.path.abspath(os.path.join(os.getcwd(), 'notebooks','eval_tsvs'))
+save_path = os.path.join(save_dir, 'real_parcellation_cerebellum.tsv')
+final_results_df.to_csv(save_path, sep='\t', index=False)
+

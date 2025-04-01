@@ -54,7 +54,8 @@ def estimate_Us(Y, V, method='correlation', alpha=1e-3, hard=False):
         U_hard = pt.zeros_like(U_hats)
         U_hard.scatter_(1, max_indices.unsqueeze(1), 1)
         U_hats = U_hard
-
+    else:
+        U_hats = pt.nn.functional.softmax(U_hats, dim=1)
     return U_hats
 
 

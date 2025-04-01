@@ -56,65 +56,6 @@ def get_prediction_error(ytest, vtest, U_hat, indices=None):
     return cos_err, cos_mean
 
 
-def evluate_dataframe_parcellation(D,condition_df,
-                        YLib,VLib,
-                        Ytest, Vtest,
-                        indices = None,method='correlation',hard = True,alpha =1e-3,localizer_time=8):
-    """ Evaluate the parcellation performance for each combination in the DataFrame D.
-
-            Args:
-                D: DataFrame containing the combinations to evaluate
-                condition_df: dataframe that contains how long each condition is and it's indices
-                YLib: The training data (all tasks all voxels) (subjects, conditions x repitions, voxels)
-                VLib: Activity profiles for training data (tasks,parcels)
-                Ytest: The test data (all tasks all voxels) (subjects, conditions, voxels)
-                Vtest: Activity profiles for test data (tasks,parcels)
-                indices: The indices of the voxels to evaluate in
-                method: The method to use for estimating the Us
-                localizer_time: The scanning time of the localizers in seconds
-    return:
-        D: DataFrame with the computed prediction error
-        """
-    D['cos_subjects'] = None
-    D['cos_mean'] = None
-
-    # Center & Normalize vtest
-    Vtest = ut.center_matrix(Vtest, axis=0)
-    Vtest = ut.normalize_matrix(Vtest, axis=0)
-
-    # Center & Normalize ytest
-    Ytest = ut.center_matrix(Ytest, axis=1)
-    Ytest = ut.normalize_matrix(Ytest, axis=1)
-
-    for i in range(len(D)):
-        if i % 1000 == 0:
-            print(f"Processing combination: {i}")
-        # Get the combination
-        combination = D['combination'].iloc[i]
-        combination = list(combination)
-
-        # construct the regressors
-        combination_regressors = ct.build_combination_regressors(combination, condition_df,localizer_time=localizer_time)
-
-        # build the actual artificial localizer data
-        YLib_subset = ct.average_regressors(YLib, combination_regressors)
-        YLib_subset = ut.center_matrix(YLib_subset, axis=1)
-        YLib_subset = ut.normalize_matrix(YLib_subset, axis=1)
-
-        # get the Vs for the combination
-        VLib_subset = VLib[combination, :]
-        VLib_subset = ut.center_matrix(VLib_subset, axis=0)
-        VLib_subset = ut.normalize_matrix(VLib_subset, axis=0)
-
-        # Build the parcellation
-        U_hats = et.estimate_Us(YLib_subset, VLib_subset,method,hard= hard,alpha=alpha)
-
-        # evaluate the parcellation
-        cos_subs, cos_mean = get_prediction_error(Ytest, Vtest, U_hats, indices=indices)
-        D.at[i, 'cos_subjects'] = cos_subs.cpu().numpy().tolist()
-        D.loc[i, 'cos_mean'] = cos_mean.item()
-    return D
-
 def fit_model(xtrain,ytrain,X_atlas,train_label_image):
     # initialize training dict
     conn_model_list = []
@@ -224,6 +165,67 @@ def real_connectivity(G_library, condition_df,
                 results_df = pd.concat([results_df,D_ev],axis=0)
                 results_df.reset_index(drop=True, inplace=True)
             
+
+    return results_df
+
+
+def real_parcellation(G_library,condition_df,
+                        YLib,Ytest,
+                        VLib,Vtest,
+                        evaluation_indices = None,
+                        battery_sizes = [3,4,5,6,7,8,9,10,12,14,16],
+                        metrics  = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],
+                        n_batteries = 1000,
+                        n_iter=5,
+                        rest_idx = 28,
+                        localizer_duration=8):
+    """ Evaluate the parcellation performance for each combination in the DataFrame D.
+
+    """
+    # Center & Normalize vtest
+    Vtest = ut.center_matrix(Vtest, axis=0)
+    Vtest = ut.normalize_matrix(Vtest, axis=0)
+
+    # Center & Normalize ytest
+    Ytest = ut.center_matrix(Ytest, axis=1)
+    Ytest = ut.normalize_matrix(Ytest, axis=1)
+
+    results_df = pd.DataFrame()
+    for n_task in battery_sizes:
+        print(f"Evaluating battery size: {n_task}")
+        for n in range(n_iter):
+            print(f"Iteration: {n}")
+            D = ct.build_combinations(G_library, strategy='random',n_batteries=n_batteries,n_tasks=n_task,seed = None,replacement=False,rest_idx= rest_idx)
+            for metric in metrics:
+                print(f"Evaluating metric: {metric}")
+                D_best = ct.choose_combination(D,metric)
+                top_comb = D_best['combination'].values[0]
+
+                # get the regressors for training data
+                combination_regressors = ct.build_combination_regressors(top_comb, condition_df=condition_df, localizer_time=localizer_duration)
+
+                # average, center and normalize the data used for the parcellation
+                Ysubset = ct.average_regressors(YLib, combination_regressors)
+                Ysubset = ut.center_matrix(Ysubset, axis=1)
+                Ysubset = ut.normalize_matrix(Ysubset, axis=1)
+
+                Vsubset = VLib[top_comb,:]
+                Vsubset = ut.center_matrix(Vsubset, axis=0)
+                Vsubset = ut.normalize_matrix(Vsubset, axis=0)
+
+                Uhats =  et.estimate_Us(Ysubset, Vsubset, method='correlation',hard=True)
+
+                cos_subjects, cos_mean = get_prediction_error(Ytest, Vtest, Uhats, indices=evaluation_indices)
+                cos_subjects = cos_subjects.cpu().numpy().tolist()
+               
+                # record
+                D_ev = pd.DataFrame()
+                D_ev['n_task'] = [n_task]
+                D_ev['metric'] = [metric]
+                D_ev['cos_err'] = [cos_subjects]
+                D_ev['iteration'] = [n]
+                results_df = pd.concat([results_df,D_ev],axis=0)
+                results_df.reset_index(drop=True, inplace=True)
 
     return results_df
                 
