@@ -17,10 +17,76 @@ import OptimalBattery.construct as ct
 import OptimalBattery.plot as plot
 
 rois = {
-    # 'Dorsolateral_PFC': ['9-46d', '46', '9a', 'a9-46v', 'p9-46v', '9p', 'IFJa', 'IFJp', 'IFSp', 'IFSa'],
-    # 'Parietal_Multisensory': ['LIPv', 'LIPd', 'VIP', 'MIP', 'AIP', '7PC', '7AL', '7Am'],
-    'Posterior_Cingulate': ['d23ab', 'v23ab', '23c', '23d', '31pv', '31pd', '31a']
+    "Dorsolateral_PFC": [
+        "9-46d", "46", "9a", "a9-46v", "p9-46v",
+        "9p", "IFJa", "IFJp", "IFSp", "IFSa"
+    ],
+    "DLPFC_Caudal": [
+        "9-46d", "46",
+        "IFJa", "IFJp",
+        "IFSp", "IFSa"
+    ],
+    "DLPFC_Rostral": [
+        "9a", "9p",
+        "a9-46v", "p9-46v"
+    ],
+    "Parietal_Multisensory": [
+        "LIPv", "LIPd", "VIP", "MIP", "AIP",
+        "7PC", "7AL", "7Am"
+    ],
+    "Posterior_Cingulate": [
+        "d23ab", "v23ab", "23c", "23d",
+        "31pv", "31pd", "31a"
+    ],
+    "Anterior_Cingulate": [
+        "p24pr", "33pr", "a24pr", "p32pr",
+        "a24", "d32"
+    ],
+    "Orbitofrontal_Ventromedial": [
+        "10v", "a10p", "10pp", "11l",
+        "13l", "OFC", "47s", "25"
+    ],
+    "Motor_Premotor": [
+        "4", "6a", "6d", "6mp", "6v"
+    ],
+    "Early_Visual": [
+        "V1", "V2", "V3", "V4",
+        "V6", "V7", "V8", "V3A"
+    ],
+    "Higher_Visual": [
+        "MT", "MST", "V3B", "V3CD",
+        "LO1", "LO2"
+    ],
+    "Auditory_Temporal": [
+        "A1", "MBelt", "LBelt", "STSdp",
+        "STSda", "STSva", "STSvp", "TA2",
+        "PBelt", "A4", "A5"
+    ],
+    "Ventral_Temporal": [
+        "FFC", "PIT", "TE1p", "TE2p",
+        "PH", "PHT"
+    ],
+
+    "Anterior_Insula": [
+        "AVI", "AAIC", "FOP1", "FOP2",
+        "FOP3", "FOP4", "FOP5", "MI"
+    ],
+    "Hippocampal_Parahipp": [
+        "H", "PHA1", "PHA2", "PHA3",
+        "PH", "PeEc", "EC"
+    ],
+    "Inferior_Parietal": [
+        "IP0", "IP1", "IP2", "PF",
+        "PFm", "PGi", "PGs"
+    ],
+    "Language_Network": [
+        "PSL", "SFL", "44", "45"
+    ],
+    "Eye_Movements": [
+        "FEF", "PEF", "SCEF", "8Av", "8Ad"
+    ]
 }
+
 
 
 # define atlas and dirs
@@ -125,6 +191,6 @@ final_results_df = pd.concat(all_results, ignore_index=True)
 
 # Save the results
 save_dir = os.path.abspath(os.path.join(os.getcwd(), 'notebooks','eval_tsvs'))
-save_path = os.path.join(save_dir, 'real_parcellation_cortex_switched.tsv')
+save_path = os.path.join(save_dir, 'real_parcellation_cortex.tsv')
 final_results_df.to_csv(save_path, sep='\t', index=False)
 

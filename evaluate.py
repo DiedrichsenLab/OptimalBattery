@@ -228,6 +228,67 @@ def real_parcellation(G_library,condition_df,
                 results_df.reset_index(drop=True, inplace=True)
 
     return results_df
+
+
+def real_localization_multi(G_library,condition_df,
+                        YLib,Ytest,
+                        VLib,Vtest,
+                        evaluation_indices = None,
+                        battery_sizes = [3,4,5,6,7,8,9,10,12,14,16],
+                        metric = ['log_det_mc'],
+                        n_batteries = 1000,
+                        n_iter=5,
+                        rest_idx = 28,
+                        localizer_duration=8):
+    """ Evaluate the localization performance multitask battery
+
+    """
+    # Center & Normalize vtest
+    Vtest = ut.center_matrix(Vtest, axis=0)
+    Vtest = ut.normalize_matrix(Vtest, axis=0)
+
+    # Center & Normalize ytest
+    Ytest = ut.center_matrix(Ytest, axis=1)
+    Ytest = ut.normalize_matrix(Ytest, axis=1)
+
+    results_df = pd.DataFrame()
+    for n_task in battery_sizes:
+        print(f"Evaluating battery size: {n_task}")
+        for n in range(n_iter):
+            print(f"Iteration: {n}")
+            D = ct.build_combinations(G_library, strategy='random',n_batteries=n_batteries,n_tasks=n_task,seed = None,replacement=False,rest_idx= rest_idx)
+            for metric in metrics:
+                print(f"Evaluating metric: {metric}")
+                D_best = ct.choose_combination(D,metric)
+                top_comb = D_best['combination'].values[0]
+
+                # get the regressors for training data
+                combination_regressors = ct.build_combination_regressors(top_comb, condition_df=condition_df, localizer_time=localizer_duration)
+
+                # average, center and normalize the data used for the parcellation
+                Ysubset = ct.average_regressors(YLib, combination_regressors)
+                Ysubset = ut.center_matrix(Ysubset, axis=1)
+                Ysubset = ut.normalize_matrix(Ysubset, axis=1)
+
+                Vsubset = VLib[top_comb,:]
+                Vsubset = ut.center_matrix(Vsubset, axis=0)
+                Vsubset = ut.normalize_matrix(Vsubset, axis=0)
+
+                Uhats =  et.estimate_Us(Ysubset, Vsubset, method='correlation',hard=True)
+
+                cos_subjects, cos_mean = get_prediction_error(Ytest, Vtest, Uhats, indices=evaluation_indices)
+                cos_subjects = cos_subjects.cpu().numpy().tolist()
+               
+                # record
+                D_ev = pd.DataFrame()
+                D_ev['n_task'] = [n_task]
+                D_ev['metric'] = [metric]
+                D_ev['cos_err'] = [cos_subjects]
+                D_ev['iteration'] = [n]
+                results_df = pd.concat([results_df,D_ev],axis=0)
+                results_df.reset_index(drop=True, inplace=True)
+
+    return results_df
                 
 
 

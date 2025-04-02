@@ -101,13 +101,12 @@ for roi_name , parcels in rois.items():
                         evaluation_indices = ROI_indices,
                         battery_sizes = [3,4,5,6,7,8,9,10,14,16],
                         metrics  = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],
-                        n_batteries = 20000,
+                        n_batteries = 10000,
                         n_iter=20,
                         rest_idx = 28,
                         localizer_duration=8)
     
     D['roi'] = roi_name
-    D['parcels'] = ', '.join(parcels)
     D['n_parcel'] = len(parcels)
         
     all_results.append(D)
