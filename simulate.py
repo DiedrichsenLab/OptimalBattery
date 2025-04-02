@@ -274,7 +274,7 @@ def sim_parcellation(num_task_lib = 100,
                 # get the V battery
                 V_battery = V_lib[top_comb,:]
                 V_battery = ut.center_matrix(V_battery,axis=0)
-                V_battery = ut.normalize_matrix(V_battery,axis=0)
+              
 
                 # get the data for the parcellation estimation and add noise
                 Y_battery = V_battery @ U_true
@@ -379,5 +379,5 @@ def sim_connectivity(num_task_lib = 100,
 
 
 if __name__=='__main__':
-    D = sim_connectivity()
+    D = sim_parcellation()
     pass
