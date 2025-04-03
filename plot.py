@@ -1,5 +1,15 @@
+"""
+Module for plotting 
+Author: Bassel Arafat
+"""
+
 import numpy as np
+import pandas as pd
 from matplotlib.colors import to_rgb, ListedColormap
+import matplotlib.pyplot as plt
+import seaborn as sns
+import ast
+
 
 def create_custom_colormap(base_colors, K_subparcels):
     """
@@ -24,3 +34,29 @@ def create_custom_colormap(base_colors, K_subparcels):
             cmap_list.append(shade_rgb)
 
     return ListedColormap(cmap_list)
+
+
+def average_per_subject(df, average_column='correlation'):
+    """"
+    Averages the specified column per subject and groups by task size and metric."""
+    # group by task size and metric
+    grouped = df.groupby(['n_task', 'metric'])[average_column]
+
+    result = []
+    for (n_task, metric), group in grouped:
+        if type(group.iloc[0]) == str:
+            # Convert string representation of list to actual list
+            subject_corr_lists = [ast.literal_eval(item) for item in group.tolist()]
+        else:
+            # If the group is already a list, no conversion needed
+            subject_corr_lists = group.tolist()
+
+        corr_array = np.array(subject_corr_lists)        
+        avg_corr_per_subject = np.mean(corr_array, axis=0)
+        result.append({
+            'n_task': n_task,
+            'metric': metric,
+            f'avg_{average_column}_per_subject': avg_corr_per_subject.tolist()
+        })
+    
+    return pd.DataFrame(result)

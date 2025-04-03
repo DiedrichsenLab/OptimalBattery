@@ -1,127 +1,23 @@
+"""
+Module for function used in the simulation of the task-battery construction problem.
+Author: Bassel Arafat
+"""
 import numpy as np
 import matplotlib.pyplot as plt
-
-def random_matrix_normal(G, R, make_exact=False, rng=None):
-    n_tasks = G.shape[0]
-    n_parcels = R.shape[0]
-
-    if rng is None:
-        rng = np.random.default_rng()
-    else:
-        rng = rng
-    V = rng.standard_normal((n_tasks, n_parcels))
-
-    if make_exact:
-        P_row = np.linalg.inv(V @ V.T)
-        L_row = np.linalg.cholesky(P_row)
-        Vs = L_row.T @ V  
-    else:
-        Vs = V
-
-    lam, eV = np.linalg.eigh(G)
-    lam[lam < 1e-15] = 0
-    lam = np.sqrt(lam)
-    chol_G = eV * lam.reshape((1, eV.shape[1]))
-
-    lam, eV = np.linalg.eigh(R)
-    lam[lam < 1e-15] = 0
-    lam = np.sqrt(lam)
-    chol_R = eV * lam.reshape((1, eV.shape[1]))
-    V = chol_G @ Vs @ chol_R.T
-    # V =Vs @ chol_R.T
-
-    return V
+import OptimalBattery.util as ut
+import OptimalBattery.estimate as et
+import OptimalBattery.evaluate as ev
+import OptimalBattery.construct as ct
+import torch as pt
+import cortico_cereb_connectivity.model as model
+import pandas as pd
 
 
-def find_best_V(G, R, num_iter=1000,rng=None):
-    """
-    Finds the best V matrix that minimizes the deviation from the desired 
-    row and column covariance matrices.
-    
-    Parameters:
-        G (np.ndarray): Desired row covariance matrix.
-        R (np.ndarray): Desired column covariance matrix.
-        num_iter (int): Number of iterations to try generating V.
-
-    Returns:
-        np.ndarray: The V matrix with the lowest deviation from the desired covariances.
-    """
-    min_deviation = float('inf')
-    best_V = None
-
-    for i in range(num_iter):
-        # Generate a random V matrix with desired properties
-        V = random_matrix_normal(G, R, make_exact=True,rng = rng)
-        
-        # Compute the row and column covariance matrices of V
-        Rs = V @ V.T
-        Cs = V.T @ V
-        
-        # Calculate deviations using nested summations
-        dev_R = np.sqrt(np.sum(np.sum((Rs - G) ** 2, axis=1), axis=0))
-        dev_C = np.sqrt(np.sum(np.sum((Cs - R) ** 2, axis=1), axis=0))
-        
-        # Calculate the total deviation
-        total_deviation = dev_R + dev_C
-        
-        # Update best_V if the current total deviation is the lowest found
-        if total_deviation < min_deviation:
-            min_deviation = total_deviation
-            best_V = V
-
-
-    return best_V
-
-
-def test_produce_V(): 
-    """ Simple test whether matrix normal production works on average. 
-    """
-    N = 5
-    num_iter = 1000
-    R = np.random.normal(0,1,(N,N))
-    C = np.random.normal(0,1,(N,N))
-    cov_R = R @ R.T / N
-    cov_C = C @ C.T / N 
-
-    V = np.zeros((num_iter, N, N)) 
-    for i in range(num_iter):
-        V[i] = random_matrix_normal(cov_R, cov_C, make_exact=True)
-
-    Rs = V@V.transpose([0,2,1])
-    Cs = V.transpose([0,2,1])@V
-    fig = plt.figure()
-
-    # Plot mean covariance matrices 
-    plt.subplot(3,2,1)
-    plt.imshow(cov_R)
-    plt.title('Row desired')
-    plt.colorbar()
-    plt.subplot(3,2,2)
-    plt.imshow(Rs.mean(axis=0)/N)
-    plt.title('Row produced')
-    plt.colorbar()
-    plt.subplot(3,2,3)
-    plt.imshow(cov_C)
-    plt.title('Col desired')
-    plt.colorbar()
-    plt.subplot(3,2,4)
-    plt.imshow(Cs.mean(axis=0)/N)
-    plt.title('Col produced')
-    plt.colorbar()
-    # Plot deviation from desired covariance structure
-    dev_R = np.sqrt(np.sum(np.sum((Rs - cov_R)**2,axis=2),axis=1))
-    dev_C = np.sqrt(np.sum(np.sum((Cs - cov_C)**2,axis=2),axis=1))
-    plt.subplot(3,2,5)
-    plt.scatter(dev_R,dev_C)
-    plt.xlabel('Row deviation')
-    plt.ylabel('Col deviation')
-    plt.show()
-    pass 
-
-def make_U_spatial(grid, centroids, K_main, K_subparcels):
+device = pt.device("cuda" if pt.cuda.is_available() else "cpu")
+def make_U_spatial(grid, centroids, K_main, K_subparcels): # ugly but works
     """
     Computes parcel labels for all pixels based on distances to centroids and divides them into subparcels.
-    
+
     """
     # Compute positions of all pixels
     width, height = grid.width, grid.height
@@ -129,17 +25,17 @@ def make_U_spatial(grid, centroids, K_main, K_subparcels):
     X_coords = X_coords.flatten()
     Y_coords = Y_coords.flatten()
     positions = np.column_stack((X_coords, Y_coords))
-    
+
     # Compute distances from each pixel to each centroid
     D = np.zeros((grid.P, K_main))
     for k, (cx, cy) in enumerate(centroids):
         D[:, k] = np.sqrt((X_coords - cx)**2 + (Y_coords - cy)**2)
-    
+
     # Initialize the parcel labels and define the size of each parcel
     parcel_labels = np.full(grid.P, -1, dtype=int)
     unassigned_nodes = set(range(grid.P))
     desired_size = grid.P // K_main
-    
+
     for k in range(K_main - 1):
         unassigned_nodes_list = list(unassigned_nodes)
         distances = D[unassigned_nodes_list, k]
@@ -147,13 +43,13 @@ def make_U_spatial(grid, centroids, K_main, K_subparcels):
         nodes_to_assign = np.array(unassigned_nodes_list)[sorted_indices[:desired_size]]
         parcel_labels[nodes_to_assign] = k
         unassigned_nodes -= set(nodes_to_assign)
-    
+
     # Assign the remaining pixels to the last parcel
     parcel_labels[list(unassigned_nodes)] = K_main - 1
-    
+
     # Initialize new parcel labels
     new_parcel_labels = np.full(grid.P, -1, dtype=int)
-    
+
     for k in range(K_main):  # For each main parcel
         nodes_in_parcel = np.where(parcel_labels == k)[0]
         # Split nodes_in_parcel into K_subparcels of equal size
@@ -161,47 +57,327 @@ def make_U_spatial(grid, centroids, K_main, K_subparcels):
         for sub_k, nodes in enumerate(subparcel_nodes):
             new_parcel_label = k * K_subparcels + sub_k
             new_parcel_labels[nodes] = new_parcel_label
-    
+
     # Convert new parcel labels to a matrix U_true
     K_total = K_main * K_subparcels
     U_true = np.zeros((K_total, grid.P))
     for k in range(K_total):
         U_true[k, new_parcel_labels == k] = 1
-    
+
     return U_true
 
+def get_percentage_correct(U_true, U_pred):
+    """Compute the percentage of correctly classified voxels.
+    Args:
+        U_true: True Us
+        U_pred: Estimated Us
+    return:
+        percentage: Percentage of correctly classified voxels
+    """
+    # if its two dimensional, add a dimension
+    if len(U_true.shape) == 2:
+        U_true = U_true.unsqueeze(0)
+    if len(U_pred.shape) == 2:
+        U_pred = U_pred.unsqueeze(0)
 
-def custom_G(n_tasks=16, n_groups=4, group_size=4, target_corr=0.0004, variance_factors=[1.0, 0.75, 0.5, 0.25]):
-    " makes a task covariance matrix with a target correlation between tasks"
-    G = np.zeros((n_tasks, n_tasks))
-    task_index = 0
+    correct_voxels = pt.sum(U_true * U_pred)
+    total_voxels = U_true.shape[2]
+    percentage = (correct_voxels / total_voxels) * 100
+    return percentage
 
-    for group in range(n_groups):
-        variances = variance_factors[group]
+
+def get_dice_coefficient(U_true, U_pred):
+    """
+    Compute Dice coefficient
+
+    Args:
+        U_true (Tensor): True Us)
+        U_pred (Tensor): Estimated Us
+    Returns:
+        mean_dice (float): Average Dice across all parcels
+    """
+    if len(U_true.shape) == 2:
+        U_true = U_true.unsqueeze(0)
+    if len(U_pred.shape) == 2:
+        U_pred = U_pred.unsqueeze(0)
+
+    intersection = (U_true * U_pred).sum(dim=2)
+    size_true = U_true.sum(dim=2)
+    size_pred = U_pred.sum(dim=2)
+
+    dice_scores = (2 * intersection ) / (size_true + size_pred )
+    mean_dice = dice_scores.mean().item()
+    return mean_dice
+
+def get_weighted_noise_std(n_task, max_n_task, noise):
+    """Compute the noise level based on the number of tasks in the battery.
+
+    Args:
+        n_task: Number of tasks in the battery
+        max_n_task: Maximum battery size
+        noise: Base noise std
+
+    Returns:
+        weighted_noise: Noise std based on the number of tasks
+    """
+    return noise * np.sqrt((n_task / max_n_task))
+
+def find_single_contrast(Vs, regionA, regionB):
+    """ Find the task that maximizes the difference between regionA and regionB """
+    difference = Vs[:, regionA -1] - Vs[:, regionB-1]
+    sorted_idx = pt.argsort(difference)
+
+    min_idx = sorted_idx[0].item()
+    max_idx = sorted_idx[-1].item()
+
+    return [max_idx, min_idx]
+
+def make_thresholded_contrast(task1, task2, threshold):
+    """gets the contrast between two tasks and thresholds it"""
+    contrast_data = task1 - task2
+    thresholded_data = pt.zeros_like(contrast_data)
+    percentile = pt.quantile(contrast_data, threshold)
+    thresholded_data[contrast_data >= percentile] = 1
+
+    # make one hot
+    thresholded_data = pt.nn.functional.one_hot(thresholded_data.long(), num_classes=2).T
+    return thresholded_data
+
+def collapse_U(U, target_parcel_idx):
+    """
+    Collapse the U matrix into two parcels: one for the target parcel and one for everything else.
+
+    Args:
+        U (Tensor): Shape (n_sub, K, P) or (K, P):
+            - n_sub: number of subjects
+            - K: number of parcels
+            - P: number of voxels
+        target_parcel (int): Index of the parcel to isolate
+
+    Returns:
+        Tensor: Collapsed U of shape (n_sub, 2, P) or (2, P)
+    """
+    # if 2d make 3d
+    added_batch_dim = False
+    if U.dim() == 2:
+        U = U.unsqueeze(0)
+        added_batch_dim = True
+
+    # select the target and non-target parcels
+    target = U[:, target_parcel_idx:target_parcel_idx+1, :]
+    rest = pt.cat([U[:, :target_parcel_idx, :], U[:, target_parcel_idx+1:, :]], dim=1)
+    rest_sum = rest.sum(dim=1, keepdim=True)
+
+    # combine
+    U_collapsed = pt.cat([rest_sum, target], dim=1)
+
+    # Remove batch dim if original input was 2D
+    if added_batch_dim:
+        U_collapsed = U_collapsed.squeeze(0)
+
+    return U_collapsed
+
+def sim_single_contrast(num_task_lib = 100,
+                        n_parcels = 5,
+                        U_true = None,
+                        base_noise = 5,
+                        max_battery_size = 28,
+                        thresholds = [0.1, 0.2, 0.3, 0.4, 0.5],
+                        U_true_collapsed = None,
+                        n_sim = 50,
+                        seed = None):
+    """ Single simulation for the single contrast evaluation."""
+
+     # Make new task battery
+    if seed is not None:
+        rng= np.random.default_rng(seed=seed)
+    else:
+        rng= np.random.default_rng()
     
-        # Compute covariances based on desired correlation
-        covariances = target_corr * np.outer(variance_factors[group], variance_factors[group])
-        np.fill_diagonal(covariances, variances)
+    results_df = pd.DataFrame()
+    for n in range(n_sim):
 
-        # Place the block into G
-        start, end = task_index, task_index + group_size
-        G[start:end, start:end] = covariances
+        V_lib = rng.normal(0,1,(num_task_lib, n_parcels))
+        V_lib = V_lib - V_lib.mean(axis=0,keepdims=True)
+        V_lib = pt.tensor(V_lib, device=device, dtype=pt.float64)
 
-        task_index += group_size
+        # get the single contrast
+        max_idx, min_idx = find_single_contrast(V_lib, 5, 4)
+        combination = [max_idx, min_idx]
 
-    return G
+        # get the V localizer
+        V_localizer = V_lib[combination,:]
+        V_localizer = ut.center_matrix(V_localizer,axis=0)
+        V_localizer = ut.normalize_matrix(V_localizer,axis=0)
 
-def custom_R(K_total, group_size, base_parcel_correlation, sub_parcel_extra_correlation):
+        # get the data for the parcellation estimation and add noise
+        Y_localizer = V_localizer @ U_true
+        weighted_noise_std = get_weighted_noise_std(2, max_battery_size, base_noise)
+        noise = rng.normal(0,weighted_noise_std,Y_localizer.shape)
+        noise = pt.tensor(noise, dtype=pt.float64, device=Y_localizer.device)
+        Y_localizer = Y_localizer + noise
+        # is cenering and normalizing necessary?
+        # Y_localizer = ut.center_matrix(Y_localizer,axis=0)
+        # Y_localizer = ut.normalize_matrix(Y_localizer,axis=0)
+
+        for threshold in thresholds:
+            # get the thresholded contrast
+            thresholded_contrast = make_thresholded_contrast(Y_localizer[0,:], Y_localizer[1,:], threshold)
+
+            # Evaluate the contrast
+            accuracy = get_dice_coefficient(U_true_collapsed, thresholded_contrast)
+
+            D_ev = pd.DataFrame()
+            D_ev['threshold'] = [threshold]
+            D_ev['accuracy'] = accuracy
+            results_df = pd.concat([results_df,D_ev],axis=0)
+
+    return results_df
+
+
+def sim_parcellation(num_task_lib = 100,
+                     n_parcels = 5,
+                     U_true = None,
+                     battery_sizes = [3,4,6,8,10,14,18,24,28],
+                     n_batteries = 100,
+                     base_noise = 2,
+                     collapsed_U_true = None,
+                     n_sim = 50,
+                     seed = None):
+    # Make new task battery
+    if seed is not None:
+        rng= np.random.default_rng(seed=seed)
+    else:
+        rng= np.random.default_rng()
+
+    # constants
+    metrics = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc']
+    max_battery_size = max(battery_sizes)
+
+    results_df =pd.DataFrame()
+    for n_task in battery_sizes:
+        print(f"Processing battery size: {n_task}")
+        for n in range(n_sim):
+            V_lib = rng.normal(0,1,(num_task_lib, n_parcels))
+            V_lib = V_lib - V_lib.mean(axis=0,keepdims=True)
+            G_lib = V_lib @ V_lib.T
+            # ensure tensor
+            V_lib = pt.tensor(V_lib, device=device, dtype=pt.float64)
+
+            # Generate possible battery combinations for current battery size and calculate eigenmetrics
+            D = ct.build_combinations(G_lib=G_lib, strategy='random',n_batteries=n_batteries,n_tasks=n_task,replacement=False,rest_idx=None,seed=seed)
+            for metric in metrics:
+                # Find the best battery for the metric
+                D_best = ct.choose_combination(D,metric)
+                top_comb = D_best['combination'].values[0]
+
+                # get the V battery
+                V_battery = V_lib[top_comb,:]
+                V_battery = ut.center_matrix(V_battery,axis=0)
+              
+
+                # get the data for the parcellation estimation and add noise
+                Y_battery = V_battery @ U_true
+                weighted_noise_std = get_weighted_noise_std(n_task, max_battery_size, base_noise)
+                noise = rng.normal(0,weighted_noise_std,Y_battery.shape)
+                noise = pt.tensor(noise, dtype=pt.float64, device=Y_battery.device)
+                Y_battery = Y_battery + noise
+                Y_battery = ut.center_matrix(Y_battery,axis=0)
+                Y_battery = ut.normalize_matrix(Y_battery,axis=0)
+
+
+                # Build the parcellation
+                U_hats = et.estimate_Us(Y_battery, V_battery, method='correlation', hard=True)
+
+                # This is for the single region analysis (optional argument to collapsee the parcellation into two regions)
+                if collapsed_U_true is not None:
+                    U_hats = collapse_U(U_hats, target_parcel_idx=4)
+
+                # Evaluate the parcellation
+                if collapsed_U_true is not None:
+                    accuracy = get_dice_coefficient(collapsed_U_true, U_hats)
+                else:
+                    accuracy = get_dice_coefficient(U_true, U_hats)
+
+                D_ev = pd.DataFrame()
+                D_ev['n_task'] = [n_task]
+                D_ev['metric'] = [metric]
+                D_ev['accuracy'] = accuracy
+                results_df = pd.concat([results_df,D_ev],axis=0)
+
+    return results_df
+
+def sim_connectivity(num_task_lib = 100,
+                     n_parcels = 5,
+                     n_voxels_y = 100,
+                     n_sim = 50,
+                     battery_sizes = [3,4,6,8,10,14,18,24,28],
+                     n_batteries = 100,
+                     base_noise = 5,
+                     ridge_alpha = 1000,
+                     seed = None):
+    """ Single simulation for the connectivity estimation.
     """
-    makes a parcel covariance matrix with a base correlation between main parcels and extra correlation within subparcels
-    """
-    R = np.full((K_total, K_total), base_parcel_correlation)
-    for i in range(0, K_total, group_size):
-        R[i:i+group_size, i:i+group_size] = base_parcel_correlation + sub_parcel_extra_correlation
 
-    np.fill_diagonal(R, 1)
-    return R
+    # Make new task battery
+    if seed is not None:
+        rng= np.random.default_rng(seed=seed)
+    else:
+        rng= np.random.default_rng()
+
+    # constants
+    metrics = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc']
+    max_n_task = max(battery_sizes)
+
+    results_df = pd.DataFrame()
+    for n_task in battery_sizes:
+        print(f"Processing battery size: {n_task}")
+
+        for n in range(n_sim):
+            V_lib = rng.normal(0,1,(num_task_lib, n_parcels))
+            V_lib = V_lib - V_lib.mean(axis=0,keepdims=True)
+            G_lib = V_lib @ V_lib.T
+
+            # sample the connectivity weights from a normal
+            W_true = rng.normal(0,1,(n_parcels, n_voxels_y))
+
+            # Generate possible battery combinations for current battery size and calculate eigenmetrics
+            D = ct.build_combinations(G_lib, strategy='random',n_batteries=n_batteries,n_tasks=n_task,replacement=False)
+
+            for metric in metrics:
+                # Find the best battery for the metric
+                D_best = ct.choose_combination(D,metric)
+                top_comb = D_best['combination'].values[0]
+
+                # get the x for the connectivity estimation
+                data_x = V_lib[top_comb,:]
+                data_x = ut.center_matrix(data_x,axis=0)
+
+                # get the y for the connectivity estimation (add weighted noise)
+                weighted_noise_std = get_weighted_noise_std(n_task, max_n_task, base_noise)
+                data_y = data_x @ W_true
+                data_y = data_y + rng.normal(0,weighted_noise_std,data_y.shape)
+                data_y = ut.center_matrix(data_y,axis=0)
+
+                # fit the model
+                conn_model = getattr(model, 'L2regression')(ridge_alpha)
+                conn_model.fit(data_x, data_y)
+
+                # get the estimated W and correlate with W_true
+                coef= conn_model.coef_.T
+
+                corrcoef_matrix = np.corrcoef(coef.flatten(), W_true.flatten())
+                pearson_corr = corrcoef_matrix[0, 1]
+
+                D_ev = pd.DataFrame()
+                D_ev['n_task'] = [n_task]
+                D_ev['metric'] = [metric]
+                D_ev['correlation'] = pearson_corr
+                results_df = pd.concat([results_df,D_ev],axis=0)
+
+    return results_df
+
 
 if __name__=='__main__':
-    test_produce_V()
+    D = sim_parcellation()
     pass

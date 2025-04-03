@@ -562,3 +562,247 @@ def build_combinations(G_lib, strategy='random',n_iter=1000,n_tasks=4,seed=1,bal
         D_list.append(pd.DataFrame(d))
     D = pd.concat(D_list)
     return D 
+
+
+def get_prediction_error_numpy(ytest,vtest,U_hat,indices = None): # old implemntation but was a clear bottle neck in the evaluation framework
+    """Compute the prediction error for simulated data.
+    Args:
+        ytest: Test data
+        vtest: Test v vectors
+        U_hat: Estimated Us
+        indices: The indices of the voxels to evaluate
+    return:
+        avg_cos: Mean prediction error across subjects
+        cos_std: Standard deviation of the prediction error across subjects
+    """
+    if U_hat.ndim == 2:
+        U_hat = U_hat[np.newaxis,:,:]
+    if ytest.ndim == 2:
+        ytest = ytest[np.newaxis,:,:]
+
+    #normalize vtest
+    vtest_normalized = normalize_matrix(vtest,axis = 0)
+    # center and normalize ytest
+    ytest_centered = center_matrix(ytest,axis = 1)
+    ytest_normalized = normalize_matrix(ytest_centered,axis = 1)
+
+    cos_err = np.zeros((U_hat.shape[0],))
+    for i in range(U_hat.shape[0]):
+        # get reconstructed y
+        yhat = np.matmul(vtest_normalized,U_hat[i])
+        if indices is not None:
+            cosine_error_vox = 1 - np.nansum(ytest_normalized[i][:, indices] * yhat[:, indices], axis=0)
+        else:
+            cosine_error_vox = 1 - np.nansum(ytest_normalized[i] * yhat, axis=0)
+        # mean across voxels within a subject
+        cos_err[i] = np.nanmean(cosine_error_vox)
+    
+    #avg across subjects
+    avg_cos = np.nanmean(cos_err)
+    # std across subjects
+    cos_std = np.nanstd(cos_err)
+
+    return avg_cos, cos_std
+
+def build_battery_dataset(YLib, info, combination, n_repeats=1):
+    """
+    Constructs a dataset based on a task battery combination.
+    
+    Parameters:
+        YLib (numpy.ndarray): The full data array of shape (subjects, regressors, voxels).
+        info (pandas.DataFrame): Information about regressors.
+        combination (list): List of indices to include in battery dataset
+        n_repeats (int): how much data you want for that combination, default is 1 meaning just make one artificial run of the combination
+    
+    Returns:
+        final_dataset (numpy.ndarray): The constructed task battery dataset of shape (subjects, regressors, voxels).
+    """
+    # list to include n_repeats of the combination dataset (artificial runs)
+    Y_subset_list = []
+    total_runs = info['run'].nunique()
+
+    task_groups = info.groupby(['task_num_uni', 'cond_num'])
+    task_only_groups = info.groupby(['task_num_uni'])
+    
+    # to make sure no regressor is chosen twice across n_repeats
+    selected_indices = []
+    for _ in range(n_repeats):
+        Y_subset = []
+        
+        for idx in combination:
+            task_num = info.loc[idx, 'task_num_uni']
+            cond_num = info.loc[idx, 'cond_num']
+            
+           # Get regressor list for the 'task'
+            task_group = task_only_groups.get_group(task_num)
+            task_indices = task_group.index.tolist()
+            
+            # Get regressor list for the 'condition of interest'
+            condition_group = task_groups.get_group((task_num, cond_num))
+            condition_indices = condition_group.index.tolist()
+            
+            # Determine if it's a task or condition
+            num_task_regressors = len(task_indices) // total_runs  # if result is > 1, it's a task with multiple conditions
+            
+            # Never choose the same regressor twice
+            chosen_indices = []
+            while len(chosen_indices) < num_task_regressors:
+                chosen_idx = condition_indices[pt.randint(len(condition_indices), (1,)).item()]
+                if chosen_idx not in selected_indices and chosen_idx not in chosen_indices: #hasn't been chosen for the preview repeat and hasn't been chosen if it's a condition
+                    chosen_indices.append(chosen_idx)
+                    selected_indices.append(chosen_idx)
+
+            # if it's a 10s condition then average 3x10s to get 30s for example
+            averaged_vector = pt.mean(YLib[:,chosen_indices, :], axis=1)
+            Y_subset.append(averaged_vector)
+        
+        # make dataset for current repeat and append to the list
+        Y_subset = pt.stack(Y_subset, axis=1)  
+        Y_subset_list.append(Y_subset)
+    
+    # Average repeats
+    stacked_Y = pt.stack(Y_subset_list, axis=0)
+    final_dataset = pt.mean(stacked_Y, axis=0)
+    return final_dataset
+
+
+def get_largest_parcels_indices(data, Vs, ROI_mask):
+    """
+    Compute the voxel count for each parcel within the ROI across subjects.
+    
+    Args:
+        data (torch.Tensor): fMRI dataset for all subjects.
+        Vs (torch.Tensor): Functional Profile matrix for all parcels
+        ROI (torch.Tensor): Binary mask of the ROI
+    
+    Returns:
+        torch.Tensor: Ordered indices of parcels based on voxel count.
+    """
+    ROI_indices = pt.where(ROI_mask == 1)[0]
+    total_parcel_counts = pt.zeros(Vs.shape[1])
+    for subject_data in data:
+        data = subject_data[:, ROI_indices]
+        data_projected = estimate_Us_projection(data, Vs)
+        data_projected_onehot = ev.get_U_hat_one_hot(data_projected)[0]
+        total_parcel_counts += pt.sum(data_projected_onehot, axis=1)
+    
+    top_parcels = pt.argsort(total_parcel_counts, descending=True)
+    
+    return top_parcels
+
+def random_matrix_normal(G, R, make_exact=False, rng=None): # not sure if this function is necessary anymore
+    n_tasks = G.shape[0]
+    n_parcels = R.shape[0]
+
+    if rng is None:
+        rng = np.random.default_rng()
+    else:
+        rng = rng
+    V = rng.standard_normal((n_tasks, n_parcels))
+
+    if make_exact:
+        P_row = np.linalg.inv(V @ V.T)
+        L_row = np.linalg.cholesky(P_row)
+        Vs = L_row.T @ V  
+    else:
+        Vs = V
+
+    lam, eV = np.linalg.eigh(G)
+    lam[lam < 1e-15] = 0
+    lam = np.sqrt(lam)
+    chol_G = eV * lam.reshape((1, eV.shape[1]))
+
+    lam, eV = np.linalg.eigh(R)
+    lam[lam < 1e-15] = 0
+    lam = np.sqrt(lam)
+    chol_R = eV * lam.reshape((1, eV.shape[1]))
+    V = chol_G @ Vs @ chol_R.T
+    # V =Vs @ chol_R.T
+
+    return V
+
+
+def find_best_V(G, R, num_iter=1000,rng=None): # not sure if this function is necessary anymore
+    """
+    Finds the best V matrix that minimizes the deviation from the desired 
+    row and column covariance matrices.
+    
+    Parameters:
+        G (np.ndarray): Desired row covariance matrix.
+        R (np.ndarray): Desired column covariance matrix.
+        num_iter (int): Number of iterations to try generating V.
+
+    Returns:
+        np.ndarray: The V matrix with the lowest deviation from the desired covariances.
+    """
+    min_deviation = float('inf')
+    best_V = None
+
+    for i in range(num_iter):
+        # Generate a random V matrix with desired properties
+        V = random_matrix_normal(G, R, make_exact=True,rng = rng)
+        
+        # Compute the row and column covariance matrices of V
+        Rs = V @ V.T
+        Cs = V.T @ V
+        
+        # Calculate deviations using nested summations
+        dev_R = np.sqrt(np.sum(np.sum((Rs - G) ** 2, axis=1), axis=0))
+        dev_C = np.sqrt(np.sum(np.sum((Cs - R) ** 2, axis=1), axis=0))
+        
+        # Calculate the total deviation
+        total_deviation = dev_R + dev_C
+        
+        # Update best_V if the current total deviation is the lowest found
+        if total_deviation < min_deviation:
+            min_deviation = total_deviation
+            best_V = V
+
+
+    return best_V
+
+
+def test_produce_V(): # not sure if this function is necessary anymore
+    """ Simple test whether matrix normal production works on average. 
+    """
+    N = 5
+    num_iter = 1000
+    R = np.random.normal(0,1,(N,N))
+    C = np.random.normal(0,1,(N,N))
+    cov_R = R @ R.T / N
+    cov_C = C @ C.T / N 
+
+    V = np.zeros((num_iter, N, N)) 
+    for i in range(num_iter):
+        V[i] = random_matrix_normal(cov_R, cov_C, make_exact=True)
+
+    Rs = V@V.transpose([0,2,1])
+    Cs = V.transpose([0,2,1])@V
+    fig = plt.figure()
+
+    # Plot mean covariance matrices 
+    plt.subplot(3,2,1)
+    plt.imshow(cov_R)
+    plt.title('Row desired')
+    plt.colorbar()
+    plt.subplot(3,2,2)
+    plt.imshow(Rs.mean(axis=0)/N)
+    plt.title('Row produced')
+    plt.colorbar()
+    plt.subplot(3,2,3)
+    plt.imshow(cov_C)
+    plt.title('Col desired')
+    plt.colorbar()
+    plt.subplot(3,2,4)
+    plt.imshow(Cs.mean(axis=0)/N)
+    plt.title('Col produced')
+    plt.colorbar()
+    # Plot deviation from desired covariance structure
+    dev_R = np.sqrt(np.sum(np.sum((Rs - cov_R)**2,axis=2),axis=1))
+    dev_C = np.sqrt(np.sum(np.sum((Cs - cov_C)**2,axis=2),axis=1))
+    plt.subplot(3,2,5)
+    plt.scatter(dev_R,dev_C)
+    plt.xlabel('Row deviation')
+    plt.ylabel('Col deviation')
+    plt.show()
+    pass 

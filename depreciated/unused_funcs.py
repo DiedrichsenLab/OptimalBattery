@@ -188,3 +188,71 @@ def traditional_battery(Vs, isolate_parcels, length=8):
         # Make the battery
         tasks_list = [best_task1, best_task2] * (length // 2)
         return tuple(tasks_list)
+    
+
+    def max_value_distribution_analysis(df, num_batteries, num_iterations, eval_metric):
+        metrics = ['variance', 'variance_mc', 'inverse_trace', 'inverse_trace_mc', 'log_det', 'log_det_mc']
+        results = []
+
+        for _ in range(num_iterations):
+            # Randomly sample task batteries without replacement
+            sampled_df = df.sample(n=num_batteries, replace=False)
+
+            iteration_results = {}
+            for metric in metrics:
+                # Find the row with the highest value for the current metric
+                max_metric_row = sampled_df.loc[sampled_df[metric].idxmax()]
+                # Record the evaluation metric (e.g., 'cos') value
+                iteration_results[metric] = max_metric_row[eval_metric]
+
+            results.append(iteration_results)
+            
+        result_df = pd.DataFrame(results)
+
+        return result_df
+    
+
+
+def custom_G(n_tasks=16, n_groups=4, group_size=4, target_corr=0.0004, variance_factors=[1.0, 0.75, 0.5, 0.25]):
+    " makes a task covariance matrix with a target correlation between tasks"
+    G = np.zeros((n_tasks, n_tasks))
+    task_index = 0
+
+    for group in range(n_groups):
+        variances = variance_factors[group]
+    
+        # Compute covariances based on desired correlation
+        covariances = target_corr * np.outer(variance_factors[group], variance_factors[group])
+        np.fill_diagonal(covariances, variances)
+
+        # Place the block into G
+        start, end = task_index, task_index + group_size
+        G[start:end, start:end] = covariances
+
+        task_index += group_size
+
+    return G
+
+def custom_R(K_total, group_size, base_parcel_correlation, sub_parcel_extra_correlation):
+    """
+    makes a parcel covariance matrix with a base correlation between main parcels and extra correlation within subparcels
+    """
+    R = np.full((K_total, K_total), base_parcel_correlation)
+    for i in range(0, K_total, group_size):
+        R[i:i+group_size, i:i+group_size] = base_parcel_correlation + sub_parcel_extra_correlation
+
+    np.fill_diagonal(R, 1)
+    return R
+
+def translate_battery(info,battery_indices):
+    """
+    Translate battery from indices to names
+    Parameters:
+        info(pd.DataFrame): task information tsv
+        battery_indices(np.ndarray): indices of tasks in the battery
+    Returns:
+        battery_names(np.ndarray): names of tasks in the battery
+    """
+    names = info['names'].unique()
+    battery_names = names[battery_indices]
+    return battery_names
