@@ -16,16 +16,16 @@ import OptimalBattery.estimate as es
 import OptimalBattery.construct as ct
 import OptimalBattery.plot as plot
 
-battery_sizes = [3,4,5,6,7,8,10,14,16]
-rois = {
-    'SD': [8,9,10,11,12,13,14,15,16,24,25,26,27,28,29,30,31,32],
-    'MA':[1,2,3,4,5,6,7,17,18,19,20,21,22,23],
-    'SDR':[24,25,26,27,28,29,30,31,32],
-    'SDL':[8,9,10,11,12,13,14,15,16],
-    'MA_L':[1,2,3,4,5,6,7],
-    'MA_R':[17,18,19,20,21,22,23],
-    'AD':[5,6,7,8,9,10,11,21,22,23,24,25,26,27],
-    'rand':[1,4,6,7,8,12,14,16,20,23,26,29,30,31]
+rois = {'all-M':[5,6,7,8,9,10,11,12,13,14,15,16,21,22,23,24,25,26,27,28,29,30,31,32],
+        'all':[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32],
+        'SD': [8,9,10,11,12,13,14,15,16,24,25,26,27,28,29,30,31,32],
+    # 'MA':[1,2,3,4,5,6,7,17,18,19,20,21,22,23],
+    # 'SDR':[24,25,26,27,28,29,30,31,32],
+    # 'SDL':[8,9,10,11,12,13,14,15,16],
+    # 'MA_L':[1,2,3,4,5,6,7],
+    # 'MA_R':[17,18,19,20,21,22,23],
+    # 'AD':[5,6,7,8,9,10,11,21,22,23,24,25,26,27],
+    # 'rand':[1,4,6,7,8,12,14,16,20,23,26,29,30,31]
 }
 
 
@@ -45,16 +45,18 @@ atlas_dir = f'{func_fus_dir}/Atlases/tpl-SUIT'
 model_name = f'{atlas_dir}/atl-NettekovenSym32_space-SUIT_dseg.nii'
 nettekoven_parcellation = atlas.read_data(model_name)
 
+subj = None
+
 # Load data
 MDTB_dataset = DataSetMDTB(f'{func_fus_dir}/MDTB')
 
-data_mdtb_s2_run,info_mdtb_2_run  =MDTB_dataset.get_data(space=space,ses_id='ses-s1',type='CondRun')
+data_mdtb_s2_run,info_mdtb_2_run  =MDTB_dataset.get_data(space=space,ses_id='ses-s2',type='CondRun',subj=subj)
 data_mdtb_s2_run[np.isnan(data_mdtb_s2_run)] = 0
 
-data_mdtb_s2_all,info_mdtb_2_all  =MDTB_dataset.get_data(space=space,ses_id='ses-s1',type='CondAll')
+data_mdtb_s2_all,info_mdtb_2_all  =MDTB_dataset.get_data(space=space,ses_id='ses-s2',type='CondAll',subj=subj)
 data_mdtb_s2_all[np.isnan(data_mdtb_s2_all)] = 0
 
-data_mdtb_s1_all,info_mdtb_1_all  =MDTB_dataset.get_data(space=space,ses_id='ses-s2',type='CondAll')
+data_mdtb_s1_all,info_mdtb_1_all  =MDTB_dataset.get_data(space=space,ses_id='ses-s1',type='CondAll',subj=subj)
 data_mdtb_s1_all[np.isnan(data_mdtb_s1_all)] = 0
 
 data_mdtb_s2_run = ut.recenter_fmri_data(data_mdtb_s2_run,info_mdtb_2_run,task_column_name='cond_name',center_condition='rest')
@@ -73,7 +75,7 @@ for roi_name , parcels in rois.items():
     ROI_indices = np.where(ROI_mask)[0]
 
     # get the G matrix
-    G_Lib = ct.get_G(data= data_mdtb_s2_run[:,:,ROI_indices],n_cond=29,n_part=16)
+    G_Lib = ct.get_G(data= data_mdtb_s2_run[:,:,ROI_indices],n_cond=32,n_part=16)
 
     # make variables torch
     device = pt.device('cuda' if pt.cuda.is_available() else 'cpu')
@@ -99,23 +101,27 @@ for roi_name , parcels in rois.items():
                         data_train,data_test,
                         full_vs_train,full_vs_test,
                         evaluation_indices = ROI_indices,
-                        battery_sizes = [3,4,5,6,7,8,9,10,14,16],
+                        battery_sizes = [3,4,5,6,7,8,9,10,11,12,13,14,15,16],
                         metrics  = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],
-                        n_batteries = 10000,
-                        n_iter=20,
-                        rest_idx = 28,
+                        n_batteries = 20000,
+                        n_iter=50,
+                        rest_idx = 31,
                         localizer_duration=8)
     
     D['roi'] = roi_name
     D['n_parcel'] = len(parcels)
+
+    averaged_df = plot.average_per_subject(D,'cos_err') # lists of subjects are averaged across iterations
+    long_df = averaged_df.explode('avg_cos_err_per_subject') # expands the list of subjects into rows for each subject
+    long_df['avg_cos_err_per_subject'] = long_df['avg_cos_err_per_subject'].astype(float) # turns each correaltion for each subject into a float
         
-    all_results.append(D)
+    all_results.append(long_df)
 
 # Concatenate all results into a single DataFrame
 final_results_df = pd.concat(all_results, ignore_index=True)
 
 # Save the results
-save_dir = os.path.abspath(os.path.join(os.getcwd(), 'notebooks','eval_tsvs'))
+save_dir = os.path.abspath(os.path.join(os.getcwd(),'eval_tsvs'))
 save_path = os.path.join(save_dir, 'real_parcellation_cerebellum.tsv')
 final_results_df.to_csv(save_path, sep='\t', index=False)
 

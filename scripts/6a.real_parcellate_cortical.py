@@ -17,76 +17,56 @@ import OptimalBattery.construct as ct
 import OptimalBattery.plot as plot
 
 rois = {
-    "Dorsolateral_PFC": [
-        "9-46d", "46", "9a", "a9-46v", "p9-46v",
-        "9p", "IFJa", "IFJp", "IFSp", "IFSa"
-    ],
-    "DLPFC_Caudal": [
-        "9-46d", "46",
-        "IFJa", "IFJp",
-        "IFSp", "IFSa"
-    ],
-    "DLPFC_Rostral": [
-        "9a", "9p",
-        "a9-46v", "p9-46v"
-    ],
-    "Parietal_Multisensory": [
-        "LIPv", "LIPd", "VIP", "MIP", "AIP",
-        "7PC", "7AL", "7Am"
-    ],
-    "Posterior_Cingulate": [
-        "d23ab", "v23ab", "23c", "23d",
-        "31pv", "31pd", "31a"
-    ],
-    "Anterior_Cingulate": [
-        "p24pr", "33pr", "a24pr", "p32pr",
-        "a24", "d32"
-    ],
-    "Orbitofrontal_Ventromedial": [
-        "10v", "a10p", "10pp", "11l",
-        "13l", "OFC", "47s", "25"
-    ],
-    "Motor_Premotor": [
-        "4", "6a", "6d", "6mp", "6v"
-    ],
-    "Early_Visual": [
-        "V1", "V2", "V3", "V4",
-        "V6", "V7", "V8", "V3A"
-    ],
-    "Higher_Visual": [
-        "MT", "MST", "V3B", "V3CD",
-        "LO1", "LO2"
-    ],
-    "Auditory_Temporal": [
-        "A1", "MBelt", "LBelt", "STSdp",
-        "STSda", "STSva", "STSvp", "TA2",
-        "PBelt", "A4", "A5"
-    ],
-    "Ventral_Temporal": [
-        "FFC", "PIT", "TE1p", "TE2p",
-        "PH", "PHT"
+'visual_cortex': [
+    "V1", "V2", "V3", "V3A", "V3B", "V3CD", "V4", "V4t", "V6", "V6A", "V7", "V8",
+    "MT", "MST", "FST", "LO1", "LO2", "LO3", "PIT",
+    "STV", "PCV", "DVT", "VMV1", "VMV2", "VMV3",
+    "VVC","FFC","RSC","POS1", "POS2","IPS1","ProS" ],       
+                        
+
+    "Non-Visual Cortex": 
+     [
+    "4", "3b", "FEF", "PEF", "55b", "A1", "PSL", "SFL", "7Pm", "7m",
+    "23d", "v23ab", "d23ab", "31pv", "5m", "5mv", "23c", "5L", "24dd", "24dv",
+    "7AL", "SCEF", "6ma", "7Am", "7PL", "7PC", "LIPv", "VIP", "MIP", "1", "2",
+    "3a", "6d", "6mp", "6v", "p24pr", "33pr", "a24pr", "p32pr", "a24", "d32",
+    "8BM", "p32", "10r", "47m", "8Av", "8Ad", "9m", "8BL", "9p", "10d", "8C",
+    "44", "45", "47l", "a47r", "6r", "IFJa", "IFJp", "IFSp", "IFSa", "p9-46v",
+    "46", "a9-46v", "9-46d", "9a", "10v", "a10p", "10pp", "11l", "13l", "OFC",
+    "47s", "LIPd", "6a", "i6-8", "s6-8", "43", "OP4", "OP1", "OP2-3", "52", "RI",
+    "PFcm", "PoI2", "TA2", "FOP4", "MI", "Pir", "AVI", "AAIC", "FOP1", "FOP3",
+    "FOP2", "PFt", "AIP", "EC", "PreS", "H", "PeEc", "STGa", "PBelt", "A5",
+    "PHA1", "PHA3", "STSda", "STSdp", "STSvp", "TGd", "TE1a", "TE1p", "TE2a",
+    "TF", "TE2p", "PHT", "PH", "TPOJ1", "TPOJ2", "TPOJ3", "PGp", "IP2", "IP1",
+    "IP0", "PFop", "PF", "PFm", "PGi", "PGs", "PHA2", "25", "s32", "pOFC",
+    "PoI1", "Ig", "FOP5", "p10p", "p47r", "TGv", "MBelt", "LBelt", "A4",
+    "STSva", "TE1m", "PI", "a32pr", "p24","31pd","31a"
+],
+
+    "All Parcels":
+    ["V1", "MST", "V6", "V2", "V3", "V4", "V8", "4", "3b", "FEF", "PEF", "55b", "V3A", "RSC", "POS2", "V7",
+    "IPS1", "FFC", "V3B", "LO1", "LO2", "PIT", "MT", "A1", "PSL", "SFL", "PCV", "STV", "7Pm", "7m", "POS1",
+    "23d", "v23ab", "d23ab", "31pv", "5m", "5mv", "23c", "5L", "24dd", "24dv", "7AL", "SCEF", "6ma", "7Am",
+    "7PL", "7PC", "LIPv", "VIP", "MIP", "1", "2", "3a", "6d", "6mp", "6v", "p24pr", "33pr", "a24pr", "p32pr",
+    "a24", "d32", "8BM", "p32", "10r", "47m", "8Av", "8Ad", "9m", "8BL", "9p", "10d", "8C", "44", "45",
+    "47l", "a47r", "6r", "IFJa", "IFJp", "IFSp", "IFSa", "p9-46v", "46", "a9-46v", "9-46d", "9a", "10v",
+    "a10p", "10pp", "11l", "13l", "OFC", "47s", "LIPd", "6a", "i6-8", "s6-8", "43", "OP4", "OP1", "OP2-3",
+    "52", "RI", "PFcm", "PoI2", "TA2", "FOP4", "MI", "Pir", "AVI", "AAIC", "FOP1", "FOP3", "FOP2", "PFt",
+    "AIP", "EC", "PreS", "H", "ProS", "PeEc", "STGa", "PBelt", "A5", "PHA1", "PHA3", "STSda", "STSdp",
+    "STSvp", "TGd", "TE1a", "TE1p", "TE2a", "TF", "TE2p", "PHT", "PH", "TPOJ1", "TPOJ2", "TPOJ3", "DVT",
+    "PGp", "IP2", "IP1", "IP0", "PFop", "PF", "PFm", "PGi", "PGs", "V6A", "VMV1", "VMV3", "PHA2", "V4t",
+    "FST", "V3CD", "LO3", "VMV2", "31pd", "31a", "VVC", "25", "s32", "pOFC", "PoI1", "Ig", "FOP5", "p10p",
+    "p47r", "TGv", "MBelt", "LBelt", "A4", "STSva", "TE1m", "PI", "a32pr", "p24"
+
     ],
 
-    "Anterior_Insula": [
-        "AVI", "AAIC", "FOP1", "FOP2",
-        "FOP3", "FOP4", "FOP5", "MI"
-    ],
-    "Hippocampal_Parahipp": [
-        "H", "PHA1", "PHA2", "PHA3",
-        "PH", "PeEc", "EC"
-    ],
-    "Inferior_Parietal": [
-        "IP0", "IP1", "IP2", "PF",
-        "PFm", "PGi", "PGs"
-    ],
-    "Language_Network": [
-        "PSL", "SFL", "44", "45"
-    ],
-    "Eye_Movements": [
-        "FEF", "PEF", "SCEF", "8Av", "8Ad"
-    ]
 }
 
+
+
+for key,value in rois.items():
+    print(key)
+    print(len(value))
 
 
 # define atlas and dirs
@@ -111,13 +91,13 @@ MDTB_dataset = DataSetMDTB(f'{func_fus_dir}/MDTB')
 
 subj = None
 
-data_mdtb_s2_run,info_mdtb_2_run  =MDTB_dataset.get_data(space=space,ses_id='ses-s1',type='CondRun',subj=subj)
+data_mdtb_s2_run,info_mdtb_2_run  =MDTB_dataset.get_data(space=space,ses_id='ses-s2',type='CondRun',subj=subj)
 data_mdtb_s2_run[np.isnan(data_mdtb_s2_run)] = 0
 
-data_mdtb_s2_all,info_mdtb_2_all  =MDTB_dataset.get_data(space=space,ses_id='ses-s1',type='CondAll',subj=subj)
+data_mdtb_s2_all,info_mdtb_2_all  =MDTB_dataset.get_data(space=space,ses_id='ses-s2',type='CondAll',subj=subj)
 data_mdtb_s2_all[np.isnan(data_mdtb_s2_all)] = 0
 
-data_mdtb_s1_all,info_mdtb_1_all  =MDTB_dataset.get_data(space=space,ses_id='ses-s2',type='CondAll',subj=subj)
+data_mdtb_s1_all,info_mdtb_1_all  =MDTB_dataset.get_data(space=space,ses_id='ses-s1',type='CondAll',subj=subj)
 data_mdtb_s1_all[np.isnan(data_mdtb_s1_all)] = 0
 
 data_mdtb_s2_run = ut.recenter_fmri_data(data_mdtb_s2_run,info_mdtb_2_run,task_column_name='cond_name',center_condition='rest')
@@ -147,7 +127,7 @@ for roi_name , parcels in rois.items():
     ROI_indices = np.where(ROI_mask == 1)[0]
 
     # get the G matrix
-    G_Lib = ct.get_G(data= data_mdtb_s2_run[:,:,ROI_indices],n_cond=29,n_part=16)
+    G_Lib = ct.get_G(data= data_mdtb_s2_run[:,:,ROI_indices],n_cond=32,n_part=16)
 
     # make variables torch
     device = pt.device('cuda' if pt.cuda.is_available() else 'cpu')
@@ -173,24 +153,28 @@ for roi_name , parcels in rois.items():
                         data_train,data_test,
                         full_vs_train,full_vs_test,
                         evaluation_indices = ROI_indices,
-                        battery_sizes = [3,4,5,6,7,8,9,10,14,16],
+                        battery_sizes = [3,4,5,6,7,8,9,10,11,12,13,14,15,16],
                         metrics  = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],
                         n_batteries = 20000,
-                        n_iter=20,
-                        rest_idx = 28,
+                        n_iter=50,
+                        rest_idx = 31,
                         localizer_duration=8)
     
     D['roi'] = roi_name
     D['parcels'] = ', '.join(parcels)
     D['n_parcel'] = len(parcels)
+
+    averaged_df = plot.average_per_subject(D,'cos_err') # lists of subjects are averaged across iterations
+    long_df = averaged_df.explode('avg_cos_err_per_subject') # expands the list of subjects into rows for each subject
+    long_df['avg_cos_err_per_subject'] = long_df['avg_cos_err_per_subject'].astype(float) # turns each correaltion for each subject into a float
         
-    all_results.append(D)
+    all_results.append(long_df)
 
 # Concatenate all results into a single DataFrame
 final_results_df = pd.concat(all_results, ignore_index=True)
 
 # Save the results
-save_dir = os.path.abspath(os.path.join(os.getcwd(), 'notebooks','eval_tsvs'))
+save_dir = os.path.abspath(os.path.join(os.getcwd(),'eval_tsvs'))
 save_path = os.path.join(save_dir, 'real_parcellation_cortex.tsv')
 final_results_df.to_csv(save_path, sep='\t', index=False)
 

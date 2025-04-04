@@ -13,6 +13,9 @@ import Functional_Fusion.dataset as fdata
 import os
 import cortico_cereb_connectivity.evaluation as con_ev
 import pandas as pd
+import HierarchBayesParcel.util as util
+import OptimalBattery.simulate as sim
+
 # define paths
 base_dir = 'Y:/data/'
 if not os.path.exists(base_dir):
@@ -226,70 +229,142 @@ def real_parcellation(G_library,condition_df,
                 D_ev['iteration'] = [n]
                 results_df = pd.concat([results_df,D_ev],axis=0)
                 results_df.reset_index(drop=True, inplace=True)
-
     return results_df
 
+def compute_region_profiles(test_data, contrast_data):
+    n_subj, n_tasks, n_vox = test_data.shape
+    region_profiles = pt.zeros((n_subj, n_tasks,1), device=test_data.device)
+
+    for s in range(n_subj):
+        # Subject-specific mask
+        mask_1 = (contrast_data[s] == 1)
+        for t in range(n_tasks):
+            # Take the average activation for all voxels in mask_1
+            region_profiles[s, t, 0] = test_data[s, t, mask_1].mean()
+    return region_profiles
+
+def average_pairwise_correlation(region_profiles):
+
+    # flatten the region_profiles (subj,taskprofiles)
+    n_subj =region_profiles.shape[0]
+    X = region_profiles.reshape(n_subj, -1).cpu().numpy()
+
+    # get the correlation matrix among all subjects
+    subjects_corr_matrix = np.corrcoef(X, rowvar=True)
+
+    # get cross sub corrs
+    i_upper, j_upper = np.triu_indices(n_subj, k=1)
+    corrs = subjects_corr_matrix[i_upper, j_upper]
+
+    return np.mean(corrs)
+
+def find_single_contrast(Vs, regionA, regionB):
+    difference = Vs[:, regionA ] - Vs[:, regionB]
+    sorted_idx = pt.argsort(difference) 
+
+    min_idx = sorted_idx[0].item()
+    max_idx = sorted_idx[-1].item()
+
+    return [max_idx, min_idx]
+
+def thresholded_contrast(task1, task2, threshold=0.85):
+
+    contrast_data = task1 - task2  # Compute contrast
+    if threshold is not None:
+        # Compute per-subject thresholds
+        subject_thresholds = pt.quantile(contrast_data, threshold, dim=1, keepdim=True) 
+        
+        # Apply thresholding: values below threshold -> -1, above threshold -> 1
+        thresholded_data = pt.where(contrast_data < subject_thresholds, 0, 1).float()
+    return thresholded_data
 
 def real_localization_multi(G_library,condition_df,
-                        YLib,Ytest,
-                        VLib,Vtest,
+                        YLib,VLib,Ytest,
                         evaluation_indices = None,
                         battery_sizes = [3,4,5,6,7,8,9,10,12,14,16],
-                        metric = ['log_det_mc'],
+                        metric = 'log_det_mc',
                         n_batteries = 1000,
                         n_iter=5,
                         rest_idx = 28,
-                        localizer_duration=8):
+                        localizer_duration=8,
+                        target_parcel_idx = 0):
     """ Evaluate the localization performance multitask battery
 
     """
-    # Center & Normalize vtest
-    Vtest = ut.center_matrix(Vtest, axis=0)
-    Vtest = ut.normalize_matrix(Vtest, axis=0)
-
-    # Center & Normalize ytest
-    Ytest = ut.center_matrix(Ytest, axis=1)
-    Ytest = ut.normalize_matrix(Ytest, axis=1)
-
     results_df = pd.DataFrame()
     for n_task in battery_sizes:
         print(f"Evaluating battery size: {n_task}")
         for n in range(n_iter):
             print(f"Iteration: {n}")
             D = ct.build_combinations(G_library, strategy='random',n_batteries=n_batteries,n_tasks=n_task,seed = None,replacement=False,rest_idx= rest_idx)
-            for metric in metrics:
-                print(f"Evaluating metric: {metric}")
-                D_best = ct.choose_combination(D,metric)
-                top_comb = D_best['combination'].values[0]
+            D_best = ct.choose_combination(D,metric)
+            top_comb = D_best['combination'].values[0]
 
-                # get the regressors for training data
-                combination_regressors = ct.build_combination_regressors(top_comb, condition_df=condition_df, localizer_time=localizer_duration)
+            # get the regressors for training data
+            combination_regressors = ct.build_combination_regressors(top_comb, condition_df=condition_df, localizer_time=localizer_duration)
 
-                # average, center and normalize the data used for the parcellation
-                Ysubset = ct.average_regressors(YLib, combination_regressors)
-                Ysubset = ut.center_matrix(Ysubset, axis=1)
-                Ysubset = ut.normalize_matrix(Ysubset, axis=1)
+            # average, center and normalize the data used for the parcellation
+            Ysubset = ct.average_regressors(YLib, combination_regressors)
+            Ysubset = ut.center_matrix(Ysubset, axis=1)
+            Ysubset = ut.normalize_matrix(Ysubset, axis=1)
 
-                Vsubset = VLib[top_comb,:]
-                Vsubset = ut.center_matrix(Vsubset, axis=0)
-                Vsubset = ut.normalize_matrix(Vsubset, axis=0)
+            Vsubset = VLib[top_comb,:]
+            Vsubset = ut.center_matrix(Vsubset, axis=0)
+            Vsubset = ut.normalize_matrix(Vsubset, axis=0)
 
-                Uhats =  et.estimate_Us(Ysubset, Vsubset, method='correlation',hard=True)
+            Uhats =  et.estimate_Us(Ysubset, Vsubset, method='correlation',hard=True)
+            U_hats_collpased = sim.collapse_U(Uhats, target_parcel_idx=target_parcel_idx)
+            U_binary  = U_hats_collpased[:,0,:]
 
-                cos_subjects, cos_mean = get_prediction_error(Ytest, Vtest, Uhats, indices=evaluation_indices)
-                cos_subjects = cos_subjects.cpu().numpy().tolist()
-               
-                # record
-                D_ev = pd.DataFrame()
-                D_ev['n_task'] = [n_task]
-                D_ev['metric'] = [metric]
-                D_ev['cos_err'] = [cos_subjects]
-                D_ev['iteration'] = [n]
-                results_df = pd.concat([results_df,D_ev],axis=0)
-                results_df.reset_index(drop=True, inplace=True)
+            test_profile = compute_region_profiles(Ytest, U_binary)
+            corr = average_pairwise_correlation(test_profile)
+        
+            # record
+            D_ev = pd.DataFrame()
+            D_ev['n_task'] = [n_task]
+            D_ev['metric'] = [metric]
+            D_ev['iteration'] = [n]
+            D_ev['corr'] = [corr]
+            results_df = pd.concat([results_df,D_ev],axis=0)
+            results_df.reset_index(drop=True, inplace=True)
 
     return results_df
-                
+
+def real_localization_single(test_data,regiona_idx,regionb_idx,
+                             full_vs_train,condition_df,data_train,ROI_indices,
+                             thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,0.95,0.99]):
+    
+    test_data = test_data[:,:,ROI_indices]
+    # find top two tasks for the single contrast
+    single_combination = find_single_contrast(full_vs_train, regiona_idx, regionb_idx)
+    task_names = condition_df['cond_name'].values
+    task_names = np.array(task_names)[single_combination]
+    print(f"Single contrast tasks: {task_names}")
+
+    # make the contrast data
+    combination_regressors = ct.build_combination_regressors(single_combination, condition_df,localizer_time=8)
+    contrast_data = ct.average_regressors(data_train, combination_regressors)
+    contrast_data = ut.normalize_matrix(contrast_data, axis=1)
+    masked_contrast_data = contrast_data[:,:,ROI_indices]
+
+    results_df = pd.DataFrame()
+    for threshold in thresholds:
+        mask = thresholded_contrast(masked_contrast_data[:,0,:],masked_contrast_data[:,1,:], threshold=threshold)
+        test_profile = compute_region_profiles(test_data, mask)
+        corr = average_pairwise_correlation(test_profile)
+
+        # record
+        D_ev = pd.DataFrame()
+        D_ev['threshold'] = [threshold]
+        D_ev['corr'] = [corr]
+        D_ev['regiona_idx'] = [regiona_idx]
+        D_ev['regionb_idx'] = [regionb_idx]
+        D_ev['single_combination'] = [single_combination]
+        results_df = pd.concat([results_df,D_ev],axis=0)
+        results_df.reset_index(drop=True, inplace=True)
+    return results_df
+
+                    
 
 
 

@@ -9,6 +9,7 @@ from matplotlib.colors import to_rgb, ListedColormap
 import matplotlib.pyplot as plt
 import seaborn as sns
 import ast
+import torch as pt
 
 
 def create_custom_colormap(base_colors, K_subparcels):
@@ -40,10 +41,10 @@ def average_per_subject(df, average_column='correlation'):
     """"
     Averages the specified column per subject and groups by task size and metric."""
     # group by task size and metric
-    grouped = df.groupby(['n_task', 'metric'])[average_column]
+    grouped = df.groupby(['n_task', 'metric','roi'])[average_column]
 
     result = []
-    for (n_task, metric), group in grouped:
+    for (n_task, metric, roi), group in grouped:
         if type(group.iloc[0]) == str:
             # Convert string representation of list to actual list
             subject_corr_lists = [ast.literal_eval(item) for item in group.tolist()]
@@ -56,7 +57,21 @@ def average_per_subject(df, average_column='correlation'):
         result.append({
             'n_task': n_task,
             'metric': metric,
+            'roi': roi,
             f'avg_{average_column}_per_subject': avg_corr_per_subject.tolist()
         })
     
     return pd.DataFrame(result)
+
+custom_cmap = create_custom_colormap(['red', 'blue', 'green', 'yellow', 'purple'],K_subparcels=5)
+def plot_Us(U,title = None):
+    if type(U) == np.ndarray:
+        U = pt.tensor(U)
+    parcel_labels_plot = U.argmax(dim=0).numpy()
+    parcel_labels_plot = parcel_labels_plot.reshape((height, width))
+    plt.imshow(parcel_labels_plot, cmap=custom_cmap)
+    if title is not None:
+        plt.title(title)
+    else:
+        plt.title('figure')
+    return

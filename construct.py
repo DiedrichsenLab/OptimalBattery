@@ -193,6 +193,7 @@ def build_combination_regressors(combination, condition_df, localizer_time=12):
         chosen_regressors = np.random.choice(condition_indices, num_required, replace=False)
         comb_regressors.append(list(chosen_regressors))
 
+
     return comb_regressors
 
 def average_regressors(run_data, regressor_groups):

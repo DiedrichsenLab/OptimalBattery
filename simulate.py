@@ -169,7 +169,7 @@ def collapse_U(U, target_parcel_idx):
     rest_sum = rest.sum(dim=1, keepdim=True)
 
     # combine
-    U_collapsed = pt.cat([rest_sum, target], dim=1)
+    U_collapsed = pt.cat([ target,rest_sum], dim=1)
 
     # Remove batch dim if original input was 2D
     if added_batch_dim:
@@ -208,7 +208,6 @@ def sim_single_contrast(num_task_lib = 100,
         # get the V localizer
         V_localizer = V_lib[combination,:]
         V_localizer = ut.center_matrix(V_localizer,axis=0)
-        V_localizer = ut.normalize_matrix(V_localizer,axis=0)
 
         # get the data for the parcellation estimation and add noise
         Y_localizer = V_localizer @ U_true
@@ -218,7 +217,7 @@ def sim_single_contrast(num_task_lib = 100,
         Y_localizer = Y_localizer + noise
         # is cenering and normalizing necessary?
         # Y_localizer = ut.center_matrix(Y_localizer,axis=0)
-        # Y_localizer = ut.normalize_matrix(Y_localizer,axis=0)
+        Y_localizer = ut.normalize_matrix(Y_localizer,axis=0)
 
         for threshold in thresholds:
             # get the thresholded contrast

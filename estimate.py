@@ -7,9 +7,11 @@ import torch as pt
 import numpy as np
 import OptimalBattery.evaluate as ev
 import OptimalBattery.util as ut
+import HierarchBayesParcel.emissions as em
+
 
 ######################### Parcellation Estimation #########################
-def estimate_Us(Y, V, method='correlation', alpha=1e-3, hard=False):
+def estimate_Us(Y, V, method='correlation', alpha=1e-3, hard=False,x_matrix = None,part_vec = None):
     """
     Estimate U_hat using different projection methods: 'correlation', 'ols', or 'ridge'.
 
@@ -45,6 +47,13 @@ def estimate_Us(Y, V, method='correlation', alpha=1e-3, hard=False):
         alpha_eye = pt.eye(A.shape[0], device=A.device) * alpha
         A_inv = pt.linalg.inv(A + alpha_eye)
         U_hats = A_inv @ (V.T @ Y)
+    elif method == 'VMF':
+        emis = em.MixVMF(K=V.shape[1],N=V.shape[0],P =Y.shape[2],X=x_matrix,part_vec=part_vec)
+        emis.initialize(data= Y)
+        emis.set_param_list(['kappa'])
+        emis.V = V
+        LL = emis.Estep()
+        U_hats = pt.softmax(LL, dim=1)
     else:
         raise ValueError(f"Invalid method")
 
@@ -54,8 +63,7 @@ def estimate_Us(Y, V, method='correlation', alpha=1e-3, hard=False):
         U_hard = pt.zeros_like(U_hats)
         U_hard.scatter_(1, max_indices.unsqueeze(1), 1)
         U_hats = U_hard
-    else:
-        U_hats = pt.nn.functional.softmax(U_hats, dim=1)
+    
     return U_hats
 
 
