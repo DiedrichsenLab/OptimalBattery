@@ -143,7 +143,7 @@ def make_thresholded_contrast(task1, task2, threshold):
     thresholded_data = pt.nn.functional.one_hot(thresholded_data.long(), num_classes=2).T
     return thresholded_data
 
-def collapse_U(U, target_parcel_idx):
+def collapse_U(U, target_parcels_indices = None):
     """
     Collapse the U matrix into two parcels: one for the target parcel and one for everything else.
 
@@ -163,13 +163,16 @@ def collapse_U(U, target_parcel_idx):
         U = U.unsqueeze(0)
         added_batch_dim = True
 
+    all_indices = np.arange(U.shape[1])
+    other_parcels_indices = np.setdiff1d(all_indices, target_parcels_indices)
     # select the target and non-target parcels
-    target = U[:, target_parcel_idx:target_parcel_idx+1, :]
-    rest = pt.cat([U[:, :target_parcel_idx, :], U[:, target_parcel_idx+1:, :]], dim=1)
+    target = U[:, target_parcels_indices, :]
+    rest = U[:, other_parcels_indices, :]
+    target_sum = target.sum(dim=1, keepdim=True)
     rest_sum = rest.sum(dim=1, keepdim=True)
 
     # combine
-    U_collapsed = pt.cat([ target,rest_sum], dim=1)
+    U_collapsed = pt.cat([ target_sum,rest_sum], dim=1)
 
     # Remove batch dim if original input was 2D
     if added_batch_dim:

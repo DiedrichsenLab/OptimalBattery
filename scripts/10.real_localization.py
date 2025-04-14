@@ -76,9 +76,9 @@ flat_mapping = {k: v for keys, v in region_mapping.items() for k in keys}
 parcelation_8 = np.vectorize(lambda x: flat_mapping.get(int(x), x))(parcelation_32)
 
 # params
-ROI_to_include = [4,5,7,8] 
+ROI_to_include = [17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32]
 # make a mask of the cerebellum
-ROI_mask = np.isin(parcelation_8, ROI_to_include).astype(int)
+ROI_mask = np.isin(parcelation_32, ROI_to_include).astype(int)
 ROI_indices = np.where(ROI_mask == 1)[0]
 
 
@@ -87,7 +87,7 @@ device = pt.device('cuda' if pt.cuda.is_available() else 'cpu')
 data_mdtb_s1_all = pt.tensor(data_mdtb_s1_all, dtype=pt.float32, device=device)
 data_test = pt.tensor(data_mdtb_s2_all, dtype=pt.float32, device=device)
 data_train = pt.tensor(data_mdtb_s1_run, dtype=pt.float32, device=device)
-parcelation = pt.tensor(parcelation_8, dtype=pt.float32, device=device)
+parcelation = pt.tensor(parcelation_32, dtype=pt.float32, device=device)
 ROI_mask = pt.tensor(ROI_mask, dtype=pt.float32, device=device)
 
 # Get G Lib
@@ -102,12 +102,12 @@ full_vs_train = ut.normalize_matrix(full_vs_train,axis=0)
 #                         data_train,full_vs_train,data_test,
 #                         evaluation_indices = None,
 #                         battery_sizes = [3,4,5,6,7,8,9,10,12,14,16],
-#                         metric = 'log_det_mc',
+#                         metric = 'inverse_trace_mc',
 #                         n_batteries = 1000,
-#                         n_iter=20,
+#                         n_iter=5,
 #                         rest_idx = 28,
 #                         localizer_duration=8,
-#                         target_parcel_idx= 2)
+#                         target_parcels_indices= [7,8,9,10])
 
 # save_dir = os.path.abspath(os.path.join(os.getcwd(),'eval_tsvs'))
 # save_path = os.path.join(save_dir, 'real_localization_multi.tsv')
@@ -118,10 +118,10 @@ full_vs_train = ut.normalize_matrix(full_vs_train,axis=0)
 regiona_idx = 2
 regionb_idx = 3
 
-D_single = ev.real_localization_single(data_test,regiona_idx,regionb_idx,
-                             full_vs_train,condition_df,data_train,ROI_indices,
-                             thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,0.95,0.99])
+# D_single = ev.real_localization_single(data_test,regiona_idx,regionb_idx,
+#                              full_vs_train,condition_df,data_train,ROI_indices,
+#                              thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,0.95,0.99])
 
-save_dir = os.path.abspath(os.path.join(os.getcwd(),'eval_tsvs'))
-save_path = os.path.join(save_dir, 'real_localization_single.tsv')
-D_single.to_csv(save_path, sep='\t', index=False)
+# save_dir = os.path.abspath(os.path.join(os.getcwd(),'eval_tsvs'))
+# save_path = os.path.join(save_dir, 'real_localization_single.tsv')
+# D_single.to_csv(save_path, sep='\t', index=False)

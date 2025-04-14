@@ -85,7 +85,7 @@ atlas_dir = f'{func_fus_dir}/Atlases/tpl-fs32k'
 model_name_L = f'{atlas_dir}/glasser.L.label.gii'
 model_name_R = f'{atlas_dir}/glasser.R.label.gii'
 glasser_atlas = atlas.read_data([model_name_L,model_name_R])
-
+  
 # Load data
 MDTB_dataset = DataSetMDTB(f'{func_fus_dir}/MDTB')
 
@@ -156,7 +156,7 @@ for roi_name , parcels in rois.items():
                         battery_sizes = [3,4,5,6,7,8,9,10,11,12,13,14,15,16],
                         metrics  = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],
                         n_batteries = 20000,
-                        n_iter=50,
+                        n_iter=20,
                         rest_idx = 31,
                         localizer_duration=8)
     

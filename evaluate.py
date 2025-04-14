@@ -164,6 +164,7 @@ def real_connectivity(G_library, condition_df,
                 D_ev['n_task'] = [n_task]
                 D_ev['metric'] = [metric]
                 D_ev['correlation'] = [R_list]
+                D_ev['roi'] = ['cortex-cereebellum']
                 D_ev['iteration'] = [n]
                 results_df = pd.concat([results_df,D_ev],axis=0)
                 results_df.reset_index(drop=True, inplace=True)
@@ -287,7 +288,7 @@ def real_localization_multi(G_library,condition_df,
                         n_iter=5,
                         rest_idx = 28,
                         localizer_duration=8,
-                        target_parcel_idx = 0):
+                        target_parcels_indices = 0):
     """ Evaluate the localization performance multitask battery
 
     """
@@ -313,7 +314,7 @@ def real_localization_multi(G_library,condition_df,
             Vsubset = ut.normalize_matrix(Vsubset, axis=0)
 
             Uhats =  et.estimate_Us(Ysubset, Vsubset, method='correlation',hard=True)
-            U_hats_collpased = sim.collapse_U(Uhats, target_parcel_idx=target_parcel_idx)
+            U_hats_collpased = sim.collapse_U(Uhats, target_parcels_indices=target_parcels_indices)
             U_binary  = U_hats_collpased[:,0,:]
 
             test_profile = compute_region_profiles(Ytest, U_binary)
@@ -328,7 +329,7 @@ def real_localization_multi(G_library,condition_df,
             results_df = pd.concat([results_df,D_ev],axis=0)
             results_df.reset_index(drop=True, inplace=True)
 
-    return results_df
+    return results_df   
 
 def real_localization_single(test_data,regiona_idx,regionb_idx,
                              full_vs_train,condition_df,data_train,ROI_indices,
@@ -344,7 +345,7 @@ def real_localization_single(test_data,regiona_idx,regionb_idx,
     # make the contrast data
     combination_regressors = ct.build_combination_regressors(single_combination, condition_df,localizer_time=8)
     contrast_data = ct.average_regressors(data_train, combination_regressors)
-    contrast_data = ut.normalize_matrix(contrast_data, axis=1)
+    # contrast_data = ut.normalize_matrix(contrast_data, axis=1)
     masked_contrast_data = contrast_data[:,:,ROI_indices]
 
     results_df = pd.DataFrame()
