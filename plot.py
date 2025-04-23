@@ -10,6 +10,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import ast
 import torch as pt
+import math
+import Functional_Fusion.atlas_map as am
+import SUITPy as suit
 
 
 def create_custom_colormap(base_colors, K_subparcels):
@@ -75,3 +78,34 @@ def plot_Us(U,title = None):
     else:
         plt.title('figure')
     return
+
+
+
+def plot_multi_flat(data,overlay_type='label',cmap='gray',colorbar=True,stats='mode'):
+    space = 'SUIT3'
+    atlas,_= am.get_atlas(atlas_str=space)
+
+    n_subs = data.shape[0]
+    ncols = 4
+    nrows = math.ceil(n_subs / ncols)
+
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(ncols * 5, nrows * 5))
+    axes = axes.flatten()
+
+    for i in range(n_subs):
+        subject_parcellation = data[i]
+        subject_parcellation = atlas.data_to_nifti(subject_parcellation)
+        img = suit.flatmap.vol_to_surf(subject_parcellation, space='SUIT', stats=stats, ignore_zeros=False)
+
+        plt.sca(axes[i])
+        show_cb = colorbar if i == 0 else False  # Show colorbar only for first
+        suit.flatmap.plot(img, overlay_type=overlay_type, cmap=cmap, colorbar=show_cb, new_figure=False)
+        axes[i].set_title(f'Sub {i+1}')
+        axes[i].axis('off')  
+
+        # Turn off unused axes
+        for j in range(n_subs, len(axes)):
+            axes[j].axis('off')
+
+    # plt.tight_layout()
+    plt.show()

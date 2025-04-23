@@ -89,7 +89,7 @@ glasser_atlas = atlas.read_data([model_name_L,model_name_R])
 # Load data
 MDTB_dataset = DataSetMDTB(f'{func_fus_dir}/MDTB')
 
-subj = None
+subj = ['sub-02','sub-03']
 
 data_mdtb_s2_run,info_mdtb_2_run  =MDTB_dataset.get_data(space=space,ses_id='ses-s2',type='CondRun',subj=subj)
 data_mdtb_s2_run[np.isnan(data_mdtb_s2_run)] = 0

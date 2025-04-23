@@ -127,7 +127,7 @@ def choose_combination(D,metric):
     return D_best
 
 
-def get_condition_indices(df):
+def get_condition_indices(df,task_column_name = 'task_name',cond_column_name = 'cond_name'):
     """
     Get condition indices from a dataframe and record the duration of each condition
     Parameters:
@@ -138,29 +138,29 @@ def get_condition_indices(df):
     Returns:
         condition_indices(np.ndarray): condition indices
     """
-    unique_conditions = df['cond_name'].unique()
-    new_df = pd.DataFrame(columns=['cond_name', 'indices', 'duration'])
+    unique_conditions = df[cond_column_name].unique()
+    new_df = pd.DataFrame(columns=[cond_column_name, 'indices', 'duration'])
     
     # Filter only the first run
     first_run_df = df[df['run'] == df['run'].min()]
-    task_run_counts = first_run_df.groupby('task_name')['cond_name'].nunique()
+    task_run_counts = first_run_df.groupby(task_column_name)[cond_column_name].nunique()
     duration_map = {1: 30, 2: 15, 3: 10}
     
     # Populate the new dataframe
     for condition in unique_conditions:
-        indices = df[df['cond_name'] == condition].index.tolist()
+        indices = df[df[cond_column_name] == condition].index.tolist()
         
         # Identify task_name for the condition from the original dataframe
-        task_name = df[df['cond_name'] == condition]['task_name'].values[0]
+        task_name = df[df[cond_column_name] == condition][task_column_name].values[0]
         num_conditions = task_run_counts.get(task_name, 1)
         duration = duration_map.get(num_conditions, 30)
         
-        new_row = {'cond_name': condition, 'indices': indices, 'duration': duration}
+        new_row = {cond_column_name: condition, 'indices': indices, 'duration': duration}
         new_df = pd.concat([new_df, pd.DataFrame([new_row])], ignore_index=True)
     
     return new_df
 
-def build_combination_regressors(combination, condition_df, localizer_time=12):
+def build_combination_regressors(combination, condition_df, localizer_time=12,seed=None):
     """
     Constructs a regressor list for current
     ensuring the total scanning time is distributed approximately equally across selected conditions. (with a 10 second difference in some cases)
@@ -176,6 +176,8 @@ def build_combination_regressors(combination, condition_df, localizer_time=12):
     Returns:
         list of lists of int: List of lists where each list contains regressors for a condition in the combination.
     """
+    if seed is not None:
+        np.random.seed(seed)
     total_seconds = localizer_time * 60  # Convert minutes to seconds
     
     # divide the localizer time equally among the conditions
