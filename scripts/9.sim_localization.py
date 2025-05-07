@@ -3,7 +3,9 @@ import HierarchBayesParcel.spatial as spatial
 import HierarchBayesParcel.arrangements as ar
 import torch as pt
 import os
-
+import OptimalBattery.plot as plot
+import matplotlib.pyplot as plt
+import pandas as pd
 
 
 device = pt.device('cuda' if pt.cuda.is_available() else 'cpu')
@@ -31,46 +33,62 @@ U_true_5 = sim.make_U_spatial(grid, centroids, K_main, K_subparcels)
 U_true_5 = pt.from_numpy(U_true_5).to(device=device, dtype=pt.float64)
 
 # make a collapsed U_true where one region is 1 and the rest are 0
-collapsed_U_true = sim.collapse_U(U_true_5, target_parcel_idx=4)
+collapsed_U_true = sim.collapse_U(U_true_5, target_parcels_indices=[4])
+
 
 
 # constants
-battery_sizes = [3,4,5,6,7,8,9,10,11,12,13,14,15,16] # only for multi
+battery_sizes = [3,4,6,8,10,14,18,25] # only for multi
 metrics = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'] # only for multi
+thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,0.95,0.99] # only for single
 n_batteries = 1000 # only for multi
 num_task_lib = 100 # shared
 n_parcels = 5 # shared
-base_noise = 2  # shared
-n_sim = 50  # shared
+base_noise_list = [2,4,8,16,32,100]  # shared
+n_sim = 20  # shared
 
-# Run the multitask simulation
-D_multi = sim.sim_parcellation(num_task_lib = num_task_lib,
-                    n_parcels = n_parcels,
-                    U_true = U_true_5,
-                    battery_sizes = battery_sizes,
-                    n_batteries = n_batteries,
-                    base_noise = base_noise,
-                    n_sim = n_sim,
-                    collapsed_U_true=collapsed_U_true)
 
+all_dfs = []
+for base_noise in base_noise_list:
+    # Run multitask simulation
+    D_multi = sim.sim_parcellation(
+        num_task_lib=num_task_lib,
+        n_parcels=n_parcels,
+        U_true=U_true_5,
+        battery_sizes=battery_sizes,
+        n_batteries=n_batteries,
+        base_noise=base_noise,
+        n_sim=n_sim,
+        collapsed_U_true=collapsed_U_true
+    )
+
+    D_multi['simulation_type'] = 'multi'
+    D_multi['base_noise'] = base_noise
+    D_multi['threshold'] = None  # add missing columns
+    all_dfs.append(D_multi)
+
+    # Run single contrast simulation
+    D_single = sim.sim_single_contrast(
+        num_task_lib=num_task_lib,
+        n_parcels=n_parcels,
+        U_true=U_true_5,
+        base_noise=base_noise,
+        max_battery_size=max(battery_sizes),
+        thresholds=thresholds,
+        U_true_collapsed=collapsed_U_true,
+        n_sim=n_sim
+    )
+
+    D_single['simulation_type'] = 'single'
+    D_single['base_noise'] = base_noise
+    D_single['n_task'] = None  # add missing columns
+    D_single['metric'] = None
+    all_dfs.append(D_single)
+
+# Combine everything
+final_df = pd.concat(all_dfs, ignore_index=True)
+
+# Save
 save_dir = os.path.abspath(os.path.join(os.getcwd(),'eval_tsvs'))
-save_path = os.path.join(save_dir, 'sim_localization_multi.tsv')
-D_multi.to_csv(save_path, sep='\t', index=False)
-
-
-
-# run the single contrast simulations
-thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,0.95,0.99]
-D_single = sim.sim_single_contrast(num_task_lib = num_task_lib,
-                            n_parcels = n_parcels,
-                            U_true = U_true_5,
-                            base_noise = base_noise,
-                            max_battery_size = max(battery_sizes),
-                            thresholds = thresholds,
-                            U_true_collapsed = collapsed_U_true,
-                            n_sim = n_sim)
-
-save_dir = os.path.abspath(os.path.join(os.getcwd(),'eval_tsvs'))
-save_path = os.path.join(save_dir, 'sim_localization_single.tsv')
-D_single.to_csv(save_path, sep='\t', index=False)
-
+save_path = os.path.join(save_dir, 'sim_localization.tsv')
+final_df.to_csv(save_path, sep='\t', index=False)

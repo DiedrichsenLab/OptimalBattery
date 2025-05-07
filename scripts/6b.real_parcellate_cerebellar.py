@@ -17,15 +17,14 @@ import OptimalBattery.construct as ct
 import OptimalBattery.plot as plot
 
 rois = {'all-M':[5,6,7,8,9,10,11,12,13,14,15,16,21,22,23,24,25,26,27,28,29,30,31,32],
-        'all':[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32],
+'all':[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32],
         'SD': [8,9,10,11,12,13,14,15,16,24,25,26,27,28,29,30,31,32],
-    # 'MA':[1,2,3,4,5,6,7,17,18,19,20,21,22,23],
-    # 'SDR':[24,25,26,27,28,29,30,31,32],
-    # 'SDL':[8,9,10,11,12,13,14,15,16],
-    # 'MA_L':[1,2,3,4,5,6,7],
-    # 'MA_R':[17,18,19,20,21,22,23],
-    # 'AD':[5,6,7,8,9,10,11,21,22,23,24,25,26,27],
-    # 'rand':[1,4,6,7,8,12,14,16,20,23,26,29,30,31]
+    'MA':[1,2,3,4,5,6,7,17,18,19,20,21,22,23],
+    'SDR':[24,25,26,27,28,29,30,31,32],
+    'SDL':[8,9,10,11,12,13,14,15,16],
+    'MA_L':[1,2,3,4,5,6,7],
+    'MA_R':[17,18,19,20,21,22,23],
+    'AD':[5,6,7,8,9,10,11,21,22,23,24,25,26,27],
 }
 
 
@@ -101,19 +100,20 @@ for roi_name , parcels in rois.items():
                         data_train,data_test,
                         full_vs_train,full_vs_test,
                         evaluation_indices = ROI_indices,
-                        battery_sizes = [3,4,5,6,7,8,9,10,11,12,13,14,15,16],
+                        battery_sizes = [3,4,5,6,7,8,9,10,12,13,14,15,16],
                         metrics  = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],
                         n_batteries = 20000,
-                        n_iter=50,
+                        n_iter=20,
                         rest_idx = 31,
                         localizer_duration=8)
     
+
     D['roi'] = roi_name
     D['n_parcel'] = len(parcels)
 
-    averaged_df = plot.average_per_subject(D,'cos_err') # lists of subjects are averaged across iterations
-    long_df = averaged_df.explode('avg_cos_err_per_subject') # expands the list of subjects into rows for each subject
-    long_df['avg_cos_err_per_subject'] = long_df['avg_cos_err_per_subject'].astype(float) # turns each correaltion for each subject into a float
+    averaged_df = plot.average_per_subject(D,'cos_sim') # lists of subjects are averaged across iterations
+    long_df = averaged_df.explode('avg_cos_sim_per_subject') # expands the list of subjects into rows for each subject
+    long_df['avg_cos_sim_per_subject'] = long_df['avg_cos_sim_per_subject'].astype(float) # turns each correaltion for each subject into a float
         
     all_results.append(long_df)
 

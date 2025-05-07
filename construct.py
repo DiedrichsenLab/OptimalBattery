@@ -160,7 +160,7 @@ def get_condition_indices(df,task_column_name = 'task_name',cond_column_name = '
     
     return new_df
 
-def build_combination_regressors(combination, condition_df, localizer_time=12,seed=None):
+def build_combination_regressors_old(combination, condition_df, localizer_time=12,seed=None):
     """
     Constructs a regressor list for current
     ensuring the total scanning time is distributed approximately equally across selected conditions. (with a 10 second difference in some cases)
@@ -183,6 +183,7 @@ def build_combination_regressors(combination, condition_df, localizer_time=12,se
     # divide the localizer time equally among the conditions
     allocated_time_per_condition = total_seconds // len(combination)
     comb_regressors = []
+    total_combination_time = 0
     for cond_idx in combination:
         condition_row = condition_df.iloc[cond_idx]
         condition_indices = condition_row['indices']
@@ -194,7 +195,74 @@ def build_combination_regressors(combination, condition_df, localizer_time=12,se
         # Randomly sample regressors from the condition
         chosen_regressors = np.random.choice(condition_indices, num_required, replace=False)
         comb_regressors.append(list(chosen_regressors))
+        total_combination_time += num_required * condition_duration
 
+
+    return comb_regressors, total_combination_time
+
+def build_combination_regressors(combination, condition_df, localizer_time=12, seed=None):
+    """
+    Constructs a regressor list for the given condition combination,
+    ensuring the total scanning time is distributed approximately equally across selected conditions.
+    Pads remaining time by sampling additional regressors as much as possible.
+
+    Parameters:
+        combination (list): List of condition indices for the current combination.
+        condition_df (pd.DataFrame): Must include:
+            - 'cond_name': name of the condition
+            - 'indices': list of regressor indices
+            - 'duration': duration of each regressor in seconds
+        localizer_time (int): Total allowed time in minutes.
+        seed (int): Optional seed for reproducibility.
+
+    Returns:
+        tuple: (List of lists of regressors per condition, total time in seconds)
+    """
+    if seed is not None:
+        np.random.seed(seed)
+
+    total_seconds = localizer_time * 60  # Convert minutes to seconds
+    allocated_time_per_condition = total_seconds // len(combination)
+
+    comb_regressors = []
+    total_combination_time = 0
+    chosen_set = set()
+
+    # Step 1: Equally allocate time per condition
+    for cond_idx in combination:
+        row = condition_df.iloc[cond_idx]
+        duration = row['duration']
+        indices = row['indices']
+        num_to_sample = allocated_time_per_condition // duration
+
+        sampled = np.random.choice(indices, size=num_to_sample, replace=False)
+
+        comb_regressors.append(list(sampled))
+        chosen_set.update(sampled)
+        total_combination_time += len(sampled) * duration
+
+    # Step 2: Fill any leftover time with unsampled regressors
+    remaining_time = total_seconds - total_combination_time
+
+    # Prepare pool of all unused regressors across conditions
+    all_remaining = []
+    for i, cond_idx in enumerate(combination):
+        row = condition_df.iloc[cond_idx]
+        duration = row['duration']
+        indices = row['indices']
+        available = list(set(indices) - chosen_set)
+        for idx in available:
+            all_remaining.append((idx, duration, i)) 
+
+    np.random.shuffle(all_remaining)
+
+    for idx, dur, list_pos in all_remaining:
+        if dur <= remaining_time:
+            comb_regressors[list_pos].append(idx)
+            remaining_time -= dur
+            total_combination_time += dur
+            if remaining_time < min([condition_df.iloc[i]['duration'] for i in combination]):
+                break
 
     return comb_regressors
 

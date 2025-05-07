@@ -123,7 +123,15 @@ def get_weighted_noise_std(n_task, max_n_task, noise):
     return noise * np.sqrt((n_task / max_n_task))
 
 def find_single_contrast(Vs, regionA, regionB):
-    """ Find the task that maximizes the difference between regionA and regionB """
+    """ Find the task that maximizes the difference between regionA and regionB 
+    Args:
+        Vs: Task library (n_tasks, n_parcels)
+        regionA: Index of the first region (region of interest)
+        regionB: Index of the second region (close to regionA)
+    Returns:
+        max_idx: Index of the task that maximizes the difference
+        min_idx: Index of the task that minimizes the difference
+    """
     difference = Vs[:, regionA -1] - Vs[:, regionB-1]
     sorted_idx = pt.argsort(difference)
 
@@ -133,15 +141,24 @@ def find_single_contrast(Vs, regionA, regionB):
     return [max_idx, min_idx]
 
 def make_thresholded_contrast(task1, task2, threshold):
-    """gets the contrast between two tasks and thresholds it"""
+    """gets the contrast between two tasks and thresholds it
+    Args:
+        task1: Task 1 data (n_voxels)
+        task2: Task 2 data (n_voxels)
+        threshold: Threshold for the contrast
+    Returns:
+        contrast_one_hot: One-hot encoded contrast (2, n_voxels)
+    """
+
     contrast_data = task1 - task2
-    thresholded_data = pt.zeros_like(contrast_data)
-    percentile = pt.quantile(contrast_data, threshold)
-    thresholded_data[contrast_data >= percentile] = 1
+    mask = (contrast_data >= pt.quantile(contrast_data, threshold)).long()
 
     # make one hot
-    thresholded_data = pt.nn.functional.one_hot(thresholded_data.long(), num_classes=2).T
-    return thresholded_data
+    contrast_one_hot = pt.stack([
+        (mask == 1).float(),  # positive/ region A
+        (mask == 0).float()   # everything else 
+    ], dim=0)
+    return contrast_one_hot
 
 def collapse_U(U, target_parcels_indices = None):
     """
@@ -189,7 +206,19 @@ def sim_single_contrast(num_task_lib = 100,
                         U_true_collapsed = None,
                         n_sim = 50,
                         seed = None):
-    """ Single simulation for the single contrast evaluation."""
+    """ Single simulation for the single contrast parcellation estimation
+    Args:
+        num_task_lib: Number of tasks in the library
+        n_parcels: Number of parcels in the U_true
+        U_true: ground truth parcellation
+        base_noise: Base noise level
+        max_battery_size: Maximum battery size (from the list of battery sizes in the multi-task simulation)
+        thresholds: List of thresholds to test
+        U_true_collapsed: Collapsed U_true for the single region analysis
+        n_sim: Number of simulations to run
+        seed: Random seed for reproducibility
+    returns:
+    """
 
      # Make new task battery
     if seed is not None:
@@ -246,6 +275,20 @@ def sim_parcellation(num_task_lib = 100,
                      collapsed_U_true = None,
                      n_sim = 50,
                      seed = None):
+    """ Single simulation for the parcellation estimation
+    Args:
+        num_task_lib: Number of tasks in the library
+        n_parcels: Number of parcels in the U_true
+        U_true: ground truth parcellation
+        battery_sizes: List of battery sizes to test
+        n_batteries: Number of batteries to sample for each battery size
+        base_noise: Base noise level
+        collapsed_U_true: Collapsed U_true for the single region analysis
+        n_sim: Number of simulations to run
+        seed: Random seed for reproducibility
+    returns:
+        results_df: DataFrame with the results of the simulations
+    """
     # Make new task battery
     if seed is not None:
         rng= np.random.default_rng(seed=seed)
@@ -293,7 +336,7 @@ def sim_parcellation(num_task_lib = 100,
 
                 # This is for the single region analysis (optional argument to collapsee the parcellation into two regions)
                 if collapsed_U_true is not None:
-                    U_hats = collapse_U(U_hats, target_parcel_idx=4)
+                    U_hats = collapse_U(U_hats, target_parcels_indices=[4])
 
                 # Evaluate the parcellation
                 if collapsed_U_true is not None:

@@ -13,36 +13,20 @@ import torch as pt
 import math
 import Functional_Fusion.atlas_map as am
 import SUITPy as suit
-
-
-def create_custom_colormap(base_colors, K_subparcels):
-    """
-    Creates a custom colormap by generating shades of base colors.
-    
-    Parameters:
-    base_colors : list of str
-        List of color names as base colors (e.g., ['red', 'green']).
-    K_subparcels : int
-        Number of subparcels used to create gradient shades of each base color.
-    
-    Returns:
-    ListedColormap
-        A custom colormap generated from the input base colors.
-    """
-    cmap_list = []
-    for color in base_colors:
-        base_rgb = np.array(to_rgb(color))
-        for i in range(K_subparcels):
-            factor = 0.6 + 0.4 * (i / (K_subparcels - 1))
-            shade_rgb = base_rgb * factor + (1 - factor) * np.ones(3)
-            cmap_list.append(shade_rgb)
-
-    return ListedColormap(cmap_list)
+import fitz  # PyMuPDF
+import os
+from PIL import Image
 
 
 def average_per_subject(df, average_column='correlation'):
     """"
-    Averages the specified column per subject and groups by task size and metric."""
+    Averages the specified column per subject and groups by task size and metric.
+    Args:
+        df (pd.DataFrame): DataFrame containing the data to be averaged.
+        average_column (str): The column to average. Default is 'correlation'.
+    Returns:
+        pd.DataFrame: A DataFrame with the average values per subject, grouped by task size and metric.
+    """
     # group by task size and metric
     grouped = df.groupby(['n_task', 'metric','roi'])[average_column]
 
@@ -66,22 +50,44 @@ def average_per_subject(df, average_column='correlation'):
     
     return pd.DataFrame(result)
 
-custom_cmap = create_custom_colormap(['red', 'blue', 'green', 'yellow', 'purple'],K_subparcels=5)
-def plot_Us(U,title = None):
+def plot_U_simulation(U,cmap = None,height = None,width = None,title = None):
+    """
+    plot ground truth parcellation for simulation
+    args:
+        U: (n_parcels, height*width pixels) tensor of parcellation labels
+        cmap: colormap for the plot
+        height: height of the plot
+        width: width of the plot
+        title: title of the plot
+    """
     if type(U) == np.ndarray:
         U = pt.tensor(U)
     parcel_labels_plot = U.argmax(dim=0).numpy()
     parcel_labels_plot = parcel_labels_plot.reshape((height, width))
-    plt.imshow(parcel_labels_plot, cmap=custom_cmap)
+    plt.imshow(parcel_labels_plot, cmap=cmap)
     if title is not None:
         plt.title(title)
     else:
         plt.title('figure')
-    return
+    return 
 
 
 
-def plot_multi_flat(data,overlay_type='label',cmap='gray',colorbar=True,stats='mode'):
+def plot_multi_flat(data,overlay_type='label',cscale = None,cmap='gray',colorbar=True,stats='mode',showfigure=True,save=False):
+    """
+    Plot multiple flatmaps in a grid layout for multiple subjects.
+    Args:
+        data (np.ndarray): 2D array of shape (n_subjects, n_vertices) containing the parcellation data for each subject.
+        overlay_type (str): Type of overlay to use ('label' or 'func'). label for parcellation, func for functional data.
+        cscale (tuple): Color scale for the flatmap. Default is None.
+        cmap (str): Colormap to use. Default is 'gray'.
+        colorbar (bool): Whether to show colorbar. Default is True. only shows it once for the first plot.
+        stats (str): Statistics to use for the flatmap. Default is 'mode'.
+        showfigure (bool): Whether to show the figure. Default is True.
+        save (bool): Whether to save the figure. Default is False.
+    Returns:
+        fig (matplotlib.figure.Figure): The figure object containing the flatmaps.
+    """
     space = 'SUIT3'
     atlas,_= am.get_atlas(atlas_str=space)
 
@@ -99,13 +105,68 @@ def plot_multi_flat(data,overlay_type='label',cmap='gray',colorbar=True,stats='m
 
         plt.sca(axes[i])
         show_cb = colorbar if i == 0 else False  # Show colorbar only for first
-        suit.flatmap.plot(img, overlay_type=overlay_type, cmap=cmap, colorbar=show_cb, new_figure=False)
-        axes[i].set_title(f'Sub {i+1}')
+        suit.flatmap.plot(img, overlay_type=overlay_type, cscale=cscale,cmap=cmap, colorbar=show_cb, new_figure=False)
         axes[i].axis('off')  
 
         # Turn off unused axes
         for j in range(n_subs, len(axes)):
             axes[j].axis('off')
 
-    # plt.tight_layout()
-    plt.show()
+    if save:
+        plt.savefig('flatmaps.png', dpi=300, bbox_inches='tight')
+    if showfigure:
+        plt.show()
+    return fig
+
+
+def save_flatmap_to_pdf(fig, title, pdf):
+    """
+    Save a flatmap figure to a PDF file with a title.
+    Args:
+        fig (matplotlib.figure.Figure): The figure object to save.
+        title (str): The title for the figure.
+        pdf (matplotlib.backends.backend_pdf.PdfPages): The PDF file to save the figure to.
+    """
+    fig.set_constrained_layout(True)
+    fig.suptitle(title, fontsize=14)
+    for ax in fig.get_axes():
+        ax.set_rasterization_zorder(1)
+    pdf.savefig(fig)
+    plt.close(fig)
+
+
+def compress_pdf(pdf_path, dpi=150):
+    """
+    Compress a PDF file by rendering each page as an image and saving it back to PDF.
+    Args:
+        pdf_path (str): Path to the PDF file to compress.
+        dpi (int): DPI for rendering images. Default is 150.
+    """
+    doc = fitz.open(pdf_path)
+    temp_images = []
+    temp_dir = os.path.join(os.path.dirname(pdf_path), "temp_flatten")
+    os.makedirs(temp_dir, exist_ok=True)
+
+    zoom = dpi / 72
+    mat = fitz.Matrix(zoom, zoom)
+
+    # Render each page to an image
+    for i in range(len(doc)):
+        page = doc.load_page(i)
+        pix = page.get_pixmap(matrix=mat)
+        img_path = os.path.join(temp_dir, f"page_{i}.png")
+        pix.save(img_path)
+        temp_images.append(img_path)
+    doc.close()
+
+    # Recombine images into a single flattened PDF
+    image_objs = [Image.open(p).convert("RGB") for p in temp_images]
+    if image_objs:
+        image_objs[0].save(
+            pdf_path,
+            save_all=True,
+            append_images=image_objs[1:],
+        )
+    for p in temp_images:
+        os.remove(p)
+    os.rmdir(temp_dir)

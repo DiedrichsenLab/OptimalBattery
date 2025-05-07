@@ -60,6 +60,11 @@ rois = {
 
     ],
 
+    "PFC":
+    ['OFC', '10pp', '10r', '8C', 's6-8', '25', 'p24', 'p47r', '46', 'a10p', '10d', '9m', '8Av', 'IFJp', 
+    '10v', '13l', '45', 'i6-8', '9-46d', 'IFJa', '47s', 'SFL', 'a24', 'IFSp', '47m', '9p', '9a', 'pOFC',
+    '8Ad', '11l', 'IFSa', 'a9-46v', '44', 'a47r', '55b', '47l', 's32', 'p9-46v', '8BM', 'p10p', '8BL', 'p32', 'a32pr', 'd32']
+
 }
 
 
@@ -89,7 +94,7 @@ glasser_atlas = atlas.read_data([model_name_L,model_name_R])
 # Load data
 MDTB_dataset = DataSetMDTB(f'{func_fus_dir}/MDTB')
 
-subj = ['sub-02','sub-03']
+subj = None
 
 data_mdtb_s2_run,info_mdtb_2_run  =MDTB_dataset.get_data(space=space,ses_id='ses-s2',type='CondRun',subj=subj)
 data_mdtb_s2_run[np.isnan(data_mdtb_s2_run)] = 0
@@ -155,7 +160,7 @@ for roi_name , parcels in rois.items():
                         evaluation_indices = ROI_indices,
                         battery_sizes = [3,4,5,6,7,8,9,10,11,12,13,14,15,16],
                         metrics  = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],
-                        n_batteries = 20000,
+                        n_batteries = 10000,
                         n_iter=20,
                         rest_idx = 31,
                         localizer_duration=8)
@@ -164,9 +169,9 @@ for roi_name , parcels in rois.items():
     D['parcels'] = ', '.join(parcels)
     D['n_parcel'] = len(parcels)
 
-    averaged_df = plot.average_per_subject(D,'cos_err') # lists of subjects are averaged across iterations
-    long_df = averaged_df.explode('avg_cos_err_per_subject') # expands the list of subjects into rows for each subject
-    long_df['avg_cos_err_per_subject'] = long_df['avg_cos_err_per_subject'].astype(float) # turns each correaltion for each subject into a float
+    averaged_df = plot.average_per_subject(D,'cos_sim') # lists of subjects are averaged across iterations
+    long_df = averaged_df.explode('avg_cos_sim_per_subject') # expands the list of subjects into rows for each subject
+    long_df['avg_cos_sim_per_subject'] = long_df['avg_cos_sim_per_subject'].astype(float) # turns each correaltion for each subject into a float
         
     all_results.append(long_df)
 

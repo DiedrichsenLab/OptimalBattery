@@ -10,10 +10,10 @@ import OptimalBattery.util as ut
 import HierarchBayesParcel.emissions as em
 
 
-######################### Parcellation Estimation #########################
-def estimate_Us(Y, V, method='correlation', alpha=1e-3, hard=False,x_matrix = None,part_vec = None):
+######################### Parcellation U  Estimation #########################
+def estimate_Us(Y, V, method='correlation', alpha=1e-3, hard=False):
     """
-    Estimate U_hat using different projection methods: 'correlation', 'ols', or 'ridge'.
+    Estimate U_hat using different projection methods: 'correlation', 'ols', or 'ridge', 'VMF
 
     Args:
         Y (torch.Tensor): fMRI data of shape (n_subjects, n_tasks, n_voxels)
@@ -47,13 +47,6 @@ def estimate_Us(Y, V, method='correlation', alpha=1e-3, hard=False,x_matrix = No
         alpha_eye = pt.eye(A.shape[0], device=A.device) * alpha
         A_inv = pt.linalg.inv(A + alpha_eye)
         U_hats = A_inv @ (V.T @ Y)
-    elif method == 'VMF':
-        emis = em.MixVMF(K=V.shape[1],N=V.shape[0],P =Y.shape[2],X=x_matrix,part_vec=part_vec)
-        emis.initialize(data= Y)
-        emis.set_param_list(['kappa'])
-        emis.V = V
-        LL = emis.Estep()
-        U_hats = pt.softmax(LL, dim=1)
     else:
         raise ValueError(f"Invalid method")
 
