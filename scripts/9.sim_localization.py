@@ -38,18 +38,19 @@ collapsed_U_true = sim.collapse_U(U_true_5, target_parcels_indices=[4])
 
 
 # constants
-battery_sizes = [3,4,6,8,10,14,18,25] # only for multi
+battery_sizes = [2,4,18] # only for multi
 metrics = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'] # only for multi
-thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,0.95,0.99] # only for single
+thresholds = [0.1,0.5,0.99] # only for single
 n_batteries = 1000 # only for multi
 num_task_lib = 100 # shared
 n_parcels = 5 # shared
-base_noise_list = [2,4,8,16,32,100]  # shared
-n_sim = 20  # shared
+base_noise_list = [2,10]  # shared
+n_sim = 4  # shared
 
 
 all_dfs = []
 for base_noise in base_noise_list:
+    print(f'base noise: {base_noise}')
     # Run multitask simulation
     D_multi = sim.sim_parcellation(
         num_task_lib=num_task_lib,
@@ -68,27 +69,27 @@ for base_noise in base_noise_list:
     all_dfs.append(D_multi)
 
     # Run single contrast simulation
-    D_single = sim.sim_single_contrast(
-        num_task_lib=num_task_lib,
-        n_parcels=n_parcels,
-        U_true=U_true_5,
-        base_noise=base_noise,
-        max_battery_size=max(battery_sizes),
-        thresholds=thresholds,
-        U_true_collapsed=collapsed_U_true,
-        n_sim=n_sim
-    )
+#     D_single = sim.sim_single_contrast(
+#         num_task_lib=num_task_lib,
+#         n_parcels=n_parcels,
+#         U_true=U_true_5,
+#         base_noise=base_noise,
+#         max_battery_size=max(battery_sizes),
+#         thresholds=thresholds,
+#         U_true_collapsed=collapsed_U_true,
+#         n_sim=n_sim
+#     )
 
-    D_single['simulation_type'] = 'single'
-    D_single['base_noise'] = base_noise
-    D_single['n_task'] = None  # add missing columns
-    D_single['metric'] = None
-    all_dfs.append(D_single)
+#     D_single['simulation_type'] = 'single'
+#     D_single['base_noise'] = base_noise
+#     D_single['n_task'] = None  # add missing columns
+#     D_single['metric'] = None
+#     all_dfs.append(D_single)
 
-# Combine everything
-final_df = pd.concat(all_dfs, ignore_index=True)
+# # Combine everything
+# final_df = pd.concat(all_dfs, ignore_index=True)
 
-# Save
-save_dir = os.path.abspath(os.path.join(os.getcwd(),'eval_tsvs'))
-save_path = os.path.join(save_dir, 'sim_localization.tsv')
-final_df.to_csv(save_path, sep='\t', index=False)
+# # Save
+# save_dir = os.path.abspath(os.path.join(os.getcwd(),'eval_tsvs'))
+# save_path = os.path.join(save_dir, 'sim_localization.tsv')
+# final_df.to_csv(save_path, sep='\t', index=False)

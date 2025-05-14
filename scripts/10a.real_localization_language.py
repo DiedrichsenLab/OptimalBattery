@@ -25,7 +25,7 @@ from matplotlib.patches import Patch
 pdf_name = 'localization_cerebellum_language.pdf'
 pdf_path = os.path.join('eval_tsvs', pdf_name)
 pdf = PdfPages(pdf_path)
-get_pdf = True
+get_pdf = False
 
 
 # define atlas and dirs

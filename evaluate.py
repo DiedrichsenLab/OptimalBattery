@@ -453,7 +453,7 @@ def calculate_spatial_overlap(U_binary):
     scores = []
     for i in range(n_subs):
         for j in range(i + 1, n_subs):
-            dice = sim.get_dice_coefficient(
+            dice = sim.get_dice_binary(
                 pt.tensor(U_binary[i][None, None, :]), 
                 pt.tensor(U_binary[j][None, None, :])
             )
