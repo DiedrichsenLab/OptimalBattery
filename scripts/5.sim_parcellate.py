@@ -38,7 +38,7 @@ U_true_5 = pt.tensor(U_true_5,device=device, dtype=pt.float64)
 D = sim.sim_parcellation(num_task_lib = 100,
                      n_parcels = 5,
                      U_true = U_true_5,
-                     battery_sizes = [3,4,5,6,7,8,9,10,11,12,13,14,15,16],
+                     battery_sizes = [4,8,16],
                      n_batteries = 1000,
                      base_noise = 2,
                      collapsed_U_true = None,

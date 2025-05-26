@@ -272,7 +272,6 @@ def sim_single_contrast(num_task_lib = 100,
 
         # get the V localizer
         V_localizer = V_lib[combination,:]
-        V_localizer = ut.center_matrix(V_localizer,axis=0)
 
         # get the data for the parcellation estimation and add noise
         Y_localizer = V_localizer @ U_true
@@ -290,7 +289,7 @@ def sim_single_contrast(num_task_lib = 100,
             thresholded_contrast = make_thresholded_contrast(Y_localizer[0,:], Y_localizer[1,:], threshold)
 
             # Evaluate the contrast
-            accuracy = get_dice_coefficient(U_true_collapsed, thresholded_contrast)
+            accuracy = get_dice_binary(U_true_collapsed, thresholded_contrast)
 
             D_ev = pd.DataFrame()
             D_ev['threshold'] = [threshold]
@@ -303,6 +302,7 @@ def sim_single_contrast(num_task_lib = 100,
 def sim_parcellation(num_task_lib = 100,
                      n_parcels = 5,
                      U_true = None,
+                     metrics = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],
                      battery_sizes = [3,4,6,8,10,14,18,24,28],
                      n_batteries = 100,
                      base_noise = 2,
@@ -330,7 +330,6 @@ def sim_parcellation(num_task_lib = 100,
         rng= np.random.default_rng()
 
     # constants
-    metrics = ['inverse_trace_mc']
     max_battery_size = max(battery_sizes)
 
     results_df =pd.DataFrame()
@@ -339,7 +338,6 @@ def sim_parcellation(num_task_lib = 100,
         accuracies = []
         for n in range(n_sim):
             V_lib = rng.normal(0,1,(num_task_lib, n_parcels))
-            V_lib = V_lib - V_lib.mean(axis=0,keepdims=True)
             G_lib = V_lib @ V_lib.T
             # ensure tensor
             V_lib = pt.tensor(V_lib, device=device, dtype=pt.float64)
@@ -356,19 +354,17 @@ def sim_parcellation(num_task_lib = 100,
 
                 # get the V battery
                 V_battery = V_lib[top_comb,:]
-                V_battery = ut.center_matrix(V_battery,axis=0)
-
 
                 # get the data for the parcellation estimation and add noise
                 Y_battery = V_battery @ U_true
                 weighted_noise_std = get_weighted_noise_std(n_task, max_battery_size, base_noise)
-                # if I dont do this it's not deterministic meaning everytime in for metric it will give diff noise cuz advancing seed
-                rng = np.random.default_rng(seed)
                 noise = rng.normal(0,weighted_noise_std,Y_battery.shape)
                 noise = pt.tensor(noise, dtype=pt.float64, device=Y_battery.device)
                 Y_battery = Y_battery + noise
                 Y_battery = ut.center_matrix(Y_battery,axis=0)
                 Y_battery = ut.normalize_matrix(Y_battery,axis=0)
+                V_battery = ut.center_matrix(V_battery,axis=0)
+                V_battery = ut.normalize_matrix(V_battery,axis=0)
 
                 # Build the parcellation
                 U_hats = et.estimate_Us(Y_battery, V_battery, method='correlation', hard=True)
@@ -379,9 +375,9 @@ def sim_parcellation(num_task_lib = 100,
 
                 # Evaluate the parcellation
                 if collapsed_U_true is not None:
-                    accuracy = get_dice_coefficient(collapsed_U_true, U_hats)
+                    accuracy = get_dice_binary(collapsed_U_true, U_hats)
                 else:
-                    accuracy = get_dice_coefficient(U_true, U_hats)
+                    accuracy = get_dice_multiclass(U_true, U_hats)
 
                 accuracies.append(accuracy)
                 D_ev = pd.DataFrame()
