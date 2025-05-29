@@ -85,7 +85,7 @@ def get_percentage_correct(U_true, U_pred):
     percentage = (correct_voxels / total_voxels) * 100
     return percentage
 
-def get_dice_binary(U_true, U_pred, roi_index=0):
+def get_dice_single(U_true, U_pred, roi_index=0):
     """
     Compute Dice coefficient for a binary ROI (single class only).
     Assumes U_true and U_pred are one-hot tensors of shape (1, 2, P) or (2, P).
@@ -106,7 +106,7 @@ def get_dice_binary(U_true, U_pred, roi_index=0):
     TP = (U_true[roi_index] * U_pred[roi_index]).sum()
     size_true = U_true[roi_index].sum()
     size_pred = U_pred[roi_index].sum()
-    dice = 2 * TP / (size_true + size_pred + 1e-8)
+    dice = 2 * TP / (size_true + size_pred8)
     return dice.item()
 
 def get_dice_multiclass(U_true, U_pred):
@@ -128,7 +128,7 @@ def get_dice_multiclass(U_true, U_pred):
     intersection = (U_true * U_pred).sum(dim=2)
     size_true = U_true.sum(dim=2)
     size_pred = U_pred.sum(dim=2)
-    dice_scores = 2 * intersection / (size_true + size_pred + 1e-8)
+    dice_scores = 2 * intersection / (size_true + size_pred)
     return dice_scores.mean().item()
 
 def get_weighted_noise_std(n_task, max_n_task, noise):
@@ -289,7 +289,7 @@ def sim_single_contrast(num_task_lib = 100,
             thresholded_contrast = make_thresholded_contrast(Y_localizer[0,:], Y_localizer[1,:], threshold)
 
             # Evaluate the contrast
-            accuracy = get_dice_binary(U_true_collapsed, thresholded_contrast)
+            accuracy = get_dice_single(U_true_collapsed, thresholded_contrast)
 
             D_ev = pd.DataFrame()
             D_ev['threshold'] = [threshold]
@@ -335,10 +335,10 @@ def sim_parcellation(num_task_lib = 100,
     results_df =pd.DataFrame()
     for n_task in battery_sizes:
         print(f"Processing battery size: {n_task}")
-        accuracies = []
         for n in range(n_sim):
             V_lib = rng.normal(0,1,(num_task_lib, n_parcels))
             G_lib = V_lib @ V_lib.T
+            G_lib = G_lib - G_lib.mean(axis=0,keepdims=True)
             # ensure tensor
             V_lib = pt.tensor(V_lib, device=device, dtype=pt.float64)
 
@@ -363,8 +363,6 @@ def sim_parcellation(num_task_lib = 100,
                 Y_battery = Y_battery + noise
                 Y_battery = ut.center_matrix(Y_battery,axis=0)
                 Y_battery = ut.normalize_matrix(Y_battery,axis=0)
-                V_battery = ut.center_matrix(V_battery,axis=0)
-                V_battery = ut.normalize_matrix(V_battery,axis=0)
 
                 # Build the parcellation
                 U_hats = et.estimate_Us(Y_battery, V_battery, method='correlation', hard=True)
@@ -375,17 +373,15 @@ def sim_parcellation(num_task_lib = 100,
 
                 # Evaluate the parcellation
                 if collapsed_U_true is not None:
-                    accuracy = get_dice_binary(collapsed_U_true, U_hats)
+                    accuracy = get_dice_single(collapsed_U_true, U_hats)
                 else:
                     accuracy = get_dice_multiclass(U_true, U_hats)
 
-                accuracies.append(accuracy)
                 D_ev = pd.DataFrame()
                 D_ev['n_task'] = [n_task]
                 D_ev['metric'] = [metric]
                 D_ev['accuracy'] = accuracy
                 results_df = pd.concat([results_df,D_ev],axis=0)
-        print(np.mean(accuracies))
     return results_df
 
 def sim_connectivity(num_task_lib = 100,
