@@ -106,7 +106,7 @@ def get_dice_single(U_true, U_pred, roi_index=0):
     TP = (U_true[roi_index] * U_pred[roi_index]).sum()
     size_true = U_true[roi_index].sum()
     size_pred = U_pred[roi_index].sum()
-    dice = 2 * TP / (size_true + size_pred8)
+    dice = 2 * TP / (size_true + size_pred)
     return dice.item()
 
 def get_dice_multiclass(U_true, U_pred):
