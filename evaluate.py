@@ -85,7 +85,7 @@ def get_prediction_error_cv(ytest, U_hat, indices=None):
         other_subs_ytest = ytest[other_subs_idx]                 
         other_subs_uhats = U_hat[other_subs_idx]                
 
-        # Compute V: mean across training subjects
+        # Compute V across n-1 subjects
         Y_train_t = other_subs_ytest.permute(0, 2, 1)       
         V = pt.matmul(other_subs_uhats, Y_train_t).mean(dim=0) 
         V = V.T                                  
