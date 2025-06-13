@@ -239,7 +239,7 @@ def real_connectivity(G_library, condition_df,
 
 def real_parcellation(G_library,condition_df,
                         YLib,Ytest,
-                        VLib,Vtest,
+                        VLib,
                         evaluation_indices = None,
                         battery_sizes = [3,4,5,6,7,8,9,10,12,14,16],
                         metrics  = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],
@@ -250,17 +250,12 @@ def real_parcellation(G_library,condition_df,
     """ Evaluate the parcellation performance for each combination in the DataFrame D.
 
     """
-    # Center & Normalize vtest
-    Vtest = ut.center_matrix(Vtest, axis=0)
-    Vtest = ut.normalize_matrix(Vtest, axis=0)
-
     # Center & Normalize ytest
     Ytest = ut.center_matrix(Ytest, axis=1)
     Ytest = ut.normalize_matrix(Ytest, axis=1)
 
     results_df = pd.DataFrame()
     for n_task in battery_sizes:
-        li = []
         print(f"Evaluating battery size: {n_task}")
         for n in range(n_iter):
             print(f"Iteration: {n}")

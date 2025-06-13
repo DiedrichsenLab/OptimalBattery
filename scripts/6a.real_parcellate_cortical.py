@@ -147,16 +147,12 @@ for roi_name , parcels in rois.items():
     full_vs_train = ut.center_matrix(full_vs_train,axis=0)
     full_vs_train = ut.normalize_matrix(full_vs_train,axis=0)
 
-    # estimate Vs for testing using s1 full data
-    full_vs_test = es.estimate_Vs(data_test,parcellation=parcelation,ROI_mask=ROI_mask)
-    full_vs_test = ut.center_matrix(full_vs_test,axis=0)
-    full_vs_test = ut.normalize_matrix(full_vs_test,axis=0)
 
     n_parcels = full_vs_train.shape[1]
 
     D = ev.real_parcellation(G_Lib,condition_df,
                         data_train,data_test,
-                        full_vs_train,full_vs_test,
+                        full_vs_train,
                         evaluation_indices = ROI_indices,
                         battery_sizes = [3,4,5,6,7,8,9,10,11,12,13,14,15,16],
                         metrics  = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],

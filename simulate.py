@@ -337,8 +337,9 @@ def sim_parcellation(num_task_lib = 100,
         print(f"Processing battery size: {n_task}")
         for n in range(n_sim):
             V_lib = rng.normal(0,1,(num_task_lib, n_parcels))
+            V_lib = V_lib - V_lib.mean(axis=0,keepdims=True)
             G_lib = V_lib @ V_lib.T
-            G_lib = G_lib - G_lib.mean(axis=0,keepdims=True)
+            
             # ensure tensor
             V_lib = pt.tensor(V_lib, device=device, dtype=pt.float64)
 
@@ -355,6 +356,7 @@ def sim_parcellation(num_task_lib = 100,
                 # get the V battery
                 V_battery = V_lib[top_comb,:]
 
+
                 # get the data for the parcellation estimation and add noise
                 Y_battery = V_battery @ U_true
                 weighted_noise_std = get_weighted_noise_std(n_task, max_battery_size, base_noise)
@@ -363,6 +365,9 @@ def sim_parcellation(num_task_lib = 100,
                 Y_battery = Y_battery + noise
                 Y_battery = ut.center_matrix(Y_battery,axis=0)
                 Y_battery = ut.normalize_matrix(Y_battery,axis=0)
+
+                V_battery = ut.center_matrix(V_battery,axis=0)
+                V_battery = ut.normalize_matrix(V_battery,axis=0)
 
                 # Build the parcellation
                 U_hats = et.estimate_Us(Y_battery, V_battery, method='correlation', hard=True)
