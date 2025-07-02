@@ -7,11 +7,13 @@ import torch as pt
 import numpy as np
 import OptimalBattery.evaluate as ev
 import OptimalBattery.util as ut
+import HierarchBayesParcel.emissions as em
 
-######################### Parcellation Estimation #########################
+
+######################### Parcellation U  Estimation #########################
 def estimate_Us(Y, V, method='correlation', alpha=1e-3, hard=False):
     """
-    Estimate U_hat using different projection methods: 'correlation', 'ols', or 'ridge'.
+    Estimate U_hat using different projection methods: 'correlation', 'ols', or 'ridge', 'VMF
 
     Args:
         Y (torch.Tensor): fMRI data of shape (n_subjects, n_tasks, n_voxels)
@@ -40,7 +42,7 @@ def estimate_Us(Y, V, method='correlation', alpha=1e-3, hard=False):
         U_hats = A_inv @ (V.T @ Y)
 
     elif method == 'ridge':
-        # Ridge: (V^T V + alpha*I)^(-1) V^T @ Y
+        # Ridge: (V^T V + alpha*I)^(-1) V^T @ Y 
         A = V.T @ V
         alpha_eye = pt.eye(A.shape[0], device=A.device) * alpha
         A_inv = pt.linalg.inv(A + alpha_eye)
@@ -50,12 +52,12 @@ def estimate_Us(Y, V, method='correlation', alpha=1e-3, hard=False):
 
     # 2) Return continuous or hard assignments
     if hard:
+        U_hats += 1e-10 * pt.arange(U_hats.shape[-1], device=U_hats.device)
         max_indices = pt.argmax(U_hats, dim=1)  # (n_subjects, n_voxels)
         U_hard = pt.zeros_like(U_hats)
         U_hard.scatter_(1, max_indices.unsqueeze(1), 1)
         U_hats = U_hard
-    else:
-        U_hats = pt.nn.functional.softmax(U_hats, dim=1)
+    
     return U_hats
 
 

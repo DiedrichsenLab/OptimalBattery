@@ -85,16 +85,40 @@ def get_percentage_correct(U_true, U_pred):
     percentage = (correct_voxels / total_voxels) * 100
     return percentage
 
-
-def get_dice_coefficient(U_true, U_pred):
+def get_dice_single(U_true, U_pred, roi_index=0):
     """
-    Compute Dice coefficient
+    Compute Dice coefficient for a binary ROI (single class only).
+    Assumes U_true and U_pred are one-hot tensors of shape (1, 2, P) or (2, P).
 
     Args:
-        U_true (Tensor): True Us)
-        U_pred (Tensor): Estimated Us
+        U_true (Tensor): Ground truth parcellation
+        U_pred (Tensor): Predicted parcellation
+        roi_index (int): Index of ROI class to evaluate (default 0)
+
     Returns:
-        mean_dice (float): Average Dice across all parcels
+        float: Dice score for ROI
+    """
+    if len(U_true.shape) == 3:
+        U_true = U_true[0]
+    if len(U_pred.shape) == 3:
+        U_pred = U_pred[0]
+
+    TP = (U_true[roi_index] * U_pred[roi_index]).sum()
+    size_true = U_true[roi_index].sum()
+    size_pred = U_pred[roi_index].sum()
+    dice = 2 * TP / (size_true + size_pred)
+    return dice.item()
+
+def get_dice_multiclass(U_true, U_pred):
+    """
+    Compute average Dice coefficient across all classes.
+
+    Args:
+        U_true (Tensor): Ground truth (K, P) or (1, K, P)
+        U_pred (Tensor): Predicted (K, P) or (1, K, P)
+
+    Returns:
+        float: Mean Dice over all classes
     """
     if len(U_true.shape) == 2:
         U_true = U_true.unsqueeze(0)
@@ -104,10 +128,8 @@ def get_dice_coefficient(U_true, U_pred):
     intersection = (U_true * U_pred).sum(dim=2)
     size_true = U_true.sum(dim=2)
     size_pred = U_pred.sum(dim=2)
-
-    dice_scores = (2 * intersection ) / (size_true + size_pred )
-    mean_dice = dice_scores.mean().item()
-    return mean_dice
+    dice_scores = 2 * intersection / (size_true + size_pred)
+    return dice_scores.mean().item()
 
 def get_weighted_noise_std(n_task, max_n_task, noise):
     """Compute the noise level based on the number of tasks in the battery.
@@ -122,9 +144,27 @@ def get_weighted_noise_std(n_task, max_n_task, noise):
     """
     return noise * np.sqrt((n_task / max_n_task))
 
-def find_single_contrast(Vs, regionA, regionB):
-    """ Find the task that maximizes the difference between regionA and regionB """
-    difference = Vs[:, regionA -1] - Vs[:, regionB-1]
+def find_max_contrast_against_all(Vs, region_idx):
+    """
+    Find the task that maximizes and minimizes the contrast between a region of interest (ROI)
+    and the average of all other regions.
+
+    Args:
+        Vs: Task library (n_tasks, n_parcels)
+        region_idx: Index of the region of interest (0-based)
+
+    Returns:
+        max_idx: Index of the task with highest contrast (ROI >> others)
+        min_idx: Index of the task with lowest contrast (ROI << others)
+    """
+    roi = Vs[:, region_idx]
+    
+    # Exclude the ROI column to get all other regions
+    others = pt.cat([Vs[:, :region_idx], Vs[:, region_idx + 1:]], dim=1)
+    others_mean = pt.mean(others, dim=1)
+
+    # Contrast: ROI - mean(other regions)
+    difference = roi - others_mean
     sorted_idx = pt.argsort(difference)
 
     min_idx = sorted_idx[0].item()
@@ -132,18 +172,28 @@ def find_single_contrast(Vs, regionA, regionB):
 
     return [max_idx, min_idx]
 
+
 def make_thresholded_contrast(task1, task2, threshold):
-    """gets the contrast between two tasks and thresholds it"""
+    """gets the contrast between two tasks and thresholds it
+    Args:
+        task1: Task 1 data (n_voxels)
+        task2: Task 2 data (n_voxels)
+        threshold: Threshold for the contrast
+    Returns:
+        contrast_one_hot: One-hot encoded contrast (2, n_voxels)
+    """
+
     contrast_data = task1 - task2
-    thresholded_data = pt.zeros_like(contrast_data)
-    percentile = pt.quantile(contrast_data, threshold)
-    thresholded_data[contrast_data >= percentile] = 1
+    mask = (contrast_data >= pt.quantile(contrast_data, threshold)).long()
 
     # make one hot
-    thresholded_data = pt.nn.functional.one_hot(thresholded_data.long(), num_classes=2).T
-    return thresholded_data
+    contrast_one_hot = pt.stack([
+        (mask == 1).float(),  # positive/ region A
+        (mask == 0).float()   # everything else 
+    ], dim=0)
+    return contrast_one_hot
 
-def collapse_U(U, target_parcel_idx):
+def collapse_U(U, target_parcels_indices = None):
     """
     Collapse the U matrix into two parcels: one for the target parcel and one for everything else.
 
@@ -163,13 +213,16 @@ def collapse_U(U, target_parcel_idx):
         U = U.unsqueeze(0)
         added_batch_dim = True
 
+    all_indices = np.arange(U.shape[1])
+    other_parcels_indices = np.setdiff1d(all_indices, target_parcels_indices)
     # select the target and non-target parcels
-    target = U[:, target_parcel_idx:target_parcel_idx+1, :]
-    rest = pt.cat([U[:, :target_parcel_idx, :], U[:, target_parcel_idx+1:, :]], dim=1)
+    target = U[:, target_parcels_indices, :]
+    rest = U[:, other_parcels_indices, :]
+    target_sum = target.sum(dim=1, keepdim=True)
     rest_sum = rest.sum(dim=1, keepdim=True)
 
     # combine
-    U_collapsed = pt.cat([rest_sum, target], dim=1)
+    U_collapsed = pt.cat([ target_sum,rest_sum], dim=1)
 
     # Remove batch dim if original input was 2D
     if added_batch_dim:
@@ -186,7 +239,19 @@ def sim_single_contrast(num_task_lib = 100,
                         U_true_collapsed = None,
                         n_sim = 50,
                         seed = None):
-    """ Single simulation for the single contrast evaluation."""
+    """ Single simulation for the single contrast parcellation estimation
+    Args:
+        num_task_lib: Number of tasks in the library
+        n_parcels: Number of parcels in the U_true
+        U_true: ground truth parcellation
+        base_noise: Base noise level
+        max_battery_size: Maximum battery size (from the list of battery sizes in the multi-task simulation)
+        thresholds: List of thresholds to test
+        U_true_collapsed: Collapsed U_true for the single region analysis
+        n_sim: Number of simulations to run
+        seed: Random seed for reproducibility
+    returns:
+    """
 
      # Make new task battery
     if seed is not None:
@@ -202,22 +267,21 @@ def sim_single_contrast(num_task_lib = 100,
         V_lib = pt.tensor(V_lib, device=device, dtype=pt.float64)
 
         # get the single contrast
-        max_idx, min_idx = find_single_contrast(V_lib, 5, 4)
+        max_idx, min_idx = find_max_contrast_against_all(V_lib, 4)
         combination = [max_idx, min_idx]
 
         # get the V localizer
         V_localizer = V_lib[combination,:]
-        V_localizer = ut.center_matrix(V_localizer,axis=0)
-        V_localizer = ut.normalize_matrix(V_localizer,axis=0)
 
         # get the data for the parcellation estimation and add noise
         Y_localizer = V_localizer @ U_true
         weighted_noise_std = get_weighted_noise_std(2, max_battery_size, base_noise)
+        rng = np.random.default_rng(seed)
         noise = rng.normal(0,weighted_noise_std,Y_localizer.shape)
         noise = pt.tensor(noise, dtype=pt.float64, device=Y_localizer.device)
         Y_localizer = Y_localizer + noise
-        # is cenering and normalizing necessary?
-        # Y_localizer = ut.center_matrix(Y_localizer,axis=0)
+        # center but no normalization?
+        Y_localizer = ut.center_matrix(Y_localizer,axis=0)
         # Y_localizer = ut.normalize_matrix(Y_localizer,axis=0)
 
         for threshold in thresholds:
@@ -225,7 +289,7 @@ def sim_single_contrast(num_task_lib = 100,
             thresholded_contrast = make_thresholded_contrast(Y_localizer[0,:], Y_localizer[1,:], threshold)
 
             # Evaluate the contrast
-            accuracy = get_dice_coefficient(U_true_collapsed, thresholded_contrast)
+            accuracy = get_dice_single(U_true_collapsed, thresholded_contrast)
 
             D_ev = pd.DataFrame()
             D_ev['threshold'] = [threshold]
@@ -238,12 +302,27 @@ def sim_single_contrast(num_task_lib = 100,
 def sim_parcellation(num_task_lib = 100,
                      n_parcels = 5,
                      U_true = None,
+                     metrics = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],
                      battery_sizes = [3,4,6,8,10,14,18,24,28],
                      n_batteries = 100,
                      base_noise = 2,
                      collapsed_U_true = None,
                      n_sim = 50,
                      seed = None):
+    """ Single simulation for the parcellation estimation
+    Args:
+        num_task_lib: Number of tasks in the library
+        n_parcels: Number of parcels in the U_true
+        U_true: ground truth parcellation
+        battery_sizes: List of battery sizes to test
+        n_batteries: Number of batteries to sample for each battery size
+        base_noise: Base noise level
+        collapsed_U_true: Collapsed U_true for the single region analysis
+        n_sim: Number of simulations to run
+        seed: Random seed for reproducibility
+    returns:
+        results_df: DataFrame with the results of the simulations
+    """
     # Make new task battery
     if seed is not None:
         rng= np.random.default_rng(seed=seed)
@@ -251,7 +330,6 @@ def sim_parcellation(num_task_lib = 100,
         rng= np.random.default_rng()
 
     # constants
-    metrics = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc']
     max_battery_size = max(battery_sizes)
 
     results_df =pd.DataFrame()
@@ -261,6 +339,7 @@ def sim_parcellation(num_task_lib = 100,
             V_lib = rng.normal(0,1,(num_task_lib, n_parcels))
             V_lib = V_lib - V_lib.mean(axis=0,keepdims=True)
             G_lib = V_lib @ V_lib.T
+            
             # ensure tensor
             V_lib = pt.tensor(V_lib, device=device, dtype=pt.float64)
 
@@ -271,10 +350,12 @@ def sim_parcellation(num_task_lib = 100,
                 D_best = ct.choose_combination(D,metric)
                 top_comb = D_best['combination'].values[0]
 
+                if n_task == 2:
+                    top_comb = find_max_contrast_against_all(Vs=V_lib,region_idx=4)
+
                 # get the V battery
                 V_battery = V_lib[top_comb,:]
-                V_battery = ut.center_matrix(V_battery,axis=0)
-              
+
 
                 # get the data for the parcellation estimation and add noise
                 Y_battery = V_battery @ U_true
@@ -285,26 +366,27 @@ def sim_parcellation(num_task_lib = 100,
                 Y_battery = ut.center_matrix(Y_battery,axis=0)
                 Y_battery = ut.normalize_matrix(Y_battery,axis=0)
 
+                V_battery = ut.center_matrix(V_battery,axis=0)
+                V_battery = ut.normalize_matrix(V_battery,axis=0)
 
                 # Build the parcellation
                 U_hats = et.estimate_Us(Y_battery, V_battery, method='correlation', hard=True)
 
                 # This is for the single region analysis (optional argument to collapsee the parcellation into two regions)
                 if collapsed_U_true is not None:
-                    U_hats = collapse_U(U_hats, target_parcel_idx=4)
+                    U_hats = collapse_U(U_hats, target_parcels_indices=[4])
 
                 # Evaluate the parcellation
                 if collapsed_U_true is not None:
-                    accuracy = get_dice_coefficient(collapsed_U_true, U_hats)
+                    accuracy = get_dice_single(collapsed_U_true, U_hats)
                 else:
-                    accuracy = get_dice_coefficient(U_true, U_hats)
+                    accuracy = get_dice_multiclass(U_true, U_hats)
 
                 D_ev = pd.DataFrame()
                 D_ev['n_task'] = [n_task]
                 D_ev['metric'] = [metric]
                 D_ev['accuracy'] = accuracy
                 results_df = pd.concat([results_df,D_ev],axis=0)
-
     return results_df
 
 def sim_connectivity(num_task_lib = 100,
