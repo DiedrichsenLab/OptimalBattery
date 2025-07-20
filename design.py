@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sb
 from numpy import sqrt
 import os
+from matplotlib import gridspec
 
 instr_code = 90 # Instruction condition code
 
@@ -14,7 +15,20 @@ def make_design_matrix_simple(reg_id=[[1, 2], [3, 4], [5, 6]],
                        T=100,
                        instruction_TR=0):  # Default: no instruction time
     """Make a design matrix with the conditions indicated in reg_id,
-    rest phases with probability p_rest, and optional instruction periods."""
+    rest phases with probability p_rest, and optional instruction periods.
+    Args:
+        reg_id (list): List of lists, where each sublist contains the condition codes for each run.
+        p_rest (float): Proportion of run dedicated to rest periods.
+        T (int): Total number of time points (s) in each run
+        instruction_TR (int): Number of time points for the instruction period, default is 0 (no instruction).
+    Returns:
+        X (np.ndarray): Design matrix of shape (T * num_part, num_reg)
+        cond_v (np.ndarray): Condition vector of shape (T * num_part,)
+        part_v (np.ndarray): Partition vector indicating the run for each time point.
+        reg_ind (np.ndarray): Regressor index for the columns of the design matrix.
+        part_ind (np.ndarray): Partition index for the columns of the design matrix.
+        lc (int): Length of task periods.
+        lr (int): Length of rest periods."""
 
     num_part = len(reg_id)  # Number of runs
     part_v = np.kron(np.arange(num_part), np.ones((T,)))  # Run indices
@@ -138,24 +152,39 @@ def var_contrasts(X,reg_ind):
     from a design matrix X the regressors indicating different conditions
     We do this seperately for all contrast against rest
     and all the pairwise contrasts between conditions.
+    Args:
+        X (np.ndarray): Design matrix of shape (T * num_part, num_reg)
+        reg_ind (np.ndarray): Regressor index for the columns of the design matrix.
+    Returns:
+        var_i (np.ndarray): Variance of the contrasts against rest.
+        var_p (np.ndarray): Variance of the pairwise contrasts.
+        sig_e: Estimated noise variance unique to conditions
+        sig_b: Estimated noise variance shared between conditions within run (baseline)
     """
-    conv_beta = inv(X.T@X)
+    cov_beta = inv(X.T@X)
     reg_ind[reg_ind==instr_code] = 0
     # CI are the contrast against rest
     CI = pcm.matrix.indicator(reg_ind,positive=True).T
     CI = CI / CI.sum(axis=1,keepdims=True)
     # CP are the pairwise contrast
     CP = pcm.matrix.pairwise_contrast(reg_ind,positive=True)
-    var_i = np.diag(CI@conv_beta@CI.T)
-    var_p = np.diag(CP@conv_beta@CP.T)
-    return var_i,var_p
+    # Variance of the different contrasts
+    var_i = np.diag(CI@cov_beta@CI.T)
+    var_p = np.diag(CP@cov_beta@CP.T)
+    # Noise variance and covariance in the run can just be read
+    # off, as no signal is present, and cross-run-covariance is zero
+    sig_b = cov_beta[0,1]
+    sig_e = cov_beta[0,0] - sig_b  # Noise variance unique
+    return var_i,var_p,sig_e,sig_b
 
 def compare_designs_1(design=None,
                     T=300,
                     p_rest=[0.7,0.6,1/2,1/2.5,1/3,1/4,1/5,1/6,1/7,1/8,1/9,1/11,1/15],
                     contrast_in=None,
                     instruction_time=5):
-    """Compare blocked and interspersed designs with optional instruction times."""
+    """Compare blocked and interspersed designs with optional instruction times.
+    Args:
+        design (list): List of designs () to compare, if None uses default designs."""
     if design is None:
         design = [[[1, 2,1,2], [3, 4,3,4]],  # Blocked design
                   [[1, 2, 3, 4]] * 2]  # Interspersed design
@@ -184,7 +213,7 @@ def compare_designs_1(design=None,
                             contrast_in[c] = False
                             break
             # Computer variance of contrasts
-            vari, varp = var_contrasts(X, reg_ind)
+            vari, varp, sig_e, sig_b = var_contrasts(X, reg_ind)
             if i == 0:
                 design_name = 'Blocked'
             else:
@@ -197,7 +226,9 @@ def compare_designs_1(design=None,
                   'Task_Vs_Rest':sqrt(vari.mean()),
                   'std_pairwise':sqrt(varp.mean()),
                   '2Task_Within':sqrt(varp[contrast_in].mean()),
-                  '2Task_Between':sqrt(varp[~contrast_in].mean())}
+                  '2Task_Between':sqrt(varp[~contrast_in].mean()),
+                  'sigma2_b':sig_b,
+                  'sigma2_e':sig_e}
             DF = pd.concat([DF,pd.DataFrame(df)],ignore_index=True)
     return DF
 
@@ -243,13 +274,38 @@ def plot_contrast_variance(DF):
     plt.legend(loc='upper right', fontsize=12)
 
     #adjust spacing on the x to be less
-    plt.xticks(np.arange(0.1, 0.71, step=0.1), fontsize=12)
+    plt.xticks(np.arange(0.1, 0.71, step=0.1))
 
     sb.despine()
     plt.tight_layout()
 
+def plot_baseline_noise(DF):
+    """ Plots a line for each design for the baseline / (baseline + cond)"""
 
-if __name__ == '__main__':
+    # diff colors for diff designs
+    design_colors = sb.color_palette("tab10", len(DF['Design'].unique()))
+
+    for i, design_name in enumerate(DF['Design'].unique()):
+        subset = DF[DF['Design'] == design_name]
+        sb.lineplot(
+            data=subset,
+            x='p_rest',
+            y=subset.sigma2_b / (subset.sigma2_b+subset.sigma2_e), # Offset for visibility
+            color=design_colors[i]  )
+
+    # add vertical lines for rest prob = task prob
+    plt.axvline(1/(DF.num_cond[0]+1), color='black', linestyle=':')
+
+    plt.xlabel('Proportion of Rest', fontsize=14)
+    plt.ylabel('baseline', fontsize=14)
+
+    #adjust spacing on the x to be less
+    plt.xticks(np.arange(0.1, 0.71, step=0.1))
+    sb.despine()
+    plt.tight_layout()
+
+
+def example_designs():
     design_b = [[1, 2,1,2,1,2], [3,4,3,4,3,4], [5, 6,5,6,5,6]]  # Blocked design
     design_i = [[1, 2, 3, 4, 5, 6]] * 3  # Interspersed design
     design = [design_b, design_i]
@@ -270,3 +326,22 @@ if __name__ == '__main__':
         draw_reference_lines('ver', part_ind, color='k', lw=1)
 
         pass
+
+def generate_figure():
+    design_b=[[1,2],[3,4]] # Blocked design
+    design_i=[[1,2,3,4]]*2 # Intersperse design
+    T=300
+    numpart = len(design_b)
+    DF = compare_designs_1([design_b,design_i],T=T, instruction_time=0)
+    plt.figure(figsize=(6,7))
+    gs = gridspec.GridSpec(4, 1)
+    ax0 = plt.subplot(gs[0:3,0])
+    plot_contrast_variance(DF)
+    ax1 = plt.subplot(gs[3,0])
+    plot_baseline_noise(DF)
+
+    pass
+
+if __name__ == '__main__':
+    generate_figure()
+    plt.show()
