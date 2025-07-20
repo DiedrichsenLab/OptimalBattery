@@ -19,7 +19,7 @@ def get_covariance_matrices(space = 'fs32k',tasks=None,base_dir = None):
         COV (list): List of covariance matrices for each task.
     """
     atlas,_= am.get_atlas(atlas_str=space)
-    HCP_dataset = ds.DataSetHcpTask(base_dir + '/HCP_tfMRI')
+    HCP_dataset = ds.DataSetHcpTask(base_dir + '/HCPur100')
     data_hcp , info_hcp= HCP_dataset.get_data(space=space,ses_id='ses-task',type = 'CondHalf')
     data_hcp[np.isnan(data_hcp)] = 0
 
