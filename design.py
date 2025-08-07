@@ -7,6 +7,7 @@ import seaborn as sb
 from numpy import sqrt
 import os
 from matplotlib import gridspec
+import scipy.linalg as la
 
 instr_code = 90 # Instruction condition code
 
@@ -115,9 +116,12 @@ def make_design_matrix(reg_id=[1, 2, 3, 4, 5, 6] * 3,
         instruction_TRs = instruction_TR * len(condv)  # Number of instruction TRs
 
         # Deduct instruction TRs if instruction_time > 0
-        len_task = int((T - T * p_rest - instruction_TRs) // num_cond) # Length of a task period
-        len_rest = int(T - len_task * num_cond - instruction_TRs)//num_rest # Length of a rest period
-
+        if num_rest >0:
+            len_task = int((T - T * p_rest - instruction_TRs) // num_cond) # Length of a task period
+            len_rest = int(T - len_task * num_cond - instruction_TRs)//num_rest # Length of a rest period
+        else:
+            len_task = int((T - instruction_TRs) // num_cond) # Length of a task period
+            len_rest = 0
         # Build the condition vector:
         cv = np.zeros((T,))  # Initialize condition vector
         start = 0  # Start index for the first condition
@@ -145,6 +149,18 @@ def make_design_matrix(reg_id=[1, 2, 3, 4, 5, 6] * 3,
     lr = (cond_v == 0).sum()  # Count rest time
     return X, cond_v, part_v, reg_ind, part_ind, lc, lr
 
+def fractional_gaussian_autcorr(H, N):
+    """
+    Generate fractional Gaussian autocorrelation.
+    """
+    if H < 0 or H > 1:
+        raise ValueError("Hurst parameter H must be in the range [0, 1].")
+
+
+    lag = np.arange(N)
+    corr = ((lag+1)**(2*H)- 2 * lag**(2*H) + (lag-1)**(2*H))/2
+    corr[lag==0]=1
+    return lag,corr
 
 
 def var_contrasts(X,reg_ind):
@@ -342,6 +358,33 @@ def generate_figure():
 
     pass
 
+def autocorrelation_limits(H = 0.9,
+                    nTasks = 20):
+    """Explores limits of interspersed design given the presence of autocorrelated noise."""
+
+    DF = pd.DataFrame()
+    design = [list(range(1, nTasks+1))] # Design with nTasks conditions
+    T=(nTasks+1)*30
+    X, _, _, reg_ind, part_ind, lc, lr = make_design_matrix(design,
+                                                            num_rest=1,
+                                                            p_rest = 1/(nTasks+1),
+                                                            T=T,
+                                                            instruction_TR=0)
+
+    CP = pcm.matrix.pairwise_contrast(reg_ind,positive=True)
+    lag,corr = fractional_gaussian_autcorr(H, T)
+    V = la.toeplitz(corr)  # Covariance matrix for the noise
+    cov_beta = la.inv(X.T@ la.inv(V) @ X)  # Covariance matrix for the
+    var_contr = CP @ cov_beta @ CP.T  # Variance of the contrasts
+    vc = np.diag(var_contr)  # Variance of the contrasts
+    df = pd.DataFrame({'Hearst':H,
+            'dist':np.arange(1, nTasks),
+            'var_con':vc[:nTasks-1]})
+    plt.plot(df.dist,df.var_con)
+    return df
+
+
+
 if __name__ == '__main__':
-    generate_figure()
+    autocorrelation_limits(H=0.8)
     plt.show()
