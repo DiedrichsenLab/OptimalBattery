@@ -12,7 +12,7 @@ from scipy.stats import ttest_ind
 
 def get_covariance_matrices(space = 'fs32k',tasks=None,base_dir = None):
     atlas,_= am.get_atlas(atlas_str=space)
-    HCP_dataset = ds.DataSetHcpTask(base_dir + '/HCP_tfMRI')
+    HCP_dataset = ds.DataSetHcpTask(base_dir + '/HCPur100')
     data_hcp , info_hcp= HCP_dataset.get_data(space=space,ses_id='ses-task',type = 'CondHalf')
     data_hcp[np.isnan(data_hcp)] = 0
     
@@ -38,6 +38,8 @@ def plot_all_covariances(COV,tasks,infos):
         cov = np.mean(COV[i],axis=0)
         scale= np.max(cov)
         plot_covariance(cov,task,infos[i],scale)
+    plt.tight_layout()
+    plt.show()
 
 def plot_covariance(cov,task,info,scale): 
     ax = plt.gca()
@@ -86,9 +88,11 @@ def estimate_all_components(COV,tasks,infos):
     return df
 
 if __name__=='__main__':
-    COV, tasks, infos = get_covariance_matrices(space = 'fs32k')
-    plot_all_covariances(COV,tasks,infos)
+    base_dir = 'Y:/data/FunctionalFusion_new'
+    COV, tasks, infos = get_covariance_matrices(space = 'fs32k',base_dir=base_dir)
+    # plot_all_covariances(COV,tasks,infos)
     D = estimate_all_components(COV,tasks,infos)
+    D.to_csv('hcp_task_components.csv',index=False)
     
     # get_covariance_matrices(space = 'fs32k')
     pass
