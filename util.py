@@ -114,3 +114,62 @@ def combine_parcellation_regions(fine_parcellation, labels, region_mapping):
     hard_parcellation = hard_parcellation.astype(np.int32)
 
     return hard_parcellation
+
+
+def reorder_mdtb(data, info, filtered_dat, run_map=None):
+    """
+    Reorder data and info table into the true experimental order.
+    
+    Params:
+    data : np.ndarray
+        Array of shape (n_subjects, n_tasks, n_voxels)
+    info : pd.DataFrame
+        MDTB info dataframe with columns ["run", "task_name", "task_num", ...]
+    filtered_dat : pd.DataFrame
+        Experimental timing dataframe with columns ["runNum", "taskName", ...]
+    run_map : dict, optional
+        Mapping from runNum in filtered_dat to run in info, if they differ.
+        If None, assumes they are identical. (mdtb dat file has runNum starting from 51)
+    Returns
+    -------
+    data_reordered : np.ndarray
+        Same as input data, but rows reordered to match true task order
+    info_reordered : pd.DataFrame
+        Same as input info, with extra column "task_num_mod" for corrected order
+    """
+    
+    # Default run mapping (identity if not provided)
+    if run_map is None:
+        run_map = {rn: rn for rn in filtered_dat['runNum'].unique()}
+    
+    info = info.copy()
+    info['task_num_orig'] = -1  # placeholder
+    
+    # Build dictionary: run -> ordered task list
+    true_orders = {}
+    for runNum, df_run in filtered_dat.groupby('runNum'):
+        run_id = run_map.get(runNum, runNum)
+        true_orders[run_id] = df_run['taskName'].tolist()
+    
+    # Assign corrected task numbers
+    for run in info['run'].unique():
+
+        true_order = true_orders[run]
+        run_mask = info['run'] == run
+        
+        for i, tname in enumerate(true_order, start=1):
+            mask = run_mask & (info['task_name'] == tname)
+            info.loc[mask, 'task_num_orig'] = i
+    
+    # Sort indices by corrected task order within each run
+    sort_idx = []
+    for run in sorted(info['run'].unique()):
+        run_mask = info['run'] == run
+        order = info.loc[run_mask].sort_values('task_num_orig').index
+        sort_idx.extend(order)
+    
+    # Apply reordering
+    data_reordered = data[:, sort_idx, :]
+    info_reordered = info.loc[sort_idx].reset_index(drop=True)
+    
+    return data_reordered, info_reordered
