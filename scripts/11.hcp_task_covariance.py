@@ -9,16 +9,23 @@ import random
 from scipy.stats import ttest_ind
 
 
-
 def get_covariance_matrices(space = 'fs32k',tasks=None,base_dir = None):
+    """ Get tge covariance matrices for the HCP task data.
+    Args:
+        space (str): The atlas space to use, e.g., 'fs32k'.
+        tasks (list): List of tasks to include, if None all tasks are included.
+        base_dir (str): Base directory for the dataset, if None uses the default path.
+    Returns:
+        COV (list): List of covariance matrices for each task.
+    """
     atlas,_= am.get_atlas(atlas_str=space)
     HCP_dataset = ds.DataSetHcpTask(base_dir + '/HCPur100')
     data_hcp , info_hcp= HCP_dataset.get_data(space=space,ses_id='ses-task',type = 'CondHalf')
     data_hcp[np.isnan(data_hcp)] = 0
-    
+
     num_subj = data_hcp.shape[0]
 
-    COV = [] 
+    COV = []
     infos = []
     if tasks is None:
         tasks = info_hcp['task_name'].unique()
@@ -41,7 +48,7 @@ def plot_all_covariances(COV,tasks,infos):
     plt.tight_layout()
     plt.show()
 
-def plot_covariance(cov,task,info,scale): 
+def plot_covariance(cov,task,info,scale):
     ax = plt.gca()
     plt.imshow(cov,cmap='viridis',vmin=0,vmax=scale)
     plt.title(task)
@@ -57,12 +64,22 @@ def plot_covariance(cov,task,info,scale):
     pass
 
 def estimate_components(cov,info):
+    """ Uses the two halves to estimate the the estimation variance components
+    Args:
+        cov (np.ndarray): Covariance matrix of shape (N, N)
+        info (pd.DataFrame): DataFrame containing information about the conditions
+    Returns:
+        n (float): Estimated noise component (IID for each condition)
+        nb (float): Estimated noise block component
+        s (float): Estimated signal component
+        c (float): Estimated signal covariance component
+    """
     i1 = info.half==1
-    i2 = info.half==2 
+    i2 = info.half==2
     within_run = (cov[i1,:][:,i1] + cov[i2,:][:,i2])/2
     between_run = (cov[i1,:][:,i2] + cov[i2,:][:,i1])/2
     N = np.sum(i1)
-    
+
     ondiag = np.where(np.eye(N))
     offdiag = np.where(1-np.eye(N))
 
@@ -75,7 +92,7 @@ def estimate_components(cov,info):
     nb=(v2-v4)/v1
     s= (v3)/v1
     c= v4/v1
-    return n,nb,s,c 
+    return n,nb,s,c
 
 def estimate_all_components(COV,tasks,infos):
     df= pd.DataFrame()
@@ -92,7 +109,5 @@ if __name__=='__main__':
     COV, tasks, infos = get_covariance_matrices(space = 'fs32k',base_dir=base_dir)
     # plot_all_covariances(COV,tasks,infos)
     D = estimate_all_components(COV,tasks,infos)
-    D.to_csv('hcp_task_components.csv',index=False)
-    
     # get_covariance_matrices(space = 'fs32k')
     pass
