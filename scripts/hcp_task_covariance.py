@@ -45,6 +45,8 @@ def plot_all_covariances(COV,tasks,infos):
         cov = np.mean(COV[i],axis=0)
         scale= np.max(cov)
         plot_covariance(cov,task,infos[i],scale)
+    plt.tight_layout()
+    plt.show()
 
 def plot_covariance(cov,task,info,scale):
     ax = plt.gca()
@@ -103,9 +105,9 @@ def estimate_all_components(COV,tasks,infos):
     return df
 
 if __name__=='__main__':
-    COV, tasks, infos = get_covariance_matrices(space = 'fs32k')
-    plot_all_covariances(COV,tasks,infos)
+    base_dir = 'Y:/data/FunctionalFusion_new'
+    COV, tasks, infos = get_covariance_matrices(space = 'fs32k',base_dir=base_dir)
+    # plot_all_covariances(COV,tasks,infos)
     D = estimate_all_components(COV,tasks,infos)
-
     # get_covariance_matrices(space = 'fs32k')
     pass
