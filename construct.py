@@ -160,46 +160,6 @@ def get_condition_indices(df,task_column_name = 'task_name',cond_column_name = '
     
     return new_df
 
-def build_combination_regressors_old(combination, condition_df, localizer_time=12,seed=None):
-    """
-    Constructs a regressor list for current
-    ensuring the total scanning time is distributed approximately equally across selected conditions. (with a 10 second difference in some cases)
-
-    Parameters:
-        combination_df (list): List of condition indices for the current combination.
-        condition_df (pd.DataFrame): DataFrame containing condition names, indices, and duration information needs to include:
-            - 'cond_name': name of the condition
-            - 'indices': indices of the condition
-            - 'duration': duration of the condition in seconds
-        localizer_time (int): Total duration in minutes for the selected regressors.
-
-    Returns:
-        list of lists of int: List of lists where each list contains regressors for a condition in the combination.
-    """
-    if seed is not None:
-        np.random.seed(seed)
-    total_seconds = localizer_time * 60  # Convert minutes to seconds
-    
-    # divide the localizer time equally among the conditions
-    allocated_time_per_condition = total_seconds // len(combination)
-    comb_regressors = []
-    total_combination_time = 0
-    for cond_idx in combination:
-        condition_row = condition_df.iloc[cond_idx]
-        condition_indices = condition_row['indices']
-        condition_duration = condition_row['duration']
-        
-        # Determine how many regressors to sample based on required time
-        num_required = allocated_time_per_condition // condition_duration
-
-        # Randomly sample regressors from the condition
-        chosen_regressors = np.random.choice(condition_indices, num_required, replace=False)
-        comb_regressors.append(list(chosen_regressors))
-        total_combination_time += num_required * condition_duration
-
-
-    return comb_regressors, total_combination_time
-
 def build_combination_regressors(combination, condition_df, localizer_time=12, seed=None):
     """
     Constructs a regressor list for the given condition combination,
