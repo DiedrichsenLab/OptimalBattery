@@ -15,6 +15,8 @@ import nibabel as nb
 import OptimalBattery.estimate as es
 import OptimalBattery.construct as ct
 import OptimalBattery.plot as plot
+import OptimalBattery.global_config as gcf
+
 
 rois = {'all-M':[5,6,7,8,9,10,11,12,13,14,15,16,21,22,23,24,25,26,27,28,29,30,31,32],
 'all':[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32],
@@ -31,11 +33,9 @@ rois = {'all-M':[5,6,7,8,9,10,11,12,13,14,15,16,21,22,23,24,25,26,27,28,29,30,31
 # define atlas and dirs
 space = 'SUIT3'
 atlas,_= am.get_atlas(atlas_str=space)
-base_dir = 'Y:/data/'
-if not os.path.exists(base_dir):
-    base_dir = '/cifs/diedrichsen/data/'
+base_dir = gcf.data_path
 
-func_fus_dir = os.path.join(base_dir, 'FunctionalFusion')
+func_fus_dir = os.path.join(base_dir, 'FunctionalFusion_new')
 cerebellum_dir = os.path.join(base_dir, 'Cerebellum')
 
 
@@ -98,12 +98,12 @@ for roi_name , parcels in rois.items():
 
     D = ev.real_parcellation(G_Lib,condition_df,
                         data_train,data_test,
-                        full_vs_train,full_vs_test,
+                        full_vs_train,
                         evaluation_indices = ROI_indices,
-                        battery_sizes = [3,4,5,6,7,8,9,10,12,13,14,15,16],
+                        battery_sizes = [3,4,6,8,10,12,14,16],
                         metrics  = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],
                         n_batteries = 20000,
-                        n_iter=20,
+                        n_iter=100,
                         rest_idx = 31,
                         localizer_duration=8)
     

@@ -45,7 +45,7 @@ n_batteries = 10000 # only for multi
 num_task_lib = 100 # shared
 n_parcels = 5 # shared
 base_noise_list = [2,4,10,100]  # shared
-n_sim = 30  # shared
+n_sim = 1  # shared
 
 
 all_dfs = []

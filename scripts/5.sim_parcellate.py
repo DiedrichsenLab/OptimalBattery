@@ -38,13 +38,13 @@ U_true_5 = pt.tensor(U_true_5,device=device, dtype=pt.float64)
 D = sim.sim_parcellation(num_task_lib = 100,
                      n_parcels = 5,
                      U_true = U_true_5,
-                     battery_sizes = [3,4,8,12,16],
+                     battery_sizes = [3,8,16,50,90],
                      n_batteries = 1000,
-                     base_noise = 2,
+                     base_noise = 5,
                      collapsed_U_true = None,
-                     n_sim = 100,
+                     n_sim = 5,
                      seed = None)
 
 save_dir = os.path.abspath(os.path.join(os.getcwd(),'eval_tsvs'))
-save_path = os.path.join(save_dir, 'sim_parcellation.tsv')
+save_path = os.path.join(save_dir, 'sim_parcellation_t.tsv')
 D.to_csv(save_path, sep='\t', index=False)
