@@ -41,16 +41,16 @@ collapsed_U_true = sim.collapse_U(U_true_5, target_parcels_indices=[4])
 battery_sizes = [2,4,8,12,18] # only for multi
 metrics = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'] # only for multi
 thresholds = [0.1,0.3,0.5,0.7,0.85,0.99] # only for single
-n_batteries = 10000 # only for multi
+n_batteries = 1000 # only for multi
 num_task_lib = 100 # shared
 n_parcels = 5 # shared
 base_noise_list = [2,4,10,100]  # shared
-n_sim = 1  # shared
+n_sim = 3  # shared
 
 
 all_dfs = []
 for base_noise in base_noise_list:
-    print(f'base noise: {base_noise}')
+    # print(f'base noise: {base_noise}')
     # Run multitask simulation
     D_multi = sim.sim_parcellation(
         num_task_lib=num_task_lib,
@@ -91,5 +91,5 @@ final_df = pd.concat(all_dfs, ignore_index=True)
 
 # Save
 save_dir = os.path.abspath(os.path.join(os.getcwd(),'eval_tsvs'))
-save_path = os.path.join(save_dir, 'sim_localization.tsv')
+save_path = os.path.join(save_dir, 'sim_localization2.tsv')
 final_df.to_csv(save_path, sep='\t', index=False)

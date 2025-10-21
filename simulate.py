@@ -173,25 +173,42 @@ def find_max_contrast_against_all(Vs, region_idx):
     return [max_idx, min_idx]
 
 
-def make_thresholded_contrast(task1, task2, threshold):
-    """gets the contrast between two tasks and thresholds it
+import torch as pt
+
+def make_thresholded_contrast(task1, task2, threshold, mode='percentile'):
+    """
+    Get the contrast between two tasks and threshold it.
+
     Args:
-        task1: Task 1 data (n_voxels)
-        task2: Task 2 data (n_voxels)
-        threshold: Threshold for the contrast
+        task1 (Tensor): Task 1 data (n_voxels)
+        task2 (Tensor): Task 2 data (n_voxels)
+        threshold (float): Threshold value
+            - if mode='percentile', interpreted as quantile (0–1)
+            - if mode='absolute', interpreted as raw value
+        mode (str): 'percentile' or 'absolute'
     Returns:
-        contrast_one_hot: One-hot encoded contrast (2, n_voxels)
+        contrast_one_hot (Tensor): One-hot encoded contrast (2, n_voxels)
     """
 
     contrast_data = task1 - task2
-    mask = (contrast_data >= pt.quantile(contrast_data, threshold)).long()
 
-    # make one hot
+    if mode == 'percentile':
+        thresh_value = pt.quantile(contrast_data, threshold)
+    elif mode == 'absolute':
+        thresh_value = threshold
+    else:
+        raise ValueError("mode must be either 'percentile' or 'absolute'")
+
+    mask = (contrast_data >= thresh_value).long()
+
+    # one-hot encoding 
     contrast_one_hot = pt.stack([
-        (mask == 1).float(),  # positive/ region A
-        (mask == 0).float()   # everything else 
+        (mask == 1).float(),  # region A
+        (mask == 0).float()   # everything else
     ], dim=0)
+
     return contrast_one_hot
+
 
 def collapse_U(U, target_parcels_indices = None):
     """
