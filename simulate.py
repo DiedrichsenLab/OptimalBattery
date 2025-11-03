@@ -1,5 +1,5 @@
 """
-Module for function used in the simulation of the task-battery construction problem.
+Module for functions used in the simulation of the task-battery construction problem.
 Author: Bassel Arafat
 """
 import numpy as np
@@ -11,60 +11,108 @@ import OptimalBattery.construct as ct
 import torch as pt
 import cortico_cereb_connectivity.model as model
 import pandas as pd
+from scipy.ndimage import binary_dilation, binary_erosion, shift
+from scipy.stats import gamma
+
 
 
 device = pt.device("cuda" if pt.cuda.is_available() else "cpu")
-def make_U_spatial(grid, centroids, K_main, K_subparcels): # ugly but works
-    """
-    Computes parcel labels for all pixels based on distances to centroids and divides them into subparcels.
 
-    """
-    # Compute positions of all pixels
-    width, height = grid.width, grid.height
-    X_coords, Y_coords = np.meshgrid(np.arange(width), np.arange(height), indexing='ij')
-    X_coords = X_coords.flatten()
-    Y_coords = Y_coords.flatten()
-    positions = np.column_stack((X_coords, Y_coords))
+def make_U_spatial(height=100, width=100, K_main=5):
+    """Like make_U_simple but enforces equal parcel size per centroid."""
+    centroids = np.array([
+        [0, 0],
+        [width - 1, 0],
+        [0, height - 1],
+        [width - 1, height - 1],
+        [(width - 1) / 2, (height - 1) / 2],
+    ])
 
-    # Compute distances from each pixel to each centroid
-    D = np.zeros((grid.P, K_main))
-    for k, (cx, cy) in enumerate(centroids):
-        D[:, k] = np.sqrt((X_coords - cx)**2 + (Y_coords - cy)**2)
+    X, Y = np.meshgrid(np.arange(width), np.arange(height), indexing="ij")
+    coords = np.stack([X.ravel(), Y.ravel()], axis=1)
+    dists = np.sum((coords[:, None, :] - centroids[None, :, :])**2, axis=-1)
 
-    # Initialize the parcel labels and define the size of each parcel
-    parcel_labels = np.full(grid.P, -1, dtype=int)
-    unassigned_nodes = set(range(grid.P))
-    desired_size = grid.P // K_main
+    P = height * width
+    desired = P // K_main
+    labels = np.full(P, -1, dtype=int)
+    remaining = set(range(P))
 
     for k in range(K_main - 1):
-        unassigned_nodes_list = list(unassigned_nodes)
-        distances = D[unassigned_nodes_list, k]
-        sorted_indices = np.argsort(distances)
-        nodes_to_assign = np.array(unassigned_nodes_list)[sorted_indices[:desired_size]]
-        parcel_labels[nodes_to_assign] = k
-        unassigned_nodes -= set(nodes_to_assign)
+        rem = np.array(list(remaining))
+        order = np.argsort(dists[rem, k])
+        chosen = rem[order[:desired]]
+        labels[chosen] = k
+        remaining -= set(chosen)
 
-    # Assign the remaining pixels to the last parcel
-    parcel_labels[list(unassigned_nodes)] = K_main - 1
+    labels[list(remaining)] = K_main - 1
 
-    # Initialize new parcel labels
-    new_parcel_labels = np.full(grid.P, -1, dtype=int)
-
-    for k in range(K_main):  # For each main parcel
-        nodes_in_parcel = np.where(parcel_labels == k)[0]
-        # Split nodes_in_parcel into K_subparcels of equal size
-        subparcel_nodes = np.array_split(nodes_in_parcel, K_subparcels)
-        for sub_k, nodes in enumerate(subparcel_nodes):
-            new_parcel_label = k * K_subparcels + sub_k
-            new_parcel_labels[nodes] = new_parcel_label
-
-    # Convert new parcel labels to a matrix U_true
-    K_total = K_main * K_subparcels
-    U_true = np.zeros((K_total, grid.P))
-    for k in range(K_total):
-        U_true[k, new_parcel_labels == k] = 1
-
+    U_true = np.zeros((K_main, P), dtype=np.float64)
+    U_true[labels, np.arange(P)] = 1.0
     return U_true
+
+def make_U_individuals(U_true,grid_width,grid_height, n_individuals=8,
+                               shift_range=3, size_jitter=2,
+                               seed=None, device=None):
+    """
+    Make individual parcellations where only the last parcel moves or changes size.
+
+    Args:
+    U_true : Ground truth parcellation (K, P)
+    grid_width : width of the spatial grid
+    grid_height : height of the spatial grid
+    n_individuals : number of individuals to simulate
+    shift_range : how many pixels to shift parcel 5 (random x/y)
+    size_jitter : how much to grow/shrink parcel 5
+    seed : random seed for reproducibility
+    device : torch device to place the output tensors on
+    Returns:
+    individuals : list of individual parcellations (each is a tensor of shape (K, P))
+    """
+    if seed is not None:
+        np.random.seed(seed)
+
+    if isinstance(U_true, pt.Tensor):
+        U_true = U_true.detach().cpu().numpy()
+
+    K, P = U_true.shape
+    width, height = grid_width, grid_height
+    base_labels = np.argmax(U_true, axis=0).reshape(width, height)
+
+    individuals = []
+    for _ in range(n_individuals):
+        new_labels = base_labels.copy()
+
+        # extract parcel 5 mask (last parcel)
+        k = K - 1
+        mask = (base_labels == k).astype(float)
+
+        # random small spatial shift
+        dx = np.random.randint(-shift_range, shift_range + 1)
+        dy = np.random.randint(-shift_range, shift_range + 1)
+        mask_shifted = shift(mask, shift=(dx, dy), order=0, mode='nearest')
+
+        # random growth or shrinkage
+        if np.random.rand() < 0.5:
+            mask_shifted = binary_dilation(mask_shifted, iterations=np.random.randint(1, size_jitter + 1))
+        else:
+            mask_shifted = binary_erosion(mask_shifted, iterations=np.random.randint(1, size_jitter + 1))
+
+        # update the parcel in the label map
+        new_labels[mask_shifted > 0] = k
+
+        # rebuild binary membership matrix
+        U_ind = np.zeros((K, P))
+        for kk in range(K):
+            U_ind[kk, new_labels.flatten() == kk] = 1
+
+        if device is not None:
+            U_ind = pt.from_numpy(U_ind).to(device=device, dtype=pt.float64)
+
+        individuals.append(U_ind)
+
+    return individuals
+
+
 
 def get_percentage_correct(U_true, U_pred):
     """Compute the percentage of correctly classified voxels.
@@ -108,6 +156,32 @@ def get_dice_single(U_true, U_pred, roi_index=0):
     size_pred = U_pred[roi_index].sum()
     dice = 2 * TP / (size_true + size_pred)
     return dice.item()
+
+def get_jaccard_single(U_true, U_pred, roi_index=0):
+    """
+    Compute Jaccard index (Intersection over Union) for a binary ROI (single class only).
+    Assumes U_true and U_pred are one-hot tensors of shape (1, 2, P) or (2, P).
+
+    Args:
+        U_true (Tensor): Ground truth parcellation
+        U_pred (Tensor): Predicted parcellation
+        roi_index (int): Index of ROI class to evaluate (default 0)
+
+    Returns:
+        float: Jaccard index for ROI
+    """
+    if len(U_true.shape) == 3:
+        U_true = U_true[0]
+    if len(U_pred.shape) == 3:
+        U_pred = U_pred[0]
+
+    TP = (U_true[roi_index] * U_pred[roi_index]).sum()
+    size_true = U_true[roi_index].sum()
+    size_pred = U_pred[roi_index].sum()
+    union = size_true + size_pred - TP
+    jaccard = TP / union
+    return jaccard.item()
+
 
 def get_dice_multiclass(U_true, U_pred):
     """
@@ -172,8 +246,6 @@ def find_max_contrast_against_all(Vs, region_idx):
 
     return [max_idx, min_idx]
 
-
-import torch as pt
 
 def make_thresholded_contrast(task1, task2, threshold, mode='percentile'):
     """
@@ -475,6 +547,88 @@ def sim_connectivity(num_task_lib = 100,
                 results_df = pd.concat([results_df,D_ev],axis=0)
 
     return results_df
+
+def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_ratios,single_threshold,seed = 0):
+    results_df = pd.DataFrame()
+    base_noise = base_noise
+    max_n_task = 5
+    types = ['single_threshold','multi']
+
+    # fit gamma to snr ratios
+    shape, loc, scale = gamma.fit(snr_ratios, floc=0)  
+
+    # generate Vs that are orthonal on the column and row (has to be square matrix)
+    rng= np.random.default_rng(seed)
+    V = np.eye(5, 5)
+    A = rng.normal(size=(5, 5))
+    Q, _ = np.linalg.qr(A)
+    V_lib = Q @ V
+    V_lib = pt.tensor(V_lib, dtype=pt.float64, device=device)
+
+    parcellation_single = []
+    parcellation_multi = []
+    for type in types:
+
+        # get the single contrast
+        if  type == 'single_threshold':
+            max_idx, min_idx = find_max_contrast_against_all(V_lib, 4)
+            combination = [max_idx, min_idx]
+        elif type == 'multi':
+            combination = [0,1,2,3,4]
+
+        # get the V localizer
+        V_battery = V_lib[combination,:]
+        n_task = V_battery.shape[0]
+
+        # Battery-level noise (same for all subs)
+        weighted_noise_std = get_weighted_noise_std(n_task=n_task, max_n_task=max_n_task, noise=base_noise)
+        battery_noise = rng.normal(0, weighted_noise_std, (V_battery.shape[0], U_individuals[0].shape[1]))
+        battery_noise = pt.tensor(battery_noise, dtype=pt.float64, device=device)
+
+        for individual in range(len(U_individuals)):
+            # get the data for the parcellation estimation and add noise
+            Y_battery = V_battery @ U_individuals[individual]
+
+            # subject-specific SNR variation
+            rng_sub = np.random.default_rng(seed=individual)
+            snr_factor = rng_sub.gamma(shape, scale=scale)
+            Y_battery = Y_battery * np.sqrt(snr_factor)
+
+            # add battery-level noise
+            Y_battery = Y_battery + battery_noise
+
+            if type == 'multi':
+                # Y_battery = ut.center_matrix(Y_battery,axis=0)
+                Y_battery = ut.normalize_matrix(Y_battery,axis=0)
+
+                # V_battery = ut.center_matrix(V_battery,axis=0)
+                V_battery = ut.normalize_matrix(V_battery,axis=0)
+
+                U_hat = et.estimate_Us(Y_battery, V_battery, method='correlation', hard=True)
+                U_hat= collapse_U(U_hat, target_parcels_indices=[4])[0]
+                parcellation_multi.append(U_hat.cpu().numpy())
+
+            elif type == 'single_threshold':
+                U_hat = make_thresholded_contrast(Y_battery[0,:], Y_battery[1,:],threshold= single_threshold,mode='absolute')
+                parcellation_single.append(U_hat.cpu().numpy())
+
+            predicted_size = U_hat[0, :].sum().item()
+
+            # Evaluate the contrast
+            accuracy = get_jaccard_single(U_individuals_collapsed[individual], U_hat)
+            D_ev = pd.DataFrame()
+            D_ev['type'] = [type]
+            D_ev['n_tasks'] = [n_task]
+            D_ev['snr_factor'] = [snr_factor]
+            D_ev['individual'] = [individual]
+            D_ev['accuracy'] = accuracy
+            D_ev['predicted_size'] = predicted_size
+            D_ev['true_size'] = U_individuals_collapsed[individual][0,:].sum().item()
+            D_ev['true_everything_size'] = U_individuals_collapsed[individual][1,:].sum().item()
+            D_ev['predicted_everything_size'] = U_hat[1,:].sum().item()
+            results_df = pd.concat([results_df,D_ev],axis=0)
+
+    return results_df,parcellation_single,parcellation_multi
 
 
 if __name__=='__main__':

@@ -57,8 +57,8 @@ def build_combinations(G_lib, strategy='random',n_batteries=1000,n_tasks=4,seed=
         n_batteries(int): Number of batteries to build
         n_tasks(int): Number of tasks in the battery
         seed(int): Random seed
-        replacement(bool): Whether to sample with replacement
-        rest_idx(int): Index of the rest condition to be added to each combination
+        replacement(bool): Whether to sample tasks with replacement
+        rest_idx(int): Index of the rest condition to be added to each combination (in criteria analysis rest is always added)
     Returns:
         D(pd.DataFrame): DataFrame containing the combinations and the eigenmetrics for each combination
     """
@@ -96,7 +96,15 @@ def build_combinations(G_lib, strategy='random',n_batteries=1000,n_tasks=4,seed=
     return D
 
 def get_G(data,n_cond = 29,n_part = 16):
-    """get the crossvalided covariance matrix of the data across all subjects"""
+    """get the crossvalided covariance matrix of the data across all subjects
+    
+    Parameters:
+        data(np.ndarray): data of shape (n_subjects, n_regressors, n_voxels)
+        n_cond(int): number of conditions
+        n_part(int): number of partitions
+    Returns:
+        G_Lib(np.ndarray): crossvalidated second moment matrix averaged across subjects
+    """
 
     # make conditiion and partition vectors
     cond_vec = np.tile(np.arange(1, n_cond + 1), n_part)
@@ -115,7 +123,13 @@ def get_G(data,n_cond = 29,n_part = 16):
 
 
 def choose_combination(D,metric):
-    """  choose the best battery based on some metric"""
+    """  choose the best battery based on some metric
+    Parameters:
+        D(pd.DataFrame): DataFrame containing the combinations and the eigenmetrics for each combination
+        metric(str): Metric to use for choosing the best battery
+    Returns:
+        D_best(pd.DataFrame): DataFrame containing the best combination based on the metric
+    """
     # sample random battery
     rng = np.random.default_rng()
     index = rng.integers(0,D.shape[0])
@@ -132,9 +146,11 @@ def get_condition_indices(df,task_column_name = 'task_name',cond_column_name = '
     Get condition indices from a dataframe and record the duration of each condition
     Parameters:
         df(pd.DataFrame): dataframe containing condition indices needs to include:
-            - 'cond_name': name of the condition
+            - 'cond_name': name of the condition (or similar column name)
             - 'run': run number
-            - 'task_name': name of the task
+            - 'task_name': name of the task (or similar column name)
+        task_column_name(str): name of the task column
+        cond_column_name(str): name of the condition column
     Returns:
         condition_indices(np.ndarray): condition indices
     """

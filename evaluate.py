@@ -124,6 +124,16 @@ def get_prediction_error_cv(ytest, U_hat, indices=None):
 
 
 def fit_model(xtrain,ytrain,X_atlas,train_label_image):
+    """Fit connectivity model for each subject
+    Args:
+        xtrain (ndarray): Cortical training data (subjects, conditions, vertices).
+        ytrain (ndarray): Cerebellar training data (subjects, conditions, voxels).
+        X_atlas (AtlasMap): Atlas map for cortical data needed getting cortical data into icosahedron parcels.
+        train_label_image (list): List of label images for left and right hemispheres.
+        Returns:
+        conn_model_list (list): List of fitted connectivity models for each subject.
+    """
+
     # initialize training dict
     conn_model_list = []
     # Loop over subjects
@@ -145,6 +155,16 @@ def fit_model(xtrain,ytrain,X_atlas,train_label_image):
     return conn_model_list
 
 def evaluate_model(xtest,ytest,X_atlas,train_label_image,conn_model_list):
+    """Evaluate connectivity model for each subject
+    Args:
+        xtest (ndarray): Cortical test data (subjects, conditions, vertices).
+        ytest (ndarray): Cerebellar test data (subjects, conditions, voxels).
+        X_atlas (AtlasMap): Atlas map for cortical data needed getting cortical data into icosahedron parcels.
+        train_label_image (list): List of label images for left and right hemispheres.
+        conn_model_list (list): List of fitted connectivity models for each subject.
+    Returns:
+        R_list (list): List of correlation values for each subject.
+    """
     R_list = []
     # loop over subjects
     for i in range(xtest.shape[0]):
@@ -173,8 +193,25 @@ def real_connectivity(G_library, condition_df,
                       metrics  = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],
                       n_batteries = 1000,
                       rest_idx = 28,
-                      n_iter=5):
-    """Evaluate the quality of a cortex-cerebellar connectivity model using different metrics"""
+                      n_iter=5,
+                      scan_duration=8):
+    """Evaluate the quality of a cortex-cerebellar connectivity model using different metrics
+    
+    Args:
+        G_library (ndarray): task x task second moment matrix for the task library.
+        condition_df (DataFrame): DataFrame containing condition information.
+        cortical_train (ndarray): Cortical training data (subjects, conditions, vertices).
+        cerebellar_train (ndarray): Cerebellar training data (subjects, conditions, voxels).
+        cortical_test (ndarray): Cortical test data (subjects, conditions, vertices).
+        cerebellar_test (ndarray): Cerebellar test data (subjects, conditions, voxels).
+        battery_sizes (list): List of battery sizes to evaluate.
+        metrics (list): List of metrics to use for selecting batteries.
+        n_batteries (int): Number of batteries to sample for each size.
+        rest_idx (int): Index of the rest condition in the task library.
+        n_iter (int): Number of iterations to run for each battery size and metric.
+        Returns:
+        results_df (DataFrame): DataFrame containing evaluation results.
+            """
     # get the label files for the icosahedron parcels
     train_label_image = []
     for hemi in ['L', 'R']:
@@ -195,7 +232,7 @@ def real_connectivity(G_library, condition_df,
                 top_comb = D_best['combination'].values[0]
 
                 # get the regressors for training data
-                combination_regressors = ct.build_combination_regressors(top_comb, condition_df=condition_df, localizer_time=8)
+                combination_regressors = ct.build_combination_regressors(top_comb, condition_df=condition_df, localizer_time=scan_duration)
 
                 # average, center and normalize the training data for cortex for this combination
                 xtrain = ct.average_regressors(cortical_train, combination_regressors)
@@ -247,7 +284,23 @@ def real_parcellation(G_library,condition_df,
                         n_iter=5,
                         rest_idx = 28,
                         localizer_duration=8):
-    """ Evaluate the parcellation performance for each combination in the DataFrame D.
+    """ Evaluate the parcellation performance for each combination in the DataFrame D
+
+    Args:
+        G_library (ndarray): task x task second moment matrix for the task library.
+        condition_df (DataFrame): DataFrame containing condition information.
+        YLib (ndarray): training data used for estimating parcellations (subjects, conditions, voxels). based on CondRun
+        Ytest (ndarray): test data used for evaluating parcellation quality (subjects, conditions, voxels). based on CondAll
+        VLib (ndarray): Vs for training data estimated from CondAll
+        evaluation_indices (list or None): Indices of the brain vertices/voxels to evaluate.
+        battery_sizes (list): List of battery sizes to evaluate.
+        metrics (list): List of metrics to use for selecting batteries.
+        n_batteries (int): Number of batteries to sample for each size.
+        n_iter (int): Number of iterations to run for each battery size and metric.
+        rest_idx (int): Index of the rest condition in the task library.
+        localizer_duration (int): Duration of the localizer in seconds.
+    Returns:
+        results_df (DataFrame): DataFrame containing evaluation results.
 
     """
     # Center & Normalize ytest
@@ -293,6 +346,14 @@ def real_parcellation(G_library,condition_df,
     return results_df
 
 def find_single_contrast(Vs, regionA, regionB):
+    """Find the indices of the two tasks that maximize the contrast between two regions.(in this case region 1 is functional region of interest and 2 is everything else)
+    Args:
+        Vs (ndarray): shape (n_tasks, parcels), task activation patterns.
+        regionA (list or ndarray): Indices of parcels representing region A.
+        regionB (list or ndarray): Indices of parcels representing region B.
+    Returns:
+        contrast_indices (list): Indices of the two tasks that maximize the contrast [max_task_idx, min_task_idx].
+    """
     difference = Vs[:, regionA ] - Vs[:, regionB]
     sorted_idx = pt.argsort(difference) 
 
@@ -302,7 +363,14 @@ def find_single_contrast(Vs, regionA, regionB):
     return [max_idx, min_idx]
 
 def thresholded_contrast(task1, task2, threshold=0.85):
-
+    """Compute the contrast between two tasks and apply thresholding.
+    Args:
+        task1 (Tensor): shape (n_subjects, n_voxels), activation patterns for task 1.
+        task2 (Tensor): shape (n_subjects, n_voxels), activation patterns for task 2.
+        threshold (float or None): Quantile threshold to apply. If None, no thresholding is applied.
+    Returns:
+        thresholded_data (Tensor): shape (n_subjects, n_voxels), thresholded contrast data.
+    """
     contrast_data = task1 - task2  # Compute contrast
     if threshold is not None:
         # Compute per-subject thresholds

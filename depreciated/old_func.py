@@ -830,3 +830,55 @@ def create_custom_colormap(base_colors, K_subparcels):
             cmap_list.append(shade_rgb)
 
     return ListedColormap(cmap_list)
+
+def make_U_spatial_old(grid, centroids, K_main, K_subparcels): # ugly but works
+    """
+    Computes parcel labels for all pixels based on distances to centroids and divides them into subparcels.
+
+    """
+    # Compute positions of all pixels
+    width, height = grid.width, grid.height
+    X_coords, Y_coords = np.meshgrid(np.arange(width), np.arange(height), indexing='ij')
+    X_coords = X_coords.flatten()
+    Y_coords = Y_coords.flatten()
+    positions = np.column_stack((X_coords, Y_coords))
+
+    # Compute distances from each pixel to each centroid
+    D = np.zeros((grid.P, K_main))
+    for k, (cx, cy) in enumerate(centroids):
+        D[:, k] = np.sqrt((X_coords - cx)**2 + (Y_coords - cy)**2)
+
+    # Initialize the parcel labels and define the size of each parcel
+    parcel_labels = np.full(grid.P, -1, dtype=int)
+    unassigned_nodes = set(range(grid.P))
+    desired_size = grid.P // K_main
+
+    for k in range(K_main - 1):
+        unassigned_nodes_list = list(unassigned_nodes)
+        distances = D[unassigned_nodes_list, k]
+        sorted_indices = np.argsort(distances)
+        nodes_to_assign = np.array(unassigned_nodes_list)[sorted_indices[:desired_size]]
+        parcel_labels[nodes_to_assign] = k
+        unassigned_nodes -= set(nodes_to_assign)
+
+    # Assign the remaining pixels to the last parcel
+    parcel_labels[list(unassigned_nodes)] = K_main - 1
+
+    # Initialize new parcel labels
+    new_parcel_labels = np.full(grid.P, -1, dtype=int)
+
+    for k in range(K_main):  # For each main parcel
+        nodes_in_parcel = np.where(parcel_labels == k)[0]
+        # Split nodes_in_parcel into K_subparcels of equal size
+        subparcel_nodes = np.array_split(nodes_in_parcel, K_subparcels)
+        for sub_k, nodes in enumerate(subparcel_nodes):
+            new_parcel_label = k * K_subparcels + sub_k
+            new_parcel_labels[nodes] = new_parcel_label
+
+    # Convert new parcel labels to a matrix U_true
+    K_total = K_main * K_subparcels
+    U_true = np.zeros((K_total, grid.P))
+    for k in range(K_total):
+        U_true[k, new_parcel_labels == k] = 1
+
+    return U_true
