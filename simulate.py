@@ -552,7 +552,7 @@ def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_rat
     results_df = pd.DataFrame()
     base_noise = base_noise
     max_n_task = 5
-    types = ['single_threshold','multi']
+    types = ['single_threshold','multi','single_percentage']
 
     # fit gamma to snr ratios
     shape, loc, scale = gamma.fit(snr_ratios, floc=0)  
@@ -565,12 +565,13 @@ def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_rat
     V_lib = Q @ V
     V_lib = pt.tensor(V_lib, dtype=pt.float64, device=device)
 
-    parcellation_single = []
+    parcellation_single_threshold = []
+    parcellation_single_percentage = []
     parcellation_multi = []
     for type in types:
 
         # get the single contrast
-        if  type == 'single_threshold':
+        if  type == 'single_threshold' or type == 'single_percentage':
             max_idx, min_idx = find_max_contrast_against_all(V_lib, 4)
             combination = [max_idx, min_idx]
         elif type == 'multi':
@@ -610,7 +611,12 @@ def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_rat
 
             elif type == 'single_threshold':
                 U_hat = make_thresholded_contrast(Y_battery[0,:], Y_battery[1,:],threshold= single_threshold,mode='absolute')
-                parcellation_single.append(U_hat.cpu().numpy())
+                parcellation_single_threshold.append(U_hat.cpu().numpy())
+
+            elif type == 'single_percentage':
+                U_hat = make_thresholded_contrast(Y_battery[0,:], Y_battery[1,:],threshold= 0.7,mode='percentile')
+                parcellation_single_percentage.append(U_hat.cpu().numpy())
+                
 
             predicted_size = U_hat[0, :].sum().item()
 
@@ -628,7 +634,7 @@ def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_rat
             D_ev['predicted_everything_size'] = U_hat[1,:].sum().item()
             results_df = pd.concat([results_df,D_ev],axis=0)
 
-    return results_df,parcellation_single,parcellation_multi
+    return results_df,parcellation_single_threshold,parcellation_single_percentage,parcellation_multi
 
 
 if __name__=='__main__':
