@@ -11,7 +11,7 @@ import HierarchBayesParcel.emissions as em
 
 
 ######################### Parcellation U  Estimation #########################
-def estimate_Us(Y, V, method='correlation', alpha=1e-3, hard=False):
+def estimate_Us(Y, V, method='cos_angle', alpha=1e-3, hard=False):
     """
     Estimate U_hat using different projection methods: 'correlation', 'ols', or 'ridge', 'VMF
 
@@ -31,7 +31,7 @@ def estimate_Us(Y, V, method='correlation', alpha=1e-3, hard=False):
     if len(Y.shape) == 2:
         Y = Y.unsqueeze(0)
     # 1) Compute weights depending on method
-    if method == 'correlation':
+    if method == 'cos_angle':
         # correlation ~ (V^T @ Y)
         U_hats = V.T @ Y
 

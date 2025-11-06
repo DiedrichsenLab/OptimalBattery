@@ -170,3 +170,64 @@ def compress_pdf(pdf_path, dpi=150):
     for p in temp_images:
         os.remove(p)
     os.rmdir(temp_dir)
+
+def plot_sim_subject_parcellation(
+    i,
+    U_individuals_collapsed,
+    parcellations_dict,
+    results_df,
+    grid_width,
+    grid_height,
+    methods=('contrast_T', 'contrast_percentage', 'multi')
+):
+    # --- Extract subject info ---
+    snr = results_df.loc[results_df["individual"] == i, "snr_factor"].values[0]
+    true_map = np.argmax(U_individuals_collapsed[i].cpu().numpy(), axis=0).reshape(grid_width, grid_height)
+    true_size = results_df.loc[results_df["individual"] == i, "true_size"].values[0]
+
+    n_methods = len(methods)
+
+    # --- Figure setup ---
+    fig = plt.figure(figsize=(8, 6))  
+    gs = fig.add_gridspec(2, 3, height_ratios=[2, 1.7])  # bottom row taller
+    plt.subplots_adjust(hspace=0.45)
+
+    cmap = ListedColormap(["#FFD300","#8c8c8c"])  # grey background, yellow ROI
+
+    # Top row: True ROI centered 
+    ax_true = fig.add_subplot(gs[0, 1])
+    ax_true.imshow(true_map.T, cmap=cmap, interpolation="nearest")
+    ax_true.set_title(
+        f"Simulated individual {i}\nTrue ROI  |  SNR = {snr:.3f}  |  Size = {true_size:.0f}",
+        fontsize=11, weight='bold'
+    )
+    ax_true.axis("off")
+
+    # Determine centered columns for methods 
+    if n_methods == 1:
+        cols = [1]
+    elif n_methods == 2:
+        cols = [0, 2]
+    elif n_methods == 3:
+        cols = [0, 1, 2]
+
+
+    # Bottom row: Predicted maps
+    for method, col in zip(methods, cols):
+        ax = fig.add_subplot(gs[1, col])
+        pred_map = np.argmax(parcellations_dict[method][i], axis=0).reshape(grid_width, grid_height)
+
+        acc = results_df.query("individual == @i and type == @method")["accuracy"].values[0]
+        pred_size = results_df.query("individual == @i and type == @method")["predicted_size"].values[0]
+
+        ax.imshow(pred_map.T, cmap=cmap, interpolation="nearest")
+        ax.set_title(
+            f"{method}\nAcc = {acc:.2f}  |  Size = {pred_size:.0f}",
+            fontsize=9
+        )
+        ax.axis("off")
+
+    plt.tight_layout()
+    plt.show()
+
+    return fig

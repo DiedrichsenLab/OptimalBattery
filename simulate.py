@@ -13,6 +13,8 @@ import cortico_cereb_connectivity.model as model
 import pandas as pd
 from scipy.ndimage import binary_dilation, binary_erosion, shift
 from scipy.stats import gamma
+from scipy.optimize import brentq
+from scipy.ndimage import distance_transform_edt
 
 
 
@@ -50,7 +52,7 @@ def make_U_spatial(height=100, width=100, K_main=5):
     U_true[labels, np.arange(P)] = 1.0
     return U_true
 
-def make_U_individuals(U_true,grid_width,grid_height, n_individuals=8,
+def make_U_individuals_old(U_true,grid_width,grid_height, n_individuals=8,
                                shift_range=3, size_jitter=2,
                                seed=None, device=None):
     """
@@ -111,6 +113,155 @@ def make_U_individuals(U_true,grid_width,grid_height, n_individuals=8,
         individuals.append(U_ind)
 
     return individuals
+
+def get_boundary(region, grid_width=30, grid_height=30):
+    """Return coordinates of pixels on the outer boundary of 'region' from a 2d mask of 1s and 0s.
+    
+    Args:
+        region : 2D boolean numpy array
+    Returns:
+        boundary : list of (x, y) tuples of boundary pixel coordinates
+    """
+    boundary = []
+    for x in range(1, grid_width - 1):
+        for y in range(1, grid_height - 1):
+            if region[x, y]:
+                # Boundary if any of 4-neighbors is False
+                if not (region[x-1, y] and region[x+1, y] and region[x, y-1] and region[x, y+1]):
+                    boundary.append((x, y))
+    return np.array(boundary)
+
+def adjust_last_parcel(U_true, grid_width, grid_height, target_size, seed=None):
+    """
+    Generate an individual variant of the base parcellation by adjusting the size of the last parcel
+
+    Args:
+        U_true        : (K, P) binary parcellation matrix (one-hot format)
+        grid_width    : width of spatial grid
+        grid_height   : height of spatial grid
+        target_size   : desired number of voxels for the last parcel
+        seed          : random seed for reproducibility
+
+    Returns:
+        U_adj : adjusted (K, P) parcellation matrix
+    """
+    if seed is not None:
+        np.random.seed(seed)
+
+    # Setup and extract index of last parcel
+    K, P = U_true.shape
+    labels = np.argmax(U_true, axis=0).reshape(grid_width, grid_height)
+    k = K - 1
+    mask = (labels == k)
+    
+
+    # get how much needs to be changed (added or removed)
+    current_size = mask.sum()
+    diff = target_size - current_size
+
+    # if its already the right size, return copy
+    if diff == 0:
+        return U_true.copy()
+
+    mask_adj = mask.copy()
+
+    # Shrink region (remove voxels)
+    if diff < 0:
+        to_remove = -diff
+        while to_remove > 0:
+            # gets x y coordinates of boundary voxels
+            boundary = get_boundary(mask_adj,grid_width=grid_width,grid_height=grid_height)
+            if len(boundary) == 0:
+                break
+            n = min(to_remove, len(boundary))
+            # randomly select n boundary voxels to remove
+            chosen = boundary[np.random.choice(len(boundary), n, replace=False)]
+            for (x, y) in chosen:
+                mask_adj[x, y] = False
+            to_remove -= n
+
+        # Reassign removed voxels to nearest non-k region
+        non_k_mask = (labels != k)
+        # this func finds nearest voxel not belonging to target mask, and the loop reassigns labels
+        dist, nearest_idx = distance_transform_edt(~non_k_mask, return_indices=True)
+        for (x, y) in np.argwhere(mask & ~mask_adj):
+            nx, ny = nearest_idx[0, x, y], nearest_idx[1, x, y]
+            labels[x, y] = labels[nx, ny]
+
+    # --- Grow region (add voxels)
+    else:
+        to_add = diff
+        while to_add > 0:
+            boundary = get_boundary(mask_adj,grid_width=grid_width,grid_height=grid_height)
+            candidates = []
+            for (x, y) in boundary:
+                # Collect 4-neighbor candidates that aren’t part of region
+                for dx, dy in [(-1,0), (1,0), (0,-1), (0,1)]:
+                    xx, yy = x + dx, y + dy
+                    if 0 <= xx < grid_width and 0 <= yy < grid_height:
+                        if not mask_adj[xx, yy]:
+                            candidates.append((xx, yy))
+            if len(candidates) == 0:
+                break
+            # some would be duplicates, remove them
+            candidates = np.unique(candidates, axis=0)
+            n = min(to_add, len(candidates))
+            chosen = candidates[np.random.choice(len(candidates), n, replace=False)]
+            for (x, y) in chosen:
+                mask_adj[x, y] = True
+                labels[x, y] = k
+            to_add -= n
+
+    # Convert back to binary (K, P)
+    U_adj = np.zeros_like(U_true)
+    flat_labels = labels.flatten()
+    for kk in range(K):
+        U_adj[kk, flat_labels == kk] = 1
+
+    return U_adj
+
+def make_U_individuals(U_true, grid_width, grid_height,
+                       n_individuals=8, size_range=(120, 260),
+                       seed=None, device=None):
+    """
+    Generate multiple individual parcellations by randomly varying
+    the size of the last parcel within a specified range.
+
+    Args:
+        U_true        : (K, P) base parcellation (numpy or torch tensor)
+        grid_width    : spatial grid width
+        grid_height   : spatial grid height
+        n_individuals : number of individuals to simulate
+        size_range    : (min, max) range for target size of last parcel
+        seed          : random seed for reproducibility
+        device        : optional torch device for output
+    Returns:
+        individuals : list of individual parcellations (each (K, P))
+    """
+    if seed is not None:
+        np.random.seed(seed)
+
+    # Convert torch tensor to numpy if needed
+    if isinstance(U_true, pt.Tensor):
+        U_true = U_true.detach().cpu().numpy()
+
+    individuals = []
+    for i in range(n_individuals):
+        # Randomly choose a target size for parcel 5
+        target_size = np.random.randint(size_range[0], size_range[1] + 1)
+
+        # Create adjusted individual
+        U_ind = adjust_last_parcel(U_true, grid_width, grid_height,
+                                   target_size=target_size, seed=seed+i)
+
+        if device is not None:
+            U_ind = pt.from_numpy(U_ind).to(device=device, dtype=pt.float64)
+
+        individuals.append(U_ind)
+
+    return individuals
+
+
 
 
 
@@ -548,11 +699,20 @@ def sim_connectivity(num_task_lib = 100,
 
     return results_df
 
-def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_ratios,single_threshold,seed = 0):
+def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_ratios,seed = 0):
+    """ Single simulation comparing contrast localization vs multi-task localization
+    args:
+        U_individuals: list of individual parcellations (each is a tensor of shape (K, P))
+        U_individuals_collapsed: list of individual collapsed parcellations (each is a tensor of shape (2, P))
+        base_noise: base noise level
+        snr_ratios: list of snr ratios to sample from gamma distribution (from empirical data mdtb1)
+        seed: random seed for reproducibility
+    returns:
+        results_df: DataFrame with the results of the simulations
+    """
     results_df = pd.DataFrame()
-    base_noise = base_noise
     max_n_task = 5
-    types = ['single_threshold','multi','single_percentage']
+    types = ['contrast_T','multi','contrast_percentage']
 
     # fit gamma to snr ratios
     shape, loc, scale = gamma.fit(snr_ratios, floc=0)  
@@ -565,13 +725,14 @@ def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_rat
     V_lib = Q @ V
     V_lib = pt.tensor(V_lib, dtype=pt.float64, device=device)
 
-    parcellation_single_threshold = []
-    parcellation_single_percentage = []
+    parcellation_contrast_T = []
+    parcellation_contrast_percentage = []
     parcellation_multi = []
-    for type in types:
 
+
+    for type in types:
         # get the single contrast
-        if  type == 'single_threshold' or type == 'single_percentage':
+        if  type == 'contrast_T' or type == 'contrast_percentage':
             max_idx, min_idx = find_max_contrast_against_all(V_lib, 4)
             combination = [max_idx, min_idx]
         elif type == 'multi':
@@ -586,12 +747,40 @@ def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_rat
         battery_noise = rng.normal(0, weighted_noise_std, (V_battery.shape[0], U_individuals[0].shape[1]))
         battery_noise = pt.tensor(battery_noise, dtype=pt.float64, device=device)
 
+         # precompute subject data
+        contrasts, true_sizes = [], []
+        for i, (U, Uc) in enumerate(zip(U_individuals, U_individuals_collapsed)):
+            rng_sub = np.random.default_rng(seed+i)
+            snr_factor = rng_sub.gamma(shape, scale=scale)
+            Y = V_battery @ U 
+            Y = Y * np.sqrt(snr_factor)
+            Y = Y + battery_noise
+            contrasts.append((Y[0,:], Y[1,:]))
+            true_sizes.append(Uc[0,:].sum().item())
+        avg_true = np.mean(true_sizes)
+
+        # calibrate threshold optimizing function that finds value that minimizes the difference between predicted and true size on avg
+        if type == 'contrast_T':
+            def f(th):
+                pred_sizes = [make_thresholded_contrast(y1,y2,threshold=th,mode='absolute')[0,:].sum().item()
+                              for y1,y2 in contrasts]
+                return np.mean(pred_sizes) - avg_true
+            best_th = brentq(f, 0.01, 50.0)
+            print(f"Best threshold (matched to actual data): {best_th:.3f}")
+        if type == 'contrast_percentage':
+            def f(th):
+                pred_sizes = [make_thresholded_contrast(y1,y2,threshold=th,mode='percentile')[0,:].sum().item()
+                              for y1,y2 in contrasts]
+                return np.mean(pred_sizes) - avg_true
+            best_th = brentq(f, 0.01, 0.99)
+            print(f"Best percentile threshold (matched to actual data): {best_th:.3f}")
+
         for individual in range(len(U_individuals)):
             # get the data for the parcellation estimation and add noise
-            Y_battery = V_battery @ U_individuals[individual]
+            Y_battery = V_battery @ U_individuals[individual] 
 
             # subject-specific SNR variation
-            rng_sub = np.random.default_rng(seed=individual)
+            rng_sub = np.random.default_rng(seed= seed + individual)
             snr_factor = rng_sub.gamma(shape, scale=scale)
             Y_battery = Y_battery * np.sqrt(snr_factor)
 
@@ -605,23 +794,23 @@ def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_rat
                 # V_battery = ut.center_matrix(V_battery,axis=0)
                 V_battery = ut.normalize_matrix(V_battery,axis=0)
 
-                U_hat = et.estimate_Us(Y_battery, V_battery, method='correlation', hard=True)
+                U_hat = et.estimate_Us(Y_battery, V_battery, method='cos_angle', hard=True)
                 U_hat= collapse_U(U_hat, target_parcels_indices=[4])[0]
                 parcellation_multi.append(U_hat.cpu().numpy())
 
-            elif type == 'single_threshold':
-                U_hat = make_thresholded_contrast(Y_battery[0,:], Y_battery[1,:],threshold= single_threshold,mode='absolute')
-                parcellation_single_threshold.append(U_hat.cpu().numpy())
+            elif type == 'contrast_T':
+                U_hat = make_thresholded_contrast(Y_battery[0,:], Y_battery[1,:],threshold= best_th,mode='absolute')
+                parcellation_contrast_T.append(U_hat.cpu().numpy())
 
-            elif type == 'single_percentage':
-                U_hat = make_thresholded_contrast(Y_battery[0,:], Y_battery[1,:],threshold= 0.7,mode='percentile')
-                parcellation_single_percentage.append(U_hat.cpu().numpy())
+            elif type == 'contrast_percentage':
+                U_hat = make_thresholded_contrast(Y_battery[0,:], Y_battery[1,:],threshold= best_th,mode='percentile')
+                parcellation_contrast_percentage.append(U_hat.cpu().numpy())
                 
 
             predicted_size = U_hat[0, :].sum().item()
 
             # Evaluate the contrast
-            accuracy = get_jaccard_single(U_individuals_collapsed[individual], U_hat)
+            accuracy = get_dice_single(U_individuals_collapsed[individual], U_hat)
             D_ev = pd.DataFrame()
             D_ev['type'] = [type]
             D_ev['n_tasks'] = [n_task]
@@ -632,9 +821,12 @@ def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_rat
             D_ev['true_size'] = U_individuals_collapsed[individual][0,:].sum().item()
             D_ev['true_everything_size'] = U_individuals_collapsed[individual][1,:].sum().item()
             D_ev['predicted_everything_size'] = U_hat[1,:].sum().item()
+            D_ev['threshold'] = [best_th if type in ['contrast_T','contrast_percentage'] else np.nan]
             results_df = pd.concat([results_df,D_ev],axis=0)
 
-    return results_df,parcellation_single_threshold,parcellation_single_percentage,parcellation_multi
+    return results_df,parcellation_contrast_T,parcellation_contrast_percentage,parcellation_multi
+
+
 
 
 if __name__=='__main__':
