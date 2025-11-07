@@ -73,7 +73,7 @@ def plot_U_simulation(U,cmap = None,height = None,width = None,title = None):
 
 
 
-def plot_multi_flat(data,overlay_type='label',cscale = None,cmap='gray',colorbar=True,stats='mode',showfigure=True,save=False):
+def plot_multi_flat(data,overlay_type='label',cscale = None,cmap='gray',colorbar=True,stats='mode',showfigure=True,save=False,single_fig = False):
     """
     Plot multiple flatmaps in a grid layout for multiple subjects.
     Args:
@@ -92,11 +92,17 @@ def plot_multi_flat(data,overlay_type='label',cscale = None,cmap='gray',colorbar
     atlas,_= am.get_atlas(atlas_str=space)
 
     n_subs = data.shape[0]
-    ncols = 4
+    if single_fig:
+        ncols = 1
+    else:
+        ncols = 4
     nrows = math.ceil(n_subs / ncols)
 
     fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(ncols * 5, nrows * 5))
-    axes = axes.flatten()
+    if isinstance(axes, np.ndarray):
+        axes = axes.flatten()
+    else:
+        axes = [axes]
 
     for i in range(n_subs):
         subject_parcellation = data[i]

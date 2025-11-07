@@ -438,7 +438,7 @@ def real_localization_multi(G_Lib,combination=None,task_names_s1=None,
     Vsubset = ut.center_matrix(Vsubset, axis=0)
     Vsubset = ut.normalize_matrix(Vsubset, axis=0)
 
-    Uhats_multi =  et.estimate_Us(Ysubset, Vsubset, method='correlation',hard=True)
+    Uhats_multi =  et.estimate_Us(Ysubset, Vsubset, method='cos_angle',hard=True)
     Uhats_multi = pt.argmax(Uhats_multi,axis=1) + 1
     Uhats_multi_masked = Uhats_multi * ROI_mask # field of view mask
     Uhats_multi_masked = Uhats_multi_masked.cpu().numpy().astype(np.float32)
@@ -516,7 +516,7 @@ def calculate_spatial_overlap(U_binary):
     scores = []
     for i in range(n_subs):
         for j in range(i + 1, n_subs):
-            dice = sim.get_dice_binary(
+            dice = sim.get_dice_single(
                 pt.tensor(U_binary[i][None, None, :]), 
                 pt.tensor(U_binary[j][None, None, :])
             )
