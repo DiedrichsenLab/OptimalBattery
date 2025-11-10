@@ -169,7 +169,7 @@ custom_colors = [
 ]
 custom_cmap = ListedColormap(custom_colors)
 if save_plot:
-    fig = plot.plot_multi_flat(Uhats_multi_full, overlay_type='label', cmap=custom_cmap, colorbar=True, stats='mode', showfigure=False)
+    fig = plot.plot_multi_flat(Uhats_multi_full[10:11,:], overlay_type='label', cmap=custom_cmap, colorbar=True, stats='mode', showfigure=False,single_fig=True)
     fig.savefig(f"{save_dir}/single_vs_multi_real/multi_predicted.pdf",bbox_inches='tight')
 if get_pdf:
     fig = plot.plot_multi_flat(Uhats_multi_full, overlay_type='label', cmap=custom_cmap, colorbar=True, stats='mode', showfigure=False)
@@ -183,7 +183,7 @@ custom_colors = [
 ]
 binary_cmap = ListedColormap(custom_colors)
 if save_plot:
-    fig = plot.plot_multi_flat(Uhats_multi_collapsed,overlay_type='label',cmap=binary_cmap,colorbar=True,stats='mode',showfigure=False)
+    fig = plot.plot_multi_flat(Uhats_multi_collapsed[10:11,:],overlay_type='label',cmap=binary_cmap,colorbar=True,stats='mode',showfigure=False,single_fig=True)
     fig.savefig(f"{save_dir}/single_vs_multi_real/multi_collapsed_predicted.pdf",bbox_inches='tight')
 if get_pdf:
     fig = plot.plot_multi_flat(Uhats_multi_collapsed,overlay_type='label',cmap=binary_cmap,colorbar=True,stats='mode',showfigure=False)
@@ -205,7 +205,7 @@ if get_pdf:
 #  create binary localizer based on n_voxels in the multi task localizer
 Uhats_single = ev.size_matched_contrast(contrast,Uhats_multi_collapsed,roi_indices=ROI_indices)
 if save_plot:
-    fig = plot.plot_multi_flat(Uhats_single,overlay_type='label',cmap=binary_cmap,colorbar=True,stats='mode',showfigure=False)
+    fig = plot.plot_multi_flat(Uhats_single[10:11,:],overlay_type='label',cmap=binary_cmap,colorbar=True,stats='mode',showfigure=False,single_fig=True)
     fig.savefig(f"{save_dir}/single_vs_multi_real/single_predicted.pdf",bbox_inches='tight')
 if get_pdf:
     fig = plot.plot_multi_flat(Uhats_single,overlay_type='label',cmap=binary_cmap,colorbar=True,stats='mode',showfigure=False)
