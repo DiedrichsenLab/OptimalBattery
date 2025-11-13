@@ -57,55 +57,55 @@ results_df.to_csv(f"{repo_dir}/eval_tsvs/localization_sim_results.tsv", sep="\t"
 # normSNR_largeROI: subj=3122, SNR=0.0171, size=238.0
 
 # Pack parcellations into a dict
-parcellations = {
-    "contrast_T": parcellations_single_threshold,
-    "contrast_percentage": parcellations_single_percentage,
-    "multi": parcellations_multi
-}
+# parcellations = {
+#     "contrast_T": parcellations_single_threshold,
+#     "contrast_percentage": parcellations_single_percentage,
+#     "multi": parcellations_multi
+# }
 
-fig = plot.plot_sim_subject_parcellation(
-    i=1414,
-    U_individuals_collapsed=U_individuals_collapsed,
-    parcellations_dict=parcellations,
-    results_df=results_df,
-    grid_width=grid_width,
-    grid_height=grid_height,
-    methods=('contrast_percentage', 'multi')
-)
-# save as pdf
-fig.savefig(f"{save_dir}/supp/single_vs_multi_sim_plots/simulated_subject_normSNR_smallsize.pdf", bbox_inches='tight')
-
-
-fig = plot.plot_sim_subject_parcellation(
-    i=3122,
-    U_individuals_collapsed=U_individuals_collapsed,
-    parcellations_dict=parcellations,
-    results_df=results_df,
-    grid_width=grid_width,
-    grid_height=grid_height,
-    methods=('contrast_percentage', 'multi')
-)
-fig.savefig(f"{save_dir}/supp/single_vs_multi_sim_plots/simulated_subject_normSNR_highsize.pdf", bbox_inches='tight')
-
-fig = plot.plot_sim_subject_parcellation(
-    i=1164,
-    U_individuals_collapsed=U_individuals_collapsed,
-    parcellations_dict=parcellations,
-    results_df=results_df,
-    grid_width=grid_width,
-    grid_height=grid_height,
-    methods=('contrast_T', 'multi')
-)
-fig.savefig(f"{save_dir}/supp/single_vs_multi_sim_plots/simulated_subject_lowSNR_normsize.pdf", bbox_inches='tight')
+# fig = plot.plot_sim_subject_parcellation(
+#     i=1414,
+#     U_individuals_collapsed=U_individuals_collapsed,
+#     parcellations_dict=parcellations,
+#     results_df=results_df,
+#     grid_width=grid_width,
+#     grid_height=grid_height,
+#     methods=('contrast_percentage', 'multi')
+# )
+# # save as pdf
+# fig.savefig(f"{save_dir}/supp/single_vs_multi_sim_plots/simulated_subject_normSNR_smallsize.pdf", bbox_inches='tight')
 
 
-fig = plot.plot_sim_subject_parcellation(
-    i=2296,
-    U_individuals_collapsed=U_individuals_collapsed,
-    parcellations_dict=parcellations,
-    results_df=results_df,
-    grid_width=grid_width,
-    grid_height=grid_height,
-    methods=('contrast_T', 'multi')
-)
-fig.savefig(f"{save_dir}/supp/single_vs_multi_sim_plots/simulated_subject_highSNR_normsize.pdf", bbox_inches='tight')
+# fig = plot.plot_sim_subject_parcellation(
+#     i=3122,
+#     U_individuals_collapsed=U_individuals_collapsed,
+#     parcellations_dict=parcellations,
+#     results_df=results_df,
+#     grid_width=grid_width,
+#     grid_height=grid_height,
+#     methods=('contrast_percentage', 'multi')
+# )
+# fig.savefig(f"{save_dir}/supp/single_vs_multi_sim_plots/simulated_subject_normSNR_highsize.pdf", bbox_inches='tight')
+
+# fig = plot.plot_sim_subject_parcellation(
+#     i=1164,
+#     U_individuals_collapsed=U_individuals_collapsed,
+#     parcellations_dict=parcellations,
+#     results_df=results_df,
+#     grid_width=grid_width,
+#     grid_height=grid_height,
+#     methods=('contrast_T', 'multi')
+# )
+# fig.savefig(f"{save_dir}/supp/single_vs_multi_sim_plots/simulated_subject_lowSNR_normsize.pdf", bbox_inches='tight')
+
+
+# fig = plot.plot_sim_subject_parcellation(
+#     i=2296,
+#     U_individuals_collapsed=U_individuals_collapsed,
+#     parcellations_dict=parcellations,
+#     results_df=results_df,
+#     grid_width=grid_width,
+#     grid_height=grid_height,
+#     methods=('contrast_T', 'multi')
+# )
+# fig.savefig(f"{save_dir}/supp/single_vs_multi_sim_plots/simulated_subject_highSNR_normsize.pdf", bbox_inches='tight')

@@ -22,7 +22,7 @@ from OptimalBattery.global_config import save_dir, data_dir, repo_dir
 
 
 # save figs?
-save_plot = True
+save_plot = False
 
 ############## Load data ##############
 space = 'SUIT3'
@@ -119,7 +119,9 @@ full_vs_train = ut.normalize_matrix(full_vs_train,axis=0)
 # gets what the indices for each task are and the duration of each regressor
 condition_df= ct.get_condition_indices(info_run, task_column_name='task_name', cond_column_name='task_name')
 
-multi_combination =[ 7,9,13,16]
+multi_combo = ['tongue_movement','theory_of_mind','demand_grid','sentence_reading']
+multi_combination = info_all.index[info_all["task_name"].isin(multi_combo)].tolist()
+
 
 
 # build multitask localizer
@@ -175,10 +177,21 @@ interaction_matrix = ev.calculate_interaction_matrix(Uhats_multi_collapsed, Uhat
 scores = ev.compute_interaction_scores(interaction_matrix)
 t_stat, p_val = ttest_rel(scores[:, 0], scores[:, 1])
 
+target_inside_single = interaction_matrix[:, 1, 0, 0]  # [localizer=1 (single), contrast=0 (target), inside=0]
+target_inside_multi  = interaction_matrix[:, 0, 0, 0]  # [localizer=0 (multi), contrast=0 (target), inside=0]
+
+# Paired t-test
+t_stat, p_val = ttest_rel(target_inside_multi, target_inside_single)
+
+print(f"t = {t_stat:.3f}, p = {p_val:.4f}")
+
 
 # evaluate cross subject correlation of maps
 mean_dice_multi = ev.calculate_spatial_overlap(Uhats_multi_collapsed)
+print(mean_dice_multi)
 mean_dice_single = ev.calculate_spatial_overlap(Uhats_single)
+print(mean_dice_single)
+
 
 #####################################################
 
