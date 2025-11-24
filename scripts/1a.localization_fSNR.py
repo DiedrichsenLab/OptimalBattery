@@ -5,6 +5,8 @@ from OptimalBattery.global_config import data_dir,save_dir
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+from scipy.stats import gamma
+
 
 # define atlas and dirs
 space = 'fs32k'
@@ -26,12 +28,24 @@ part_vec = np.repeat(np.arange(1, n_part + 1), n_cond)
 
 var = rel.decompose_subj_group(data_mdtb_s1_run, cond_vec, part_vec,separate='subject_wise')
 
-combined = (var[:, 0] + var[:, 1]).tolist()
-snr_list = combined
+snr_list = (var[:, 0] + var[:, 1]).tolist()
 
-sns.histplot(snr_list, bins=10, kde=True)
-plt.xlabel("SNR")
+shape, loc, scale = gamma.fit(snr_list, floc=0)
+sns.histplot(snr_list, bins=10, color="lightblue", edgecolor="black")
+
+# compute x and scaled pdf
+x = np.linspace(0, max(snr_list)*1.1, 300)
+pdf = gamma.pdf(x, shape, loc=loc, scale=scale)
+
+N = len(snr_list)
+bin_width = (max(snr_list) - min(snr_list)) / 10
+pdf_scaled = pdf * N * bin_width
+
+plt.plot(x, pdf_scaled, color="blue")
+plt.xlabel("fSNR")
 plt.ylabel("Frequency")
-plt.gca().spines['top'].set_visible(False)
-plt.gca().spines['right'].set_visible(False)
+plt.title(f"alpha: {shape},beta{scale}")
+sns.despine()
+plt.tight_layout()
 plt.savefig(f"{save_dir}/single_vs_multi/fSNR_distribution.pdf")
+

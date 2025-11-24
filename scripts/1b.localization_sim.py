@@ -42,7 +42,7 @@ snr_list = [0.0196991187488852, 0.0291119097017132, 0.009868315372056239, 0.0266
 results_df, parcellations_single_threshold,parcellations_single_percentage, parcellations_multi = sim.sim_single_vs_multi(
     U_individuals,
     U_individuals_collapsed,
-    base_noise=0.04,
+    base_noise=0.055,
     snr_ratios=snr_list,seed=47
 )
 

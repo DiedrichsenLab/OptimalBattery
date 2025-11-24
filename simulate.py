@@ -698,6 +698,7 @@ def sim_connectivity(num_task_lib = 100,
                 results_df = pd.concat([results_df,D_ev],axis=0)
 
     return results_df
+    
 
 def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_ratios,seed = 0):
     """ Single simulation comparing contrast localization vs multi-task localization
@@ -711,8 +712,8 @@ def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_rat
         results_df: DataFrame with the results of the simulations
     """
     results_df = pd.DataFrame()
-    max_n_task = 5
-    types = ['contrast_T','multi','contrast_percentage']
+    max_n_task = 10
+    types = ['contrast_fixed','multitask','contrast_adaptive']
 
     # fit gamma to snr ratios
     shape, loc, scale = gamma.fit(snr_ratios, floc=0)  
@@ -732,10 +733,10 @@ def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_rat
 
     for type in types:
         # get the single contrast
-        if  type == 'contrast_T' or type == 'contrast_percentage':
+        if  type == 'contrast_fixed' or type == 'contrast_adaptive':
             max_idx, min_idx = find_max_contrast_against_all(V_lib, 4)
             combination = [max_idx, min_idx]
-        elif type == 'multi':
+        elif type == 'multitask':
             combination = [0,1,2,3,4]
 
         # get the V localizer
@@ -760,14 +761,14 @@ def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_rat
         avg_true = np.mean(true_sizes)
 
         # calibrate threshold optimizing function that finds value that minimizes the difference between predicted and true size on avg
-        if type == 'contrast_T':
+        if type == 'contrast_fixed':
             def f(th):
                 pred_sizes = [make_thresholded_contrast(y1,y2,threshold=th,mode='absolute')[0,:].sum().item()
                               for y1,y2 in contrasts]
                 return np.mean(pred_sizes) - avg_true
             best_th = brentq(f, 0.01, 50.0)
             print(f"Best threshold (matched to actual data): {best_th:.3f}")
-        if type == 'contrast_percentage':
+        if type == 'contrast_adaptive':
             def f(th):
                 pred_sizes = [make_thresholded_contrast(y1,y2,threshold=th,mode='percentile')[0,:].sum().item()
                               for y1,y2 in contrasts]
@@ -787,7 +788,7 @@ def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_rat
             # add battery-level noise
             Y_battery = Y_battery + battery_noise
 
-            if type == 'multi':
+            if type == 'multitask':
                 # Y_battery = ut.center_matrix(Y_battery,axis=0)
                 Y_battery = ut.normalize_matrix(Y_battery,axis=0)
 
@@ -798,11 +799,11 @@ def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_rat
                 U_hat= collapse_U(U_hat, target_parcels_indices=[4])[0]
                 parcellation_multi.append(U_hat.cpu().numpy())
 
-            elif type == 'contrast_T':
+            elif type == 'contrast_fixed':
                 U_hat = make_thresholded_contrast(Y_battery[0,:], Y_battery[1,:],threshold= best_th,mode='absolute')
                 parcellation_contrast_T.append(U_hat.cpu().numpy())
 
-            elif type == 'contrast_percentage':
+            elif type == 'contrast_adaptive':
                 U_hat = make_thresholded_contrast(Y_battery[0,:], Y_battery[1,:],threshold= best_th,mode='percentile')
                 parcellation_contrast_percentage.append(U_hat.cpu().numpy())
                 
@@ -821,7 +822,7 @@ def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_rat
             D_ev['true_size'] = U_individuals_collapsed[individual][0,:].sum().item()
             D_ev['true_everything_size'] = U_individuals_collapsed[individual][1,:].sum().item()
             D_ev['predicted_everything_size'] = U_hat[1,:].sum().item()
-            D_ev['threshold'] = [best_th if type in ['contrast_T','contrast_percentage'] else np.nan]
+            D_ev['threshold'] = [best_th if type in ['contrast_fixed','contrast_adaptive'] else np.nan]
             results_df = pd.concat([results_df,D_ev],axis=0)
 
     return results_df,parcellation_contrast_T,parcellation_contrast_percentage,parcellation_multi

@@ -15,6 +15,8 @@ import cortico_cereb_connectivity.evaluation as con_ev
 import pandas as pd
 import HierarchBayesParcel.util as util
 import OptimalBattery.simulate as sim
+import OptimalBattery.estimate as es
+from scipy.stats import pearsonr, ttest_rel
 
 # define paths
 base_dir = 'Y:/data/'
@@ -362,66 +364,11 @@ def find_single_contrast(Vs, regionA, regionB):
 
     return [max_idx, min_idx]
 
-def thresholded_contrast(task1, task2, threshold=0.85):
-    """Compute the contrast between two tasks and apply thresholding.
-    Args:
-        task1 (Tensor): shape (n_subjects, n_voxels), activation patterns for task 1.
-        task2 (Tensor): shape (n_subjects, n_voxels), activation patterns for task 2.
-        threshold (float or None): Quantile threshold to apply. If None, no thresholding is applied.
-    Returns:
-        thresholded_data (Tensor): shape (n_subjects, n_voxels), thresholded contrast data.
-    """
-    contrast_data = task1 - task2  # Compute contrast
-    if threshold is not None:
-        # Compute per-subject thresholds
-        subject_thresholds = pt.quantile(contrast_data, threshold, dim=1, keepdim=True) 
-        
-        # Apply thresholding: values below threshold -> -1, above threshold -> 1
-        thresholded_data = pt.where(contrast_data < subject_thresholds, 0, 1).float()
-    return thresholded_data
-
-def size_matched_contrast(contrast_map, reference_mask, roi_indices):
-    """
-    For each subject, selects the top-N voxels from the contrast map within the ROI,
-    where N is the number of voxels in the reference binary mask.
-
-    Parameters:
-    - contrast_map (np.ndarray): shape (n_subjects, n_voxels), contrast values per subject
-    - reference_mask (np.ndarray): shape (n_subjects, n_voxels), binary mask (e.g., multitask)
-    - roi_indices (np.ndarray): indices of ROI voxels to consider
-
-    Returns:
-    - binary_masks (np.ndarray): shape (n_subjects, n_voxels), new binary masks
-    """
-    n_subjects, n_voxels = contrast_map.shape
-    binary_masks = np.zeros_like(contrast_map)
-
-    for i in range(n_subjects):
-        n_voxels_to_select = int(reference_mask[i].sum())
-        contrast_vals = contrast_map[i, roi_indices]
-
-        sorted_indices = np.argsort(contrast_vals)
-        top_indices = sorted_indices[-n_voxels_to_select:]
-
-        temp_mask = np.zeros_like(contrast_vals)
-        temp_mask[top_indices] = 1.0
-
-        full_mask = np.zeros(n_voxels, dtype=np.float32)
-        full_mask[roi_indices] = temp_mask
-
-        binary_masks[i] = full_mask
-
-    return binary_masks
-
-def real_localization_multi(G_Lib,combination=None,task_names_s1=None,
+def real_localization_multi(combination=None,task_names_s1=None,
                         condition_df= None, ROI_mask=None,
-                        data_train=None,full_vs_train=None,parcel_interest_idx=None):
-    if combination is None:
-        D = ct.build_combinations(G_lib=G_Lib, strategy='random',n_batteries=10000,n_tasks=4,seed = None,replacement=False,rest_idx= 0)
-        D_best = ct.choose_combination(D,'log_det_mc')
-        comb = D_best['combination'].values[0]
-    else:
-        comb = combination
+                        data_train=None,data_vs= None,parcellation_vs= None,parcel_interest_idx=None):
+    
+    comb = combination
 
     # store top_comb names
     comb_names = [task_names_s1[i] for i in comb]
@@ -429,78 +376,44 @@ def real_localization_multi(G_Lib,combination=None,task_names_s1=None,
     # get the regressors for training data
     combination_regressors = ct.build_combination_regressors(comb, condition_df=condition_df, localizer_time=8,seed=1)
 
-    # average, center and normalize the data used for the parcellation
-    Ysubset = ct.average_regressors(data_train, combination_regressors)
-    Ysubset = ut.center_matrix(Ysubset, axis=1)
-    Ysubset = ut.normalize_matrix(Ysubset, axis=1)
+    nsub , ntask , nvox = data_vs.shape 
+    sub_indices = pt.arange(len(data_vs))
+    
+    Uhats_multi_masked_li=[]
+    Uhats_multi_collapsed_li = []
+    for i in range(nsub):
+        other_sub_data = data_vs[sub_indices != i]
+        # estimate vs for training cross val
+        Vs_sub = es.estimate_Vs(other_sub_data,parcellation=parcellation_vs,ROI_mask= ROI_mask)
+        Vs_sub = ut.center_matrix(Vs_sub,axis=0)
+        Vs_sub = ut.normalize_matrix(Vs_sub,axis=0)
 
-    Vsubset = full_vs_train[comb,:]
-    Vsubset = ut.center_matrix(Vsubset, axis=0)
-    Vsubset = ut.normalize_matrix(Vsubset, axis=0)
+        # get sub parcellation data
+        sub_data = data_train[i].reshape(1,data_train.shape[1],data_train.shape[2])
+        Ysubset = ct.average_regressors(sub_data, combination_regressors)
+        Ysubset = ut.center_matrix(Ysubset, axis=1)
+        Ysubset = ut.normalize_matrix(Ysubset, axis=1)
 
-    Uhats_multi =  et.estimate_Us(Ysubset, Vsubset, method='cos_angle',hard=True)
-    Uhats_multi = pt.argmax(Uhats_multi,axis=1) + 1
-    Uhats_multi_masked = Uhats_multi * ROI_mask # field of view mask
-    Uhats_multi_masked = Uhats_multi_masked.cpu().numpy().astype(np.float32)
-    Uhats_multi_collapsed = np.where(Uhats_multi_masked == parcel_interest_idx, 1, 0)
+        # get Vs for comb
+        Vsubset = Vs_sub[comb,:]
+        Vsubset = ut.center_matrix(Vsubset, axis=0)
+        Vsubset = ut.normalize_matrix(Vsubset, axis=0)
 
-    return comb_names, Uhats_multi_masked, Uhats_multi_collapsed
+        # get the parcellation
+        Uhats_multi =  et.estimate_Us(Ysubset, Vsubset, method='cos_angle',hard=True)
+        Uhats_multi = pt.argmax(Uhats_multi,axis=1) + 1
+        Uhats_multi_masked = Uhats_multi * ROI_mask # field of view mask
+        Uhats_multi_masked = Uhats_multi_masked.cpu().numpy().astype(np.float32)
+        Uhats_multi_masked_li.append(Uhats_multi_masked)
+        Uhats_multi_collapsed = np.where(Uhats_multi_masked == parcel_interest_idx, 1, 0)
+        Uhats_multi_collapsed_li.append(Uhats_multi_collapsed)
 
+    Uhats_multi_masked_arr = np.stack(Uhats_multi_masked_li, axis=0)
+    Uhats_multi_masked_arr = Uhats_multi_masked_arr[:, 0, :]
+    Uhats_multi_collapsed_arr = np.stack(Uhats_multi_collapsed_li, axis=0)
+    Uhats_multi_collapsed_arr = Uhats_multi_collapsed_arr[:, 0, :]
+    return comb_names, Uhats_multi_masked_arr, Uhats_multi_collapsed_arr
 
-def calculate_interaction_matrix(multi_mask, single_mask, contrast1, contrast2):
-    """
-    Calculates a 2x2 interaction matrix for each subject and localizer.
-
-    For each subject:
-        - Rows = contrasts: contrast1 (e.g. language), contrast2 (e.g. n-back)
-        - Columns = inside and outside the mask
-
-    Parameters:
-    - multi_mask: (n_subjects, n_voxels)
-    - single_mask: (n_subjects, n_voxels)
-    - contrast1: (n_subjects, n_voxels)
-    - contrast2: (n_subjects, n_voxels)
-
-    Returns:
-    - interaction_matrix: (n_subjects, 2, 2, 2)
-        [subject, localizer (multi=0/single=1), contrast (1=lang/2=nback), in/out (0=in, 1=out)]
-    """
-    n_subs = multi_mask.shape[0]
-    interaction_matrix = np.zeros((n_subs, 2, 2, 2))
-
-    for i in range(n_subs):
-        for loc_idx, mask in enumerate([multi_mask, single_mask]):
-            for con_idx, contrast in enumerate([contrast1, contrast2]):
-                in_vals = contrast[i][mask[i] == 1]
-                out_vals = contrast[i][mask[i] == 0]
-                interaction_matrix[i, loc_idx, con_idx, 0] = np.nanmean(in_vals)
-                interaction_matrix[i, loc_idx, con_idx, 1] = np.nanmean(out_vals)
-
-    return interaction_matrix
-
-def compute_interaction_scores(interaction_matrix):
-    """
-    Computes interaction scores from a precomputed interaction matrix.
-
-    Interaction score is:
-    (contrast1_in - contrast1_out) - (contrast2_in - contrast2_out)
-
-    Parameters:
-    - interaction_matrix: (n_subjects, 2, 2, 2)
-        [subject, localizer, contrast, in/out]
-
-    Returns:
-    - scores: (n_subjects, 2)
-        scores[:, 0] = multitask
-        scores[:, 1] = single
-    """
-    contrast1_in = interaction_matrix[:, :, 0, 0]
-    contrast1_out = interaction_matrix[:, :, 0, 1]
-    contrast2_in = interaction_matrix[:, :, 1, 0]
-    contrast2_out = interaction_matrix[:, :, 1, 1]
-
-    scores = (contrast1_in - contrast1_out) - (contrast2_in - contrast2_out)
-    return scores
 
 def calculate_spatial_overlap(U_binary):
     """
@@ -521,8 +434,31 @@ def calculate_spatial_overlap(U_binary):
                 pt.tensor(U_binary[j][None, None, :])
             )
             scores.append(dice)
-    return np.mean(scores)
+    return scores
 
+def thresholded_t_contrast(task1, task2, threshold, mode='percentile'):
+    """
+    """
+    tvals, pvals = ttest_rel(task1, task2, axis=0)
+
+    if mode == 'percentile':
+        thresh_value = np.nanpercentile(tvals, threshold)
+    elif mode == 'absolute':
+        thresh_value = threshold
+    else:
+        raise ValueError("mode must be either 'percentile' or 'absolute'")
+
+    # threshold and count active voxels
+    mask = np.where(tvals > thresh_value, 1, 0)
+    mask = pt.tensor(mask, device='cuda' if pt.cuda.is_available() else 'cpu')
+
+    # one-hot encoding 
+    contrast_one_hot = pt.stack([
+        (mask == 1).float(),  # ROI
+        (mask == 0).float()   # everything else
+    ], dim=0)
+
+    return contrast_one_hot
 
 if __name__=='__main__':
     # U_hat = pt.random.rand(3,10,6000)

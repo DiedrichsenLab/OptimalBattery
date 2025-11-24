@@ -10,6 +10,8 @@ import OptimalBattery.estimate as es
 import OptimalBattery.util as ut
 import OptimalBattery.construct as ct
 import OptimalBattery.plot as plot
+import OptimalBattery.simulate as sim
+from scipy.optimize import brentq
 import matplotlib.pyplot as plt
 import numpy as np
 from Functional_Fusion.dataset import DataSetLanguage
@@ -22,13 +24,13 @@ from OptimalBattery.global_config import save_dir, data_dir, repo_dir
 
 
 # save figs?
-save_plot = False
+save_plot = True
 
 ############## Load data ##############
 space = 'SUIT3'
 atlas,_= am.get_atlas(atlas_str=space)
 subj = ['sub-02','sub-04','sub-06','sub-07','sub-08','sub-09','sub-10','sub-12','sub-13','sub-14','sub-15','sub-16','sub-17','sub-18','sub-19']
-# subj= ['sub-02','sub-03']
+# subj= ['sub-02','sub-04','sub-06']
 lang_dataset = DataSetLanguage(f'{data_dir}/FunctionalFusion_new/Language')
 
 data_run,info_run  =lang_dataset.get_data(space=space,ses_id='ses-localizer',type='CondRun',subj=subj)
@@ -37,16 +39,19 @@ data_run[np.isnan(data_run)] = 0
 data_all,info_all  =lang_dataset.get_data(space=space,ses_id='ses-localizer',type='CondAll',subj=subj)
 data_all[np.isnan(data_all)] = 0
 
+test_target_tasks =['intact_passage','degraded_passage']
+idx_intact = info_run.index[info_run["task_name"] == test_target_tasks[0]].tolist()
+idx_degraded = info_run.index[info_run["task_name"] == test_target_tasks[1]].tolist()
+test_target_intact  = data_run[:, idx_intact, :]
+test_target_degraded = data_run[:, idx_degraded, :]
+tvals_target, pvals_target = ttest_rel(test_target_intact, test_target_degraded, axis=1)
 
-data_run = ut.recenter_fmri_data(data_run,info_run,task_column_name='task_name',center_condition='rest')
-data_all = ut.recenter_fmri_data(data_all,info_all,task_column_name='task_name',center_condition='rest')
-
-test_data_language_idx = [5,6]
-test_data_language = data_all[:,test_data_language_idx[0],:] - data_all[:,test_data_language_idx[1],:]
-
-test_data_nback_idx = [11]
-test_data_nback = data_all[:,test_data_nback_idx[0],:]
-
+test_control_tasks =['n_back','rest']
+idx_nback = info_run.index[info_run["task_name"] == test_control_tasks[0]].tolist()
+idx_rest = info_run.index[info_run["task_name"] == test_control_tasks[1]].tolist()
+test_nback  = data_run[:, idx_nback, :]
+test_rest = data_run[:, idx_rest, :]
+tvals_control, pvals_control = ttest_rel(test_nback, test_rest, axis=1)
 
 task_names_s1  = info_all['task_name'].unique()
 #####################################
@@ -95,26 +100,12 @@ ROI_to_include = np.arange(5, 10)
 ROI_mask = np.isin(coarse_parcelation, ROI_to_include).astype(int)
 ROI_indices = np.where(ROI_mask == 1)[0]
 
-
-
-# Get the G_library for task selection (in this case not used but could be if needed)
-n_conds = len(task_names_s1)
-n_part = data_run.shape[1] // n_conds
-G_Lib = ct.get_G(data=data_run[:,:,ROI_indices],n_cond=n_conds,n_part=n_part)
-
-
 # torchify
 device = pt.device('cuda' if pt.cuda.is_available() else 'cpu')
 data_all = pt.tensor(data_all, dtype=pt.float32, device=device)
-data_train = pt.tensor(data_run, dtype=pt.float32, device=device)
+data_run = pt.tensor(data_run, dtype=pt.float32, device=device)
 parcelation = pt.tensor(coarse_parcelation, dtype=pt.float32, device=device)
 ROI_mask = pt.tensor(ROI_mask, dtype=pt.float32, device=device)
-
-# estimate vs for training
-full_vs_train = es.estimate_Vs(data_all,parcellation=parcelation,ROI_mask= ROI_mask)
-full_vs_train = ut.center_matrix(full_vs_train,axis=0)
-full_vs_train = ut.normalize_matrix(full_vs_train,axis=0)
-
 
 # gets what the indices for each task are and the duration of each regressor
 condition_df= ct.get_condition_indices(info_run, task_column_name='task_name', cond_column_name='task_name')
@@ -125,9 +116,13 @@ multi_combination = info_all.index[info_all["task_name"].isin(multi_combo)].toli
 
 
 # build multitask localizer
-comb_names, Uhats_multi_full, Uhats_multi_collapsed =ev.real_localization_multi(G_Lib,combination=multi_combination,task_names_s1=task_names_s1,
+comb_names, Uhats_multi_full, Uhats_multi_collapsed =ev.real_localization_multi(combination=multi_combination,task_names_s1=task_names_s1,
                                                                                 condition_df= condition_df, ROI_mask=ROI_mask,
-                                                                                data_train=data_train,full_vs_train=full_vs_train,parcel_interest_idx=4)
+                                                                                data_train=data_run,data_vs=data_all,parcellation_vs= parcelation,parcel_interest_idx=4)
+
+# compute average roi size in multi to find optimal fixed and adaptive thresholds
+roi_sizes = Uhats_multi_collapsed.sum(axis=1)
+avg_size = roi_sizes.mean()
 
 if save_plot:
     group_percent_map = np.nanmean(Uhats_multi_collapsed, axis=0) * 100 * np.array(ROI_mask.cpu())
@@ -135,7 +130,7 @@ if save_plot:
     fig = plot.plot_multi_flat(
             group_percent_map_masked.reshape(1, -1),
             overlay_type='func',
-            cscale=[0, 50],
+            cscale=[0, 40],
             cmap='inferno',
             colorbar=True,
             stats='nanmean',
@@ -144,74 +139,119 @@ if save_plot:
     fig.savefig(f"{save_dir}/single_vs_multi/group_mutli_flatmap.pdf", bbox_inches='tight')
     plt.close(fig)
 
-# store how many voxels assigned as target for each sub to use later on for single contrast thresholding
-n_voxels_assgiend = np.sum(Uhats_multi_collapsed, axis=1)
 
 # make single contrast and show unthresholded
-single_contrast_regs = [16,17]
-contrast_names= task_names_s1[single_contrast_regs]
-combination_regressors = ct.build_combination_regressors(single_contrast_regs, condition_df=condition_df, localizer_time=8) # sentences vs non words
-Ysubset = ct.average_regressors(data_train, combination_regressors).cpu().numpy()
-contrast = Ysubset[:,0,:] - Ysubset[:,1,:] 
+single_contrast_names = ['sentence_reading','nonword_reading']
+single_combo_indices = info_all.index[info_all["task_name"].isin(single_contrast_names)].tolist()
+combination_regressors = ct.build_combination_regressors(single_combo_indices, condition_df=condition_df, localizer_time=8) # sentences vs non words
+combination_regressors_sorted = [sorted(sublist) for sublist in combination_regressors]
+sentence_data = data_run[:, combination_regressors_sorted[0], :]
+nonword_data = data_run[:, combination_regressors_sorted[1], :]
+sentence_data = sentence_data.cpu().numpy()
+nonword_data = nonword_data.cpu().numpy()
 
-#  create binary localizer based on n_voxels in the multi task localizer
-Uhats_single = ev.size_matched_contrast(contrast,Uhats_multi_collapsed,roi_indices=ROI_indices)
+def f(th):
+    pred_sizes = [ev.thresholded_t_contrast(sentence_data[i],nonword_data[i],threshold=th,mode='absolute')[0,:].sum().item()
+                    for i in range(sentence_data.shape[0])]
+    return np.mean(pred_sizes) - avg_size
+best_th_fixed = brentq(f, 0.01, 50.0)
+print(f"Best fixed threshold (matched to actual data): {best_th_fixed:.3f}")
+
+def f(th):
+    pred_sizes = [ev.thresholded_t_contrast(sentence_data[i],nonword_data[i],threshold=th,mode='percentile')[0,:].sum().item()
+                    for i in range(sentence_data.shape[0])]
+    return np.mean(pred_sizes) - avg_size
+best_th_adaptive = brentq(f, 1, 99)
+print(f"Best adaptive threshold (matched to actual data): {best_th_adaptive:.3f}")
+
+contrasts_fixed = [ev.thresholded_t_contrast(sentence_data[i],nonword_data[i],threshold=best_th_fixed,mode='absolute')[0] for i in range(sentence_data.shape[0])]
+contrasts_fixed = pt.stack(contrasts_fixed,axis=0)
+contrasts_adaptive = [ev.thresholded_t_contrast(sentence_data[i],nonword_data[i],threshold=best_th_adaptive,mode='percentile')[0] for i in range(sentence_data.shape[0])]
+contrasts_adaptive = pt.stack(contrasts_adaptive,axis=0)
+
 if save_plot:
-    group_percent_map = np.nanmean(Uhats_single, axis=0) * 100 * np.array(ROI_mask.cpu())
+    group_percent_map = np.nanmean(contrasts_fixed.cpu(), axis=0) * 100 * np.array(ROI_mask.cpu())
     group_percent_map_masked = np.where(np.array(ROI_mask.cpu()) == 1, group_percent_map, np.nan)
     fig = plot.plot_multi_flat(
             group_percent_map_masked.reshape(1, -1),
             overlay_type='func',
-            cscale=[0, 50],
+            cscale=[0, 40],
             cmap='inferno',
             colorbar=True,
             stats='nanmean',
             showfigure=False, single_fig= True
         )
-    fig.savefig(f"{save_dir}/single_vs_multi/group_singlecon_flatmap.pdf", bbox_inches='tight')
+    fig.savefig(f"{save_dir}/single_vs_multi/group_contrat_fixed.pdf", bbox_inches='tight')
+    plt.close(fig)
+
+    # save adaptive
+    group_percent_map = np.nanmean(contrasts_adaptive.cpu(), axis=0) * 100 * np.array(ROI_mask.cpu())
+    group_percent_map_masked = np.where(np.array(ROI_mask.cpu()) == 1, group_percent_map, np.nan)
+    fig = plot.plot_multi_flat(
+            group_percent_map_masked.reshape(1, -1),
+            overlay_type='func',
+            cscale=[0, 40],
+            cmap='inferno',
+            colorbar=True,
+            stats='nanmean',
+            showfigure=False, single_fig= True
+        )
+    fig.savefig(f"{save_dir}/single_vs_multi/group_contrat_adaptive.pdf", bbox_inches='tight')
     plt.close(fig)
 
 ############### evaluate the localizers ###############
-# evaluate selectivity and specificity
-interaction_matrix = ev.calculate_interaction_matrix(Uhats_multi_collapsed, Uhats_single, test_data_language, test_data_nback)
-scores = ev.compute_interaction_scores(interaction_matrix)
-t_stat, p_val = ttest_rel(scores[:, 0], scores[:, 1])
-
-target_inside_single = interaction_matrix[:, 1, 0, 0]  # [localizer=1 (single), contrast=0 (target), inside=0]
-target_inside_multi  = interaction_matrix[:, 0, 0, 0]  # [localizer=0 (multi), contrast=0 (target), inside=0]
-
-# Paired t-test
-t_stat, p_val = ttest_rel(target_inside_multi, target_inside_single)
-
-print(f"t = {t_stat:.3f}, p = {p_val:.4f}")
-
-
-# evaluate cross subject correlation of maps
-mean_dice_multi = ev.calculate_spatial_overlap(Uhats_multi_collapsed)
-print(mean_dice_multi)
-mean_dice_single = ev.calculate_spatial_overlap(Uhats_single)
-print(mean_dice_single)
+# evaluate cross subject correlation of maps (dice for each localization method)
+dice_multi_list = ev.calculate_spatial_overlap(Uhats_multi_collapsed)
+print(np.mean(dice_multi_list))
+dice_fixed_list = ev.calculate_spatial_overlap(contrasts_fixed)
+print(np.mean(dice_fixed_list))
+dice_adaptive_list = ev.calculate_spatial_overlap(contrasts_adaptive)
+print(np.mean(dice_adaptive_list))
 
 
 #####################################################
 
-# Compute means and SEMs
-means = np.nanmean(interaction_matrix, axis=0)  # [loc, contrast, in/out]
-sems = sem(interaction_matrix, axis=0, nan_policy='omit')
+# Compute mean value of each test contrast in and out of roi defined by each localizer
+multi_mask = Uhats_multi_collapsed
+fixed_mask = contrasts_fixed.cpu().numpy()
+adaptive_mask = contrasts_adaptive.cpu().numpy()
+
+contrast_lang = tvals_target
+contrast_nback = tvals_control
 
 
-# Convert to df
+localizers = {
+    "multitask": multi_mask,
+    "contrast_fixed": fixed_mask,
+    "contrast_adaptive": adaptive_mask
+}
+
+contrasts = {
+    "intact>degraded": contrast_lang,
+    "nback>rest": contrast_nback
+}
+
+def compute_in_out(mask, contrast):
+    in_vals = contrast[mask == 1]
+    out_vals = contrast[mask == 0]
+    return np.nanmean(in_vals), np.nanmean(out_vals)
+
+
 rows = []
-for loc_i, loc_name in enumerate(['Multitask', 'Single-task']):
-    for con_i, con_name in enumerate(['Intact>Degraded', 'n-back>Rest']):
-        for reg_i, reg_name in enumerate(['Inside', 'Outside']):
+n_subs = multi_mask.shape[0]
+for loc_name, loc_mask in localizers.items():
+    for con_name, con_data in contrasts.items():
+        for s in range(n_subs):
+            inside, outside = compute_in_out(loc_mask[s], con_data[s])
             rows.append({
-                'Region': reg_name,
-                'Localizer': loc_name,
-                'Contrast': con_name,
-                'Value': means[loc_i, con_i, reg_i],
-                'SEM': sems[loc_i, con_i, reg_i]
+                "subject": subj[s],
+                "localizer": loc_name,
+                "contrast": con_name,
+                "inside": inside,
+                "outside": outside
             })
-df = pd.DataFrame(rows)
-df.to_csv(f"{repo_dir}/eval_tsvs/localization_real_contrasts.tsv", sep="\t", index=False)
 
+# Make dataframe
+df_eval = pd.DataFrame(rows)
+out_path = f"{repo_dir}/eval_tsvs/localization_real_contrasts.tsv"
+df_eval.to_csv(out_path, sep="\t", index=False)
