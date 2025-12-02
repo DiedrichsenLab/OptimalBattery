@@ -18,7 +18,7 @@ atlas,_= am.get_atlas(atlas_str=space)
 # Load data
 MDTB_dataset = DataSetLanguage(f'{data_dir}/FunctionalFusion_new/Language')
 
-subj = ['sub-02','sub-04','sub-06','sub-07','sub-08','sub-09','sub-10','sub-12','sub-13','sub-14','sub-15','sub-16','sub-17','sub-18','sub-19']
+subj = ['sub-02','sub-03','sub-04','sub-06','sub-07','sub-08','sub-09','sub-10','sub-12','sub-13','sub-14','sub-15','sub-16','sub-17','sub-18','sub-19']
 
 
 data_mdtb_s1_run,info_mdtb_1_run  =MDTB_dataset.get_data(space=space,ses_id='ses-localizer',type='CondRun',subj=subj)
@@ -77,6 +77,7 @@ for thr in thresholds:
         n_active_voxels = np.sum(mask)
         active_vox.append(n_active_voxels)
 
+    avge_active_vox = np.mean(active_vox)
     # correlation between SNR and number of active voxels
     r, p = pearsonr(snr_list, active_vox)
     r_values.append(r)

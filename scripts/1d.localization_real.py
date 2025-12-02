@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from Functional_Fusion.dataset import DataSetLanguage
 from matplotlib.colors import ListedColormap
-from scipy.stats import ttest_rel
+from scipy.stats import ttest_rel,  ttest_1samp
 import nitools as nt
 from scipy.stats import sem  
 import pandas as pd 
@@ -24,12 +24,12 @@ from OptimalBattery.global_config import save_dir, data_dir, repo_dir
 
 
 # save figs?
-save_plot = True
+save_plot = False
 
 ############## Load data ##############
 space = 'SUIT3'
 atlas,_= am.get_atlas(atlas_str=space)
-subj = ['sub-02','sub-04','sub-06','sub-07','sub-08','sub-09','sub-10','sub-12','sub-13','sub-14','sub-15','sub-16','sub-17','sub-18','sub-19']
+subj = ['sub-02','sub-03','sub-04','sub-06','sub-07','sub-08','sub-09','sub-10','sub-12','sub-13','sub-14','sub-15','sub-16','sub-17','sub-18','sub-19']
 # subj= ['sub-02','sub-04','sub-06']
 lang_dataset = DataSetLanguage(f'{data_dir}/FunctionalFusion_new/Language')
 
@@ -166,8 +166,10 @@ print(f"Best adaptive threshold (matched to actual data): {best_th_adaptive:.3f}
 
 contrasts_fixed = [ev.thresholded_t_contrast(sentence_data[i],nonword_data[i],threshold=best_th_fixed,mode='absolute')[0] for i in range(sentence_data.shape[0])]
 contrasts_fixed = pt.stack(contrasts_fixed,axis=0)
+contrasts_fixed = contrasts_fixed * ROI_mask
 contrasts_adaptive = [ev.thresholded_t_contrast(sentence_data[i],nonword_data[i],threshold=best_th_adaptive,mode='percentile')[0] for i in range(sentence_data.shape[0])]
 contrasts_adaptive = pt.stack(contrasts_adaptive,axis=0)
+contrasts_adaptive = contrasts_adaptive * ROI_mask
 
 if save_plot:
     group_percent_map = np.nanmean(contrasts_fixed.cpu(), axis=0) * 100 * np.array(ROI_mask.cpu())
@@ -201,13 +203,27 @@ if save_plot:
 
 ############### evaluate the localizers ###############
 # evaluate cross subject correlation of maps (dice for each localization method)
-dice_multi_list = ev.calculate_spatial_overlap(Uhats_multi_collapsed)
+print("Dice scores:")
+print ('multi')
+dice_multi_list = ev.calculate_crosssub_overlap(Uhats_multi_collapsed)
 print(np.mean(dice_multi_list))
-dice_fixed_list = ev.calculate_spatial_overlap(contrasts_fixed)
-print(np.mean(dice_fixed_list))
-dice_adaptive_list = ev.calculate_spatial_overlap(contrasts_adaptive)
-print(np.mean(dice_adaptive_list))
+print( np.std(dice_multi_list)/np.sqrt(len(dice_multi_list)))
+t,p = ttest_1samp(dice_multi_list, 0.0)
+print(f"t={t:.3f}, p={p:.3f}")
 
+print ('fixed')
+dice_fixed_list = ev.calculate_crosssub_overlap(contrasts_fixed)
+print(np.mean(dice_fixed_list))
+print(np.std(dice_fixed_list)/np.sqrt(len(dice_fixed_list)))
+t,p = ttest_1samp(dice_fixed_list, 0.0)
+print(f"t={t:.3f}, p={p:.3f}")
+
+print ('adaptive')
+dice_adaptive_list = ev.calculate_crosssub_overlap(contrasts_adaptive)
+print(np.mean(dice_adaptive_list))
+print(np.std(dice_adaptive_list)/np.sqrt(len(dice_adaptive_list)))
+t,p = ttest_1samp(dice_adaptive_list, 0.0)
+print(f"t={t:.3f}, p={p:.3f}")
 
 #####################################################
 

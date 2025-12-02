@@ -119,9 +119,8 @@ def get_prediction_error_cv(ytest, U_hat, indices=None):
         cos_err.append(cos_sim_subj)
 
     cos_err = pt.stack(cos_err)
-    cos_mean = pt.mean(cos_err)
 
-    return cos_err, cos_mean
+    return cos_err
 
 
 
@@ -277,8 +276,10 @@ def real_connectivity(G_library, condition_df,
 
 
 def real_parcellation(G_library,condition_df,
-                        YLib,Ytest,
-                        VLib,
+                        YLib,
+                        Y_vs, parcellation_vs,
+                        Ytest,
+                        ROI_mask,
                         evaluation_indices = None,
                         battery_sizes = [3,4,5,6,7,8,9,10,12,14,16],
                         metrics  = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],
@@ -292,6 +293,7 @@ def real_parcellation(G_library,condition_df,
         G_library (ndarray): task x task second moment matrix for the task library.
         condition_df (DataFrame): DataFrame containing condition information.
         YLib (ndarray): training data used for estimating parcellations (subjects, conditions, voxels). based on CondRun
+        Y_vs (ndarray): Data to estimate Vs in a cross-validated way
         Ytest (ndarray): test data used for evaluating parcellation quality (subjects, conditions, voxels). based on CondAll
         VLib (ndarray): Vs for training data estimated from CondAll
         evaluation_indices (list or None): Indices of the brain vertices/voxels to evaluate.
@@ -323,20 +325,35 @@ def real_parcellation(G_library,condition_df,
                 # get the regressors for training data
                 combination_regressors = ct.build_combination_regressors(top_comb, condition_df=condition_df, localizer_time=localizer_duration)
 
-                # average, center and normalize the data used for the parcellation
-                Ysubset = ct.average_regressors(YLib, combination_regressors)
-                Ysubset = ut.center_matrix(Ysubset, axis=1)
-                Ysubset = ut.normalize_matrix(Ysubset, axis=1)
+                nsub , ntask , nvox = Y_vs.shape
+                sub_indices = pt.arange(nsub)
+                Uhats = []
+                for i in range(nsub):
+                    other_sub_data = Y_vs[sub_indices != i]
+                    # estimate vs for training cross val
+                    Vs_sub = es.estimate_Vs(other_sub_data,parcellation=parcellation_vs,ROI_mask= ROI_mask)
+                    Vs_sub = ut.center_matrix(Vs_sub,axis=0)
+                    Vs_sub = ut.normalize_matrix(Vs_sub,axis=0)
 
-                Vsubset = VLib[top_comb,:]
-                Vsubset = ut.center_matrix(Vsubset, axis=0)
-                Vsubset = ut.normalize_matrix(Vsubset, axis=0)
+                    # get sub parcellation data
+                    sub_data = YLib[i].reshape(1,YLib.shape[1],YLib.shape[2])
+                    Ysubset = ct.average_regressors(sub_data, combination_regressors)
+                    Ysubset = ut.center_matrix(Ysubset, axis=1)
+                    Ysubset = ut.normalize_matrix(Ysubset, axis=1)
 
-                Uhats =  et.estimate_Us(Ysubset, Vsubset, method='correlation',hard=True)
+                    # get Vs for comb
+                    Vsubset = Vs_sub[top_comb,:]
+                    Vsubset = ut.center_matrix(Vsubset, axis=0)
+                    Vsubset = ut.normalize_matrix(Vsubset, axis=0)
 
-                cos_subjects, cos_mean = get_prediction_error_cv(Ytest, Uhats, indices=evaluation_indices)
+                    # get the parcellation
+                    Uhat_sub =  et.estimate_Us(Ysubset, Vsubset, method='cos_angle',hard=True)
+                    Uhats.append(Uhat_sub)
+
+                Uhats = pt.cat(Uhats,dim=0)
+                cos_subjects = get_prediction_error_cv(Ytest, Uhats, indices=evaluation_indices)
                 cos_subjects = cos_subjects.cpu().numpy().tolist()
-               
+
                 # record
                 D_ev = pd.DataFrame()
                 D_ev['n_task'] = [n_task]
@@ -415,7 +432,7 @@ def real_localization_multi(combination=None,task_names_s1=None,
     return comb_names, Uhats_multi_masked_arr, Uhats_multi_collapsed_arr
 
 
-def calculate_spatial_overlap(U_binary):
+def calculate_crosssub_overlap(U_binary):
     """
     Compute average Dice coefficient across all pairs of subjects.
 
@@ -428,12 +445,17 @@ def calculate_spatial_overlap(U_binary):
     n_subs = U_binary.shape[0]
     scores = []
     for i in range(n_subs):
-        for j in range(i + 1, n_subs):
+        sub_scores = []
+        for j in range(n_subs):
+            if i == j:
+                continue
             dice = sim.get_dice_single(
                 pt.tensor(U_binary[i][None, None, :]), 
                 pt.tensor(U_binary[j][None, None, :])
             )
-            scores.append(dice)
+            sub_scores.append(dice)
+        mean_sub_dice = np.mean(sub_scores)
+        scores.append(mean_sub_dice)
     return scores
 
 def thresholded_t_contrast(task1, task2, threshold, mode='percentile'):

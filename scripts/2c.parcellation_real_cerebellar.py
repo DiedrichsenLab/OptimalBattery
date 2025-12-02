@@ -1,42 +1,27 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import OptimalBattery.util as ut
 import os
-import PcmPy as pcm
-import seaborn as sns
 import pandas as pd
 import OptimalBattery.evaluate as ev
 import Functional_Fusion.atlas_map as am
 from Functional_Fusion.dataset import DataSetMDTB
-from IndividualParcellation.global_config import *
-import nilearn.plotting as plotting
-import nitools as nt
-import nibabel as nb
 import OptimalBattery.estimate as es
 import OptimalBattery.construct as ct
 import OptimalBattery.plot as plot
-import OptimalBattery.global_config as gcf
+from OptimalBattery.global_config import data_dir
+import torch as pt
 
 
-rois = {'all-M':[5,6,7,8,9,10,11,12,13,14,15,16,21,22,23,24,25,26,27,28,29,30,31,32],
-'all':[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32],
-        'SD': [8,9,10,11,12,13,14,15,16,24,25,26,27,28,29,30,31,32],
-    'MA':[1,2,3,4,5,6,7,17,18,19,20,21,22,23],
-    'SDR':[24,25,26,27,28,29,30,31,32],
-    'SDL':[8,9,10,11,12,13,14,15,16],
-    'MA_L':[1,2,3,4,5,6,7],
-    'MA_R':[17,18,19,20,21,22,23],
-    'AD':[5,6,7,8,9,10,11,21,22,23,24,25,26,27],
+rois = {
+'all':[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32]
 }
 
 
 # define atlas and dirs
 space = 'SUIT3'
 atlas,_= am.get_atlas(atlas_str=space)
-base_dir = gcf.data_path
-
-func_fus_dir = os.path.join(base_dir, 'FunctionalFusion_new')
-cerebellum_dir = os.path.join(base_dir, 'Cerebellum')
+func_fus_dir = os.path.join(data_dir, 'FunctionalFusion_new')
+cerebellum_dir = os.path.join(data_dir, 'Cerebellum')
 
 
 # Load group parcellation
@@ -84,28 +69,19 @@ for roi_name , parcels in rois.items():
     parcelation = pt.tensor(nettekoven_parcellation, dtype=pt.float32, device=device)
     ROI_mask = pt.tensor(ROI_mask, dtype=pt.float32, device=device)
 
-    # estimate Vs for training using s2 full data
-    full_vs_train = es.estimate_Vs(data_mdtb_s2_all,parcellation=parcelation,ROI_mask= ROI_mask)
-    full_vs_train = ut.center_matrix(full_vs_train,axis=0)
-    full_vs_train = ut.normalize_matrix(full_vs_train,axis=0)
-
-    # estimate Vs for testing using s1 full data
-    full_vs_test = es.estimate_Vs(data_test,parcellation=parcelation,ROI_mask=ROI_mask)
-    full_vs_test = ut.center_matrix(full_vs_test,axis=0)
-    full_vs_test = ut.normalize_matrix(full_vs_test,axis=0)
-
-    n_parcels = full_vs_train.shape[1]
-
+    
     D = ev.real_parcellation(G_Lib,condition_df,
-                        data_train,data_test,
-                        full_vs_train,
-                        evaluation_indices = ROI_indices,
-                        battery_sizes = [3,4,6,8,10,12,14,16],
-                        metrics  = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],
-                        n_batteries = 20000,
-                        n_iter=100,
-                        rest_idx = 31,
-                        localizer_duration=8)
+                    data_train,
+                    data_mdtb_s2_all, parcelation,
+                    data_test,
+                    ROI_mask,
+                    evaluation_indices = ROI_indices,
+                    battery_sizes = [3,4,5,6,7,8,9,10,11,12,13,14,15,16],
+                    metrics  = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],
+                    n_batteries = 20000,
+                    n_iter=100,
+                    rest_idx = 31,
+                    localizer_duration=8)
     
 
     D['roi'] = roi_name
