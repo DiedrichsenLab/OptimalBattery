@@ -13,31 +13,6 @@ from OptimalBattery.global_config import data_dir
 import torch as pt
 
 rois = {
-'visual_cortex': [
-    "V1", "V2", "V3", "V3A", "V3B", "V3CD", "V4", "V4t", "V6", "V6A", "V7", "V8",
-    "MT", "MST", "FST", "LO1", "LO2", "LO3", "PIT",
-    "STV", "PCV", "DVT", "VMV1", "VMV2", "VMV3",
-    "VVC","FFC","RSC","POS1", "POS2","IPS1","ProS" ],       
-                        
-
-    "Non-Visual Cortex": 
-     [
-    "4", "3b", "FEF", "PEF", "55b", "A1", "PSL", "SFL", "7Pm", "7m",
-    "23d", "v23ab", "d23ab", "31pv", "5m", "5mv", "23c", "5L", "24dd", "24dv",
-    "7AL", "SCEF", "6ma", "7Am", "7PL", "7PC", "LIPv", "VIP", "MIP", "1", "2",
-    "3a", "6d", "6mp", "6v", "p24pr", "33pr", "a24pr", "p32pr", "a24", "d32",
-    "8BM", "p32", "10r", "47m", "8Av", "8Ad", "9m", "8BL", "9p", "10d", "8C",
-    "44", "45", "47l", "a47r", "6r", "IFJa", "IFJp", "IFSp", "IFSa", "p9-46v",
-    "46", "a9-46v", "9-46d", "9a", "10v", "a10p", "10pp", "11l", "13l", "OFC",
-    "47s", "LIPd", "6a", "i6-8", "s6-8", "43", "OP4", "OP1", "OP2-3", "52", "RI",
-    "PFcm", "PoI2", "TA2", "FOP4", "MI", "Pir", "AVI", "AAIC", "FOP1", "FOP3",
-    "FOP2", "PFt", "AIP", "EC", "PreS", "H", "PeEc", "STGa", "PBelt", "A5",
-    "PHA1", "PHA3", "STSda", "STSdp", "STSvp", "TGd", "TE1a", "TE1p", "TE2a",
-    "TF", "TE2p", "PHT", "PH", "TPOJ1", "TPOJ2", "TPOJ3", "PGp", "IP2", "IP1",
-    "IP0", "PFop", "PF", "PFm", "PGi", "PGs", "PHA2", "25", "s32", "pOFC",
-    "PoI1", "Ig", "FOP5", "p10p", "p47r", "TGv", "MBelt", "LBelt", "A4",
-    "STSva", "TE1m", "PI", "a32pr", "p24","31pd","31a"
-],
 
     "All Parcels":
     ["V1", "MST", "V6", "V2", "V3", "V4", "V8", "4", "3b", "FEF", "PEF", "55b", "V3A", "RSC", "POS2", "V7",
@@ -83,7 +58,7 @@ glasser_atlas = atlas.read_data([model_name_L,model_name_R])
 # Load data
 MDTB_dataset = DataSetMDTB(f'{func_fus_dir}/MDTB')
 
-subj = ['sub-02','sub-03']
+subj = None
 
 data_mdtb_s2_run,info_mdtb_2_run  =MDTB_dataset.get_data(space=space,ses_id='ses-s2',type='CondRun',subj=subj)
 data_mdtb_s2_run[np.isnan(data_mdtb_s2_run)] = 0
@@ -133,17 +108,18 @@ for roi_name , parcels in rois.items():
 
 
     D = ev.real_parcellation(G_Lib,condition_df,
-                        data_train,
-                        data_mdtb_s2_all, parcelation,
-                        data_test,
-                        ROI_mask,
-                        evaluation_indices = ROI_indices,
-                        battery_sizes = [4,6,8,10,12,14,16],
-                        metrics  = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],
-                        n_batteries = 10000,
-                        n_iter=10,
-                        rest_idx = 31,
-                        localizer_duration=8)
+                    data_train,
+                    data_mdtb_s2_all, parcelation,
+                    data_test,
+                    ROI_mask,
+                    evaluation_indices = ROI_indices,
+                    battery_sizes = [3,4,5,6,7,8,9,10,11,12,13,14,15,16],
+                    metrics  = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],
+                    n_batteries = 20000,
+                    n_iter=100,
+                    rest_idx = 31,
+                    localizer_duration=8)
+    
     
     D['roi'] = roi_name
     D['parcels'] = ', '.join(parcels)
@@ -160,6 +136,6 @@ final_results_df = pd.concat(all_results, ignore_index=True)
 
 # Save the results
 save_dir = os.path.abspath(os.path.join(os.getcwd(),'eval_tsvs'))
-save_path = os.path.join(save_dir, 'real_parcellation_cortex.tsv')
+save_path = os.path.join(save_dir, 'parcellation_real_cortex.tsv')
 final_results_df.to_csv(save_path, sep='\t', index=False)
 

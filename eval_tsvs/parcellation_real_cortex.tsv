@@ -1,0 +1,3361 @@
+n_task	metric	roi	avg_cos_sim_per_subject
+3	inverse_trace_mc	All Parcels	0.2648144897818565
+3	inverse_trace_mc	All Parcels	0.2907494780421257
+3	inverse_trace_mc	All Parcels	0.17656821116805077
+3	inverse_trace_mc	All Parcels	0.358443061709404
+3	inverse_trace_mc	All Parcels	0.2331438921391964
+3	inverse_trace_mc	All Parcels	0.26418030336499215
+3	inverse_trace_mc	All Parcels	0.3750528752803802
+3	inverse_trace_mc	All Parcels	0.358858497440815
+3	inverse_trace_mc	All Parcels	0.173308337777853
+3	inverse_trace_mc	All Parcels	0.2588458658754826
+3	inverse_trace_mc	All Parcels	0.3863220876455307
+3	inverse_trace_mc	All Parcels	0.2313031367957592
+3	inverse_trace_mc	All Parcels	0.30727294892072676
+3	inverse_trace_mc	All Parcels	0.3063117143511772
+3	inverse_trace_mc	All Parcels	0.22553520455956458
+3	inverse_trace_mc	All Parcels	0.3161746597290039
+3	inverse_trace_mc	All Parcels	0.3200201240181923
+3	inverse_trace_mc	All Parcels	0.2752892664074898
+3	inverse_trace_mc	All Parcels	0.19819067627191544
+3	inverse_trace_mc	All Parcels	0.29815508872270585
+3	inverse_trace_mc	All Parcels	0.31179904848337175
+3	inverse_trace_mc	All Parcels	0.23572484999895096
+3	inverse_trace_mc	All Parcels	0.18979690372943878
+3	inverse_trace_mc	All Parcels	0.26369173377752303
+3	log_det_mc	All Parcels	0.2667050492763519
+3	log_det_mc	All Parcels	0.29277916729450226
+3	log_det_mc	All Parcels	0.1758846215903759
+3	log_det_mc	All Parcels	0.3594931423664093
+3	log_det_mc	All Parcels	0.2324556502699852
+3	log_det_mc	All Parcels	0.26531427428126336
+3	log_det_mc	All Parcels	0.37591743558645246
+3	log_det_mc	All Parcels	0.3598462614417076
+3	log_det_mc	All Parcels	0.1740512366592884
+3	log_det_mc	All Parcels	0.2596792797744274
+3	log_det_mc	All Parcels	0.38687639862298967
+3	log_det_mc	All Parcels	0.22965957075357438
+3	log_det_mc	All Parcels	0.30709444373846057
+3	log_det_mc	All Parcels	0.30436303079128263
+3	log_det_mc	All Parcels	0.22665726006031037
+3	log_det_mc	All Parcels	0.31557507991790773
+3	log_det_mc	All Parcels	0.32168569445610046
+3	log_det_mc	All Parcels	0.2746036645770073
+3	log_det_mc	All Parcels	0.19746576994657516
+3	log_det_mc	All Parcels	0.2984563434123993
+3	log_det_mc	All Parcels	0.3124086046218872
+3	log_det_mc	All Parcels	0.2361832770705223
+3	log_det_mc	All Parcels	0.18891705453395843
+3	log_det_mc	All Parcels	0.26264392361044886
+3	random	All Parcels	0.23741560876369477
+3	random	All Parcels	0.24854269370436669
+3	random	All Parcels	0.1422511076927185
+3	random	All Parcels	0.3014849230647087
+3	random	All Parcels	0.1899379563331604
+3	random	All Parcels	0.20910980939865112
+3	random	All Parcels	0.30251372054219244
+3	random	All Parcels	0.30886927992105484
+3	random	All Parcels	0.17540484726428984
+3	random	All Parcels	0.21879250079393386
+3	random	All Parcels	0.33301063627004623
+3	random	All Parcels	0.17632934652268886
+3	random	All Parcels	0.22341902196407318
+3	random	All Parcels	0.23063185885548593
+3	random	All Parcels	0.20000119671225547
+3	random	All Parcels	0.278085174113512
+3	random	All Parcels	0.293923259973526
+3	random	All Parcels	0.24690941452980042
+3	random	All Parcels	0.1756439997255802
+3	random	All Parcels	0.2499760527908802
+3	random	All Parcels	0.2599389347434044
+3	random	All Parcels	0.19043700143694878
+3	random	All Parcels	0.13499574236571787
+3	random	All Parcels	0.23208878695964813
+3	variance	All Parcels	0.27538741916418075
+3	variance	All Parcels	0.29013624489307405
+3	variance	All Parcels	0.16926895394921304
+3	variance	All Parcels	0.351919929087162
+3	variance	All Parcels	0.2221659567952156
+3	variance	All Parcels	0.2652084992825985
+3	variance	All Parcels	0.36143952965736387
+3	variance	All Parcels	0.34494829177856445
+3	variance	All Parcels	0.16656083464622498
+3	variance	All Parcels	0.25855897963047025
+3	variance	All Parcels	0.37580587208271027
+3	variance	All Parcels	0.19750412225723266
+3	variance	All Parcels	0.2767310094833374
+3	variance	All Parcels	0.2923164165019989
+3	variance	All Parcels	0.22294266551733016
+3	variance	All Parcels	0.30707738548517227
+3	variance	All Parcels	0.30892079681158063
+3	variance	All Parcels	0.26710634589195253
+3	variance	All Parcels	0.1826321943104267
+3	variance	All Parcels	0.28417024344205855
+3	variance	All Parcels	0.3000769314169884
+3	variance	All Parcels	0.23143807530403138
+3	variance	All Parcels	0.17023973032832146
+3	variance	All Parcels	0.2600760233402252
+3	variance_mc	All Parcels	0.2662977015972137
+3	variance_mc	All Parcels	0.29313502728939056
+3	variance_mc	All Parcels	0.17716725245118142
+3	variance_mc	All Parcels	0.35969565659761427
+3	variance_mc	All Parcels	0.23321692645549774
+3	variance_mc	All Parcels	0.26452234879136083
+3	variance_mc	All Parcels	0.37608076333999635
+3	variance_mc	All Parcels	0.3587111231684685
+3	variance_mc	All Parcels	0.17349836230278015
+3	variance_mc	All Parcels	0.26043520629405975
+3	variance_mc	All Parcels	0.3865184989571571
+3	variance_mc	All Parcels	0.22883656829595567
+3	variance_mc	All Parcels	0.3072852811217308
+3	variance_mc	All Parcels	0.3057177123427391
+3	variance_mc	All Parcels	0.2276950743794441
+3	variance_mc	All Parcels	0.315877768099308
+3	variance_mc	All Parcels	0.32122926592826845
+3	variance_mc	All Parcels	0.2756445336341858
+3	variance_mc	All Parcels	0.19571514904499054
+3	variance_mc	All Parcels	0.29778426736593244
+3	variance_mc	All Parcels	0.3124824702739716
+3	variance_mc	All Parcels	0.23617965161800383
+3	variance_mc	All Parcels	0.19072234466671945
+3	variance_mc	All Parcels	0.2641800823807716
+4	inverse_trace_mc	All Parcels	0.2838964223861694
+4	inverse_trace_mc	All Parcels	0.30343822956085204
+4	inverse_trace_mc	All Parcels	0.18563403472304343
+4	inverse_trace_mc	All Parcels	0.4030476438999176
+4	inverse_trace_mc	All Parcels	0.24554588735103608
+4	inverse_trace_mc	All Parcels	0.29584188789129257
+4	inverse_trace_mc	All Parcels	0.4058034825325012
+4	inverse_trace_mc	All Parcels	0.38689826607704164
+4	inverse_trace_mc	All Parcels	0.18152006104588508
+4	inverse_trace_mc	All Parcels	0.2848355346918106
+4	inverse_trace_mc	All Parcels	0.4290377652645111
+4	inverse_trace_mc	All Parcels	0.25685964912176135
+4	inverse_trace_mc	All Parcels	0.3227534818649292
+4	inverse_trace_mc	All Parcels	0.3207245880365372
+4	inverse_trace_mc	All Parcels	0.2603759363293648
+4	inverse_trace_mc	All Parcels	0.35411593288183213
+4	inverse_trace_mc	All Parcels	0.33336074382066727
+4	inverse_trace_mc	All Parcels	0.3208815896511078
+4	inverse_trace_mc	All Parcels	0.21095353618264198
+4	inverse_trace_mc	All Parcels	0.3298474723100662
+4	inverse_trace_mc	All Parcels	0.3453767701983452
+4	inverse_trace_mc	All Parcels	0.2511416056752205
+4	inverse_trace_mc	All Parcels	0.2202447122335434
+4	inverse_trace_mc	All Parcels	0.304499596953392
+4	log_det_mc	All Parcels	0.2837857639789581
+4	log_det_mc	All Parcels	0.3040233215689659
+4	log_det_mc	All Parcels	0.1849875858426094
+4	log_det_mc	All Parcels	0.4023760434985161
+4	log_det_mc	All Parcels	0.24467824026942253
+4	log_det_mc	All Parcels	0.2953323459625244
+4	log_det_mc	All Parcels	0.4044502913951874
+4	log_det_mc	All Parcels	0.3859121671319008
+4	log_det_mc	All Parcels	0.18218115583062172
+4	log_det_mc	All Parcels	0.2858822458982468
+4	log_det_mc	All Parcels	0.42953404277563095
+4	log_det_mc	All Parcels	0.2540715551376343
+4	log_det_mc	All Parcels	0.3236536434292793
+4	log_det_mc	All Parcels	0.3215368089079857
+4	log_det_mc	All Parcels	0.26187604829669
+4	log_det_mc	All Parcels	0.35346136420965196
+4	log_det_mc	All Parcels	0.3335957613587379
+4	log_det_mc	All Parcels	0.3209374925494194
+4	log_det_mc	All Parcels	0.2129932151734829
+4	log_det_mc	All Parcels	0.33019383758306503
+4	log_det_mc	All Parcels	0.34594094425439836
+4	log_det_mc	All Parcels	0.2527853128314018
+4	log_det_mc	All Parcels	0.22203446552157402
+4	log_det_mc	All Parcels	0.3033509221673012
+4	random	All Parcels	0.25559717655181885
+4	random	All Parcels	0.2730274248123169
+4	random	All Parcels	0.15839408196508883
+4	random	All Parcels	0.336884628534317
+4	random	All Parcels	0.21144283592700958
+4	random	All Parcels	0.2423521338403225
+4	random	All Parcels	0.33650230705738066
+4	random	All Parcels	0.33553523898124693
+4	random	All Parcels	0.1817169301211834
+4	random	All Parcels	0.24531358048319818
+4	random	All Parcels	0.3643379530310631
+4	random	All Parcels	0.19505657322704792
+4	random	All Parcels	0.24905653819441795
+4	random	All Parcels	0.25417869493365286
+4	random	All Parcels	0.21818283170461655
+4	random	All Parcels	0.3087629666924477
+4	random	All Parcels	0.3178493413329124
+4	random	All Parcels	0.2716869166493416
+4	random	All Parcels	0.19767282016575335
+4	random	All Parcels	0.27568008586764337
+4	random	All Parcels	0.283307938426733
+4	random	All Parcels	0.20385249257087706
+4	random	All Parcels	0.1566820751130581
+4	random	All Parcels	0.2524538525938988
+4	variance	All Parcels	0.2776633021235466
+4	variance	All Parcels	0.2986095708608627
+4	variance	All Parcels	0.17592265829443932
+4	variance	All Parcels	0.3686447408795357
+4	variance	All Parcels	0.24144255191087724
+4	variance	All Parcels	0.2764067485928535
+4	variance	All Parcels	0.3775952914357185
+4	variance	All Parcels	0.3655936712026596
+4	variance	All Parcels	0.17695482820272446
+4	variance	All Parcels	0.2705543565750122
+4	variance	All Parcels	0.39262102216482164
+4	variance	All Parcels	0.23037505879998207
+4	variance	All Parcels	0.30524226278066635
+4	variance	All Parcels	0.30750144124031065
+4	variance	All Parcels	0.23426490381360054
+4	variance	All Parcels	0.32361694872379304
+4	variance	All Parcels	0.33096639811992645
+4	variance	All Parcels	0.2938751637935638
+4	variance	All Parcels	0.199095249325037
+4	variance	All Parcels	0.31150982677936556
+4	variance	All Parcels	0.324077330827713
+4	variance	All Parcels	0.2409922021627426
+4	variance	All Parcels	0.19357476651668548
+4	variance	All Parcels	0.27781485378742216
+4	variance_mc	All Parcels	0.27187230825424197
+4	variance_mc	All Parcels	0.29360543251037596
+4	variance_mc	All Parcels	0.18201640561223031
+4	variance_mc	All Parcels	0.35768605798482894
+4	variance_mc	All Parcels	0.23627512097358705
+4	variance_mc	All Parcels	0.2807277101278305
+4	variance_mc	All Parcels	0.3824023216962814
+4	variance_mc	All Parcels	0.3602933144569397
+4	variance_mc	All Parcels	0.17998088628053666
+4	variance_mc	All Parcels	0.2573475041985512
+4	variance_mc	All Parcels	0.3936361488699913
+4	variance_mc	All Parcels	0.21864428177475928
+4	variance_mc	All Parcels	0.3024652421474457
+4	variance_mc	All Parcels	0.29634503558278086
+4	variance_mc	All Parcels	0.2255923356115818
+4	variance_mc	All Parcels	0.32765212148427963
+4	variance_mc	All Parcels	0.3219414541125298
+4	variance_mc	All Parcels	0.28968177556991576
+4	variance_mc	All Parcels	0.19775312900543213
+4	variance_mc	All Parcels	0.305539076924324
+4	variance_mc	All Parcels	0.3095111671090126
+4	variance_mc	All Parcels	0.2300359296798706
+4	variance_mc	All Parcels	0.1749587844312191
+4	variance_mc	All Parcels	0.2642818048596382
+5	inverse_trace_mc	All Parcels	0.28237471371889117
+5	inverse_trace_mc	All Parcels	0.29797731444239617
+5	inverse_trace_mc	All Parcels	0.17943152502179147
+5	inverse_trace_mc	All Parcels	0.403459686934948
+5	inverse_trace_mc	All Parcels	0.2451813177764416
+5	inverse_trace_mc	All Parcels	0.2949730986356735
+5	inverse_trace_mc	All Parcels	0.3923683208227158
+5	inverse_trace_mc	All Parcels	0.3769536045193672
+5	inverse_trace_mc	All Parcels	0.1815020491182804
+5	inverse_trace_mc	All Parcels	0.28578635036945343
+5	inverse_trace_mc	All Parcels	0.4226509940624237
+5	inverse_trace_mc	All Parcels	0.24772268563508987
+5	inverse_trace_mc	All Parcels	0.31715363085269926
+5	inverse_trace_mc	All Parcels	0.31484306752681734
+5	inverse_trace_mc	All Parcels	0.25748764410614966
+5	inverse_trace_mc	All Parcels	0.34791019827127456
+5	inverse_trace_mc	All Parcels	0.3434214287996292
+5	inverse_trace_mc	All Parcels	0.3257283753156662
+5	inverse_trace_mc	All Parcels	0.2126926961541176
+5	inverse_trace_mc	All Parcels	0.3341380497813225
+5	inverse_trace_mc	All Parcels	0.3371530315279961
+5	inverse_trace_mc	All Parcels	0.24232412427663802
+5	inverse_trace_mc	All Parcels	0.2071717669069767
+5	inverse_trace_mc	All Parcels	0.3065794011950493
+5	log_det_mc	All Parcels	0.2994139766693115
+5	log_det_mc	All Parcels	0.3103280794620514
+5	log_det_mc	All Parcels	0.1933872054517269
+5	log_det_mc	All Parcels	0.4196130031347275
+5	log_det_mc	All Parcels	0.2487001171708107
+5	log_det_mc	All Parcels	0.31195837318897246
+5	log_det_mc	All Parcels	0.4109553149342537
+5	log_det_mc	All Parcels	0.38214603930711744
+5	log_det_mc	All Parcels	0.17926142662763594
+5	log_det_mc	All Parcels	0.297919103205204
+5	log_det_mc	All Parcels	0.43732275038957596
+5	log_det_mc	All Parcels	0.2536573298275471
+5	log_det_mc	All Parcels	0.32485208839178087
+5	log_det_mc	All Parcels	0.3209179759025574
+5	log_det_mc	All Parcels	0.2592418394982815
+5	log_det_mc	All Parcels	0.36893566101789477
+5	log_det_mc	All Parcels	0.3473255208134651
+5	log_det_mc	All Parcels	0.3338874804973602
+5	log_det_mc	All Parcels	0.22299141228199004
+5	log_det_mc	All Parcels	0.3448759385943413
+5	log_det_mc	All Parcels	0.3451685833930969
+5	log_det_mc	All Parcels	0.25912735641002654
+5	log_det_mc	All Parcels	0.2147802548110485
+5	log_det_mc	All Parcels	0.3051439437270165
+5	random	All Parcels	0.2561422258615494
+5	random	All Parcels	0.27816553801298144
+5	random	All Parcels	0.1642018387466669
+5	random	All Parcels	0.34884388476610184
+5	random	All Parcels	0.2134020657837391
+5	random	All Parcels	0.2527517245709896
+5	random	All Parcels	0.3455217519402504
+5	random	All Parcels	0.34331534296274185
+5	random	All Parcels	0.17785602539777756
+5	random	All Parcels	0.2585862474143505
+5	random	All Parcels	0.37185468286275863
+5	random	All Parcels	0.20331008076667786
+5	random	All Parcels	0.2582047228515148
+5	random	All Parcels	0.2649986344575882
+5	random	All Parcels	0.2306785762310028
+5	random	All Parcels	0.3137245470285416
+5	random	All Parcels	0.31961872935295105
+5	random	All Parcels	0.28332861229777334
+5	random	All Parcels	0.19700034692883492
+5	random	All Parcels	0.28777567520737646
+5	random	All Parcels	0.2865635746717453
+5	random	All Parcels	0.21677547231316566
+5	random	All Parcels	0.16282628841698168
+5	random	All Parcels	0.2558338934183121
+5	variance	All Parcels	0.282572021484375
+5	variance	All Parcels	0.29833479434251786
+5	variance	All Parcels	0.1786145532131195
+5	variance	All Parcels	0.3811291432380676
+5	variance	All Parcels	0.24001042932271957
+5	variance	All Parcels	0.28564459636807443
+5	variance	All Parcels	0.38100229620933534
+5	variance	All Parcels	0.3725013491511345
+5	variance	All Parcels	0.1783048130571842
+5	variance	All Parcels	0.2749210226535797
+5	variance	All Parcels	0.4062230125069618
+5	variance	All Parcels	0.23423195049166678
+5	variance	All Parcels	0.3092804515361786
+5	variance	All Parcels	0.3103609809279442
+5	variance	All Parcels	0.24220216795802116
+5	variance	All Parcels	0.33836216270923614
+5	variance	All Parcels	0.3274658891558647
+5	variance	All Parcels	0.30024767309427264
+5	variance	All Parcels	0.205101398229599
+5	variance	All Parcels	0.3206128704547882
+5	variance	All Parcels	0.3308852156996727
+5	variance	All Parcels	0.24263666525483132
+5	variance	All Parcels	0.1982119509577751
+5	variance	All Parcels	0.2887517249584198
+5	variance_mc	All Parcels	0.2846620336174965
+5	variance_mc	All Parcels	0.3015021392703056
+5	variance_mc	All Parcels	0.18538231432437896
+5	variance_mc	All Parcels	0.37852794140577317
+5	variance_mc	All Parcels	0.2443170902132988
+5	variance_mc	All Parcels	0.2946419295668602
+5	variance_mc	All Parcels	0.3896987780928612
+5	variance_mc	All Parcels	0.3671495473384857
+5	variance_mc	All Parcels	0.17999681070446968
+5	variance_mc	All Parcels	0.2720703139901161
+5	variance_mc	All Parcels	0.40568667560815813
+5	variance_mc	All Parcels	0.2290877416729927
+5	variance_mc	All Parcels	0.3071362006664276
+5	variance_mc	All Parcels	0.30467636451125146
+5	variance_mc	All Parcels	0.2358549664914608
+5	variance_mc	All Parcels	0.34512203454971313
+5	variance_mc	All Parcels	0.33151682525873183
+5	variance_mc	All Parcels	0.30984817534685133
+5	variance_mc	All Parcels	0.20214257761836052
+5	variance_mc	All Parcels	0.3207618573307991
+5	variance_mc	All Parcels	0.3245804336667061
+5	variance_mc	All Parcels	0.24486619904637336
+5	variance_mc	All Parcels	0.18841088503599168
+5	variance_mc	All Parcels	0.2763569921255112
+6	inverse_trace_mc	All Parcels	0.2930730763077736
+6	inverse_trace_mc	All Parcels	0.3060111576318741
+6	inverse_trace_mc	All Parcels	0.17953059822320938
+6	inverse_trace_mc	All Parcels	0.41412832617759704
+6	inverse_trace_mc	All Parcels	0.2486047637462616
+6	inverse_trace_mc	All Parcels	0.3016288924217224
+6	inverse_trace_mc	All Parcels	0.391780661046505
+6	inverse_trace_mc	All Parcels	0.3800103607773781
+6	inverse_trace_mc	All Parcels	0.17953271582722663
+6	inverse_trace_mc	All Parcels	0.29705694794654847
+6	inverse_trace_mc	All Parcels	0.42478891372680666
+6	inverse_trace_mc	All Parcels	0.24980715572834014
+6	inverse_trace_mc	All Parcels	0.3128069925308228
+6	inverse_trace_mc	All Parcels	0.3166790720820427
+6	inverse_trace_mc	All Parcels	0.25776669040322303
+6	inverse_trace_mc	All Parcels	0.35535823613405226
+6	inverse_trace_mc	All Parcels	0.34214956670999525
+6	inverse_trace_mc	All Parcels	0.3435893979668617
+6	inverse_trace_mc	All Parcels	0.22010414510965348
+6	inverse_trace_mc	All Parcels	0.34326927065849305
+6	inverse_trace_mc	All Parcels	0.3375779864192009
+6	inverse_trace_mc	All Parcels	0.25233568593859673
+6	inverse_trace_mc	All Parcels	0.21751654386520386
+6	inverse_trace_mc	All Parcels	0.303640094101429
+6	log_det_mc	All Parcels	0.29300522834062576
+6	log_det_mc	All Parcels	0.3027085404098034
+6	log_det_mc	All Parcels	0.18118216156959532
+6	log_det_mc	All Parcels	0.41574374616146087
+6	log_det_mc	All Parcels	0.24829066470265387
+6	log_det_mc	All Parcels	0.3083394166827202
+6	log_det_mc	All Parcels	0.4008498737215996
+6	log_det_mc	All Parcels	0.37984120965003965
+6	log_det_mc	All Parcels	0.1789114524424076
+6	log_det_mc	All Parcels	0.2925963112711906
+6	log_det_mc	All Parcels	0.4286461383104324
+6	log_det_mc	All Parcels	0.25343778550624846
+6	log_det_mc	All Parcels	0.3138619142770767
+6	log_det_mc	All Parcels	0.31202322006225586
+6	log_det_mc	All Parcels	0.2567509330809116
+6	log_det_mc	All Parcels	0.35966208934783933
+6	log_det_mc	All Parcels	0.34074533700942994
+6	log_det_mc	All Parcels	0.3357087007164955
+6	log_det_mc	All Parcels	0.2159713889658451
+6	log_det_mc	All Parcels	0.34220350176095965
+6	log_det_mc	All Parcels	0.3389863893389702
+6	log_det_mc	All Parcels	0.251183415055275
+6	log_det_mc	All Parcels	0.20753318399190904
+6	log_det_mc	All Parcels	0.30561834543943406
+6	random	All Parcels	0.2606389915943146
+6	random	All Parcels	0.2809530456364155
+6	random	All Parcels	0.16355480760335922
+6	random	All Parcels	0.3575850170850754
+6	random	All Parcels	0.21748611435294152
+6	random	All Parcels	0.26398608207702634
+6	random	All Parcels	0.35264983981847764
+6	random	All Parcels	0.3462957388162613
+6	random	All Parcels	0.1811481659114361
+6	random	All Parcels	0.2613293345272541
+6	random	All Parcels	0.3765699028968811
+6	random	All Parcels	0.20421764358878136
+6	random	All Parcels	0.26305637329816817
+6	random	All Parcels	0.270284268707037
+6	random	All Parcels	0.22789740949869156
+6	random	All Parcels	0.3219048646092415
+6	random	All Parcels	0.3196177136898041
+6	random	All Parcels	0.2875144903361797
+6	random	All Parcels	0.19983945071697234
+6	random	All Parcels	0.295381098985672
+6	random	All Parcels	0.2941321715712547
+6	random	All Parcels	0.21263515770435334
+6	random	All Parcels	0.16545453928411008
+6	random	All Parcels	0.26429604306817056
+6	variance	All Parcels	0.2766586290299892
+6	variance	All Parcels	0.2925912019610405
+6	variance	All Parcels	0.17693354994058608
+6	variance	All Parcels	0.37572319090366363
+6	variance	All Parcels	0.23635687351226806
+6	variance	All Parcels	0.27760903105139734
+6	variance	All Parcels	0.37559431940317156
+6	variance	All Parcels	0.36767600387334826
+6	variance	All Parcels	0.17873025178909302
+6	variance	All Parcels	0.2712530954182148
+6	variance	All Parcels	0.40240859031677245
+6	variance	All Parcels	0.22760646373033525
+6	variance	All Parcels	0.2986088156700134
+6	variance	All Parcels	0.30479514122009277
+6	variance	All Parcels	0.23126544997096063
+6	variance	All Parcels	0.3356553801894188
+6	variance	All Parcels	0.32650637328624726
+6	variance	All Parcels	0.2968995177745819
+6	variance	All Parcels	0.20539074689149855
+6	variance	All Parcels	0.31608351826667785
+6	variance	All Parcels	0.32221401393413546
+6	variance	All Parcels	0.2329213635623455
+6	variance	All Parcels	0.18938223525881767
+6	variance	All Parcels	0.2862835042178631
+6	variance_mc	All Parcels	0.2945552571117878
+6	variance_mc	All Parcels	0.30842352032661435
+6	variance_mc	All Parcels	0.186575695425272
+6	variance_mc	All Parcels	0.39935403496026994
+6	variance_mc	All Parcels	0.24724985122680665
+6	variance_mc	All Parcels	0.30580084726214407
+6	variance_mc	All Parcels	0.40151818841695786
+6	variance_mc	All Parcels	0.37246099561452867
+6	variance_mc	All Parcels	0.1795657168328762
+6	variance_mc	All Parcels	0.28455426275730134
+6	variance_mc	All Parcels	0.41930806517601016
+6	variance_mc	All Parcels	0.23895455911755561
+6	variance_mc	All Parcels	0.3105368962883949
+6	variance_mc	All Parcels	0.30829384744167326
+6	variance_mc	All Parcels	0.2436181600391865
+6	variance_mc	All Parcels	0.36034595131874086
+6	variance_mc	All Parcels	0.34039361149072644
+6	variance_mc	All Parcels	0.32502383351325986
+6	variance_mc	All Parcels	0.21518233746290208
+6	variance_mc	All Parcels	0.33161203145980833
+6	variance_mc	All Parcels	0.33236883878707885
+6	variance_mc	All Parcels	0.24854397177696227
+6	variance_mc	All Parcels	0.19537768825888635
+6	variance_mc	All Parcels	0.2854652626812458
+7	inverse_trace_mc	All Parcels	0.2880438873171806
+7	inverse_trace_mc	All Parcels	0.3021769243478775
+7	inverse_trace_mc	All Parcels	0.1745319816470146
+7	inverse_trace_mc	All Parcels	0.4111350917816162
+7	inverse_trace_mc	All Parcels	0.24896018981933593
+7	inverse_trace_mc	All Parcels	0.30383737802505495
+7	inverse_trace_mc	All Parcels	0.3925527986884117
+7	inverse_trace_mc	All Parcels	0.3779232534766197
+7	inverse_trace_mc	All Parcels	0.17872014805674552
+7	inverse_trace_mc	All Parcels	0.29696483761072157
+7	inverse_trace_mc	All Parcels	0.42199758529663084
+7	inverse_trace_mc	All Parcels	0.2482323943078518
+7	inverse_trace_mc	All Parcels	0.30589577585458755
+7	inverse_trace_mc	All Parcels	0.30422993838787077
+7	inverse_trace_mc	All Parcels	0.2554036907851696
+7	inverse_trace_mc	All Parcels	0.3559528189897537
+7	inverse_trace_mc	All Parcels	0.3364026457071304
+7	inverse_trace_mc	All Parcels	0.339367947280407
+7	inverse_trace_mc	All Parcels	0.20879967585206033
+7	inverse_trace_mc	All Parcels	0.3358811953663826
+7	inverse_trace_mc	All Parcels	0.3255315986275673
+7	inverse_trace_mc	All Parcels	0.2543294720351696
+7	inverse_trace_mc	All Parcels	0.20764917477965356
+7	inverse_trace_mc	All Parcels	0.2937392172217369
+7	log_det_mc	All Parcels	0.29388105005025866
+7	log_det_mc	All Parcels	0.30382227405905726
+7	log_det_mc	All Parcels	0.17935099333524704
+7	log_det_mc	All Parcels	0.4158631694316864
+7	log_det_mc	All Parcels	0.251492061316967
+7	log_det_mc	All Parcels	0.31152486234903337
+7	log_det_mc	All Parcels	0.40198943704366685
+7	log_det_mc	All Parcels	0.3792031779885292
+7	log_det_mc	All Parcels	0.17908311769366264
+7	log_det_mc	All Parcels	0.2962957578897476
+7	log_det_mc	All Parcels	0.43018833428621295
+7	log_det_mc	All Parcels	0.25176747649908066
+7	log_det_mc	All Parcels	0.3161235049366951
+7	log_det_mc	All Parcels	0.3068353968858719
+7	log_det_mc	All Parcels	0.2560427474975586
+7	log_det_mc	All Parcels	0.3622339195013046
+7	log_det_mc	All Parcels	0.3398257318139076
+7	log_det_mc	All Parcels	0.3423523861169815
+7	log_det_mc	All Parcels	0.2161269249022007
+7	log_det_mc	All Parcels	0.342403951883316
+7	log_det_mc	All Parcels	0.333929557800293
+7	log_det_mc	All Parcels	0.25491223692893983
+7	log_det_mc	All Parcels	0.20826751857995987
+7	log_det_mc	All Parcels	0.30165536344051364
+7	random	All Parcels	0.26123289272189143
+7	random	All Parcels	0.28176516756415365
+7	random	All Parcels	0.16272533118724822
+7	random	All Parcels	0.3562987798452377
+7	random	All Parcels	0.21811560571193694
+7	random	All Parcels	0.26432515010237695
+7	random	All Parcels	0.3547643029689789
+7	random	All Parcels	0.3454481938481331
+7	random	All Parcels	0.17685028716921805
+7	random	All Parcels	0.25989172950387
+7	random	All Parcels	0.37753694534301757
+7	random	All Parcels	0.2030052937567234
+7	random	All Parcels	0.2574540373682976
+7	random	All Parcels	0.2642437581717968
+7	random	All Parcels	0.22145818531513214
+7	random	All Parcels	0.32497576355934144
+7	random	All Parcels	0.318032151311636
+7	random	All Parcels	0.28479615956544874
+7	random	All Parcels	0.20159752205014228
+7	random	All Parcels	0.2976475170254707
+7	random	All Parcels	0.29142496719956396
+7	random	All Parcels	0.21492170237004757
+7	random	All Parcels	0.15563460402190685
+7	random	All Parcels	0.26018028914928437
+7	variance	All Parcels	0.27741566494107245
+7	variance	All Parcels	0.2921441632509232
+7	variance	All Parcels	0.17496648907661438
+7	variance	All Parcels	0.37864307433366773
+7	variance	All Parcels	0.23504723265767097
+7	variance	All Parcels	0.2795226801931858
+7	variance	All Parcels	0.3793444871902466
+7	variance	All Parcels	0.36750697195529936
+7	variance	All Parcels	0.17597113117575647
+7	variance	All Parcels	0.27181886389851573
+7	variance	All Parcels	0.4043653243780136
+7	variance	All Parcels	0.22407466694712638
+7	variance	All Parcels	0.29996016100049017
+7	variance	All Parcels	0.30164277404546735
+7	variance	All Parcels	0.2309276369214058
+7	variance	All Parcels	0.3385595574975014
+7	variance	All Parcels	0.32123894155025484
+7	variance	All Parcels	0.2980938613414764
+7	variance	All Parcels	0.209737229347229
+7	variance	All Parcels	0.31485548049211504
+7	variance	All Parcels	0.3214766493439674
+7	variance	All Parcels	0.2297476327419281
+7	variance	All Parcels	0.18486914679408073
+7	variance	All Parcels	0.2875118225812912
+7	variance_mc	All Parcels	0.2946620348095894
+7	variance_mc	All Parcels	0.3030091066658497
+7	variance_mc	All Parcels	0.18561533942818642
+7	variance_mc	All Parcels	0.39998657047748565
+7	variance_mc	All Parcels	0.24640225008130073
+7	variance_mc	All Parcels	0.3078900121152401
+7	variance_mc	All Parcels	0.4016623115539551
+7	variance_mc	All Parcels	0.3704428195953369
+7	variance_mc	All Parcels	0.1780319841206074
+7	variance_mc	All Parcels	0.28393768072128295
+7	variance_mc	All Parcels	0.42093796372413633
+7	variance_mc	All Parcels	0.23270196974277496
+7	variance_mc	All Parcels	0.3063869333267212
+7	variance_mc	All Parcels	0.3052196188271046
+7	variance_mc	All Parcels	0.24314724236726762
+7	variance_mc	All Parcels	0.3624409976601601
+7	variance_mc	All Parcels	0.33645439565181734
+7	variance_mc	All Parcels	0.32566249430179595
+7	variance_mc	All Parcels	0.2141984061896801
+7	variance_mc	All Parcels	0.3342436441779137
+7	variance_mc	All Parcels	0.3301501289010048
+7	variance_mc	All Parcels	0.24167696326971055
+7	variance_mc	All Parcels	0.19267834231257439
+7	variance_mc	All Parcels	0.28466294690966604
+8	inverse_trace_mc	All Parcels	0.2927964517474175
+8	inverse_trace_mc	All Parcels	0.3059032365679741
+8	inverse_trace_mc	All Parcels	0.17766477167606354
+8	inverse_trace_mc	All Parcels	0.41625311195850373
+8	inverse_trace_mc	All Parcels	0.2520014932751656
+8	inverse_trace_mc	All Parcels	0.3106601122021675
+8	inverse_trace_mc	All Parcels	0.40079697251319885
+8	inverse_trace_mc	All Parcels	0.38123356699943545
+8	inverse_trace_mc	All Parcels	0.17968613132834435
+8	inverse_trace_mc	All Parcels	0.3009385946393013
+8	inverse_trace_mc	All Parcels	0.4262182605266571
+8	inverse_trace_mc	All Parcels	0.24973144978284836
+8	inverse_trace_mc	All Parcels	0.3057543683052063
+8	inverse_trace_mc	All Parcels	0.3053128911554813
+8	inverse_trace_mc	All Parcels	0.25683059096336364
+8	inverse_trace_mc	All Parcels	0.36336309015750884
+8	inverse_trace_mc	All Parcels	0.3386275717616081
+8	inverse_trace_mc	All Parcels	0.3421122711896896
+8	inverse_trace_mc	All Parcels	0.215620479285717
+8	inverse_trace_mc	All Parcels	0.3392844295501709
+8	inverse_trace_mc	All Parcels	0.3303196284174919
+8	inverse_trace_mc	All Parcels	0.259297409504652
+8	inverse_trace_mc	All Parcels	0.20709038630127907
+8	inverse_trace_mc	All Parcels	0.29641092896461485
+8	log_det_mc	All Parcels	0.29326808869838716
+8	log_det_mc	All Parcels	0.301962326169014
+8	log_det_mc	All Parcels	0.18123295933008193
+8	log_det_mc	All Parcels	0.4148815169930458
+8	log_det_mc	All Parcels	0.25213045701384545
+8	log_det_mc	All Parcels	0.31388852417469026
+8	log_det_mc	All Parcels	0.40185956716537474
+8	log_det_mc	All Parcels	0.3786680689454079
+8	log_det_mc	All Parcels	0.17902170598506928
+8	log_det_mc	All Parcels	0.3007316902279854
+8	log_det_mc	All Parcels	0.42944921284914017
+8	log_det_mc	All Parcels	0.25196134626865385
+8	log_det_mc	All Parcels	0.30886373192071914
+8	log_det_mc	All Parcels	0.31363830000162124
+8	log_det_mc	All Parcels	0.25658911287784575
+8	log_det_mc	All Parcels	0.3616559442877769
+8	log_det_mc	All Parcels	0.34170410722494127
+8	log_det_mc	All Parcels	0.34059853345155716
+8	log_det_mc	All Parcels	0.21769332855939866
+8	log_det_mc	All Parcels	0.33854801654815675
+8	log_det_mc	All Parcels	0.33461242496967314
+8	log_det_mc	All Parcels	0.25708134710788727
+8	log_det_mc	All Parcels	0.20701484724879265
+8	log_det_mc	All Parcels	0.3011056870222092
+8	random	All Parcels	0.2628204771876335
+8	random	All Parcels	0.2806652368605137
+8	random	All Parcels	0.1639537073671818
+8	random	All Parcels	0.3641946396231651
+8	random	All Parcels	0.22287467256188392
+8	random	All Parcels	0.26755403146147727
+8	random	All Parcels	0.3567861971259117
+8	random	All Parcels	0.3497088634967804
+8	random	All Parcels	0.17712791189551352
+8	random	All Parcels	0.2624085074663162
+8	random	All Parcels	0.38406768679618836
+8	random	All Parcels	0.20827261701226235
+8	random	All Parcels	0.2653342700004578
+8	random	All Parcels	0.26559940561652184
+8	random	All Parcels	0.230232302993536
+8	random	All Parcels	0.32931558072566985
+8	random	All Parcels	0.31559656739234926
+8	random	All Parcels	0.2917610959708691
+8	random	All Parcels	0.19959313973784445
+8	random	All Parcels	0.30081154212355615
+8	random	All Parcels	0.29502917900681497
+8	random	All Parcels	0.22115008786320686
+8	random	All Parcels	0.159311236217618
+8	random	All Parcels	0.2660967780649662
+8	variance	All Parcels	0.28129550129175185
+8	variance	All Parcels	0.29326960921287537
+8	variance	All Parcels	0.17705659180879593
+8	variance	All Parcels	0.38344533294439315
+8	variance	All Parcels	0.23815293356776238
+8	variance	All Parcels	0.2852620705962181
+8	variance	All Parcels	0.3789498853683472
+8	variance	All Parcels	0.37003674507141116
+8	variance	All Parcels	0.17833884164690972
+8	variance	All Parcels	0.2731544871628284
+8	variance	All Parcels	0.4089950689673424
+8	variance	All Parcels	0.22770480528473855
+8	variance	All Parcels	0.29913180232048037
+8	variance	All Parcels	0.29839799672365186
+8	variance	All Parcels	0.23212823480367661
+8	variance	All Parcels	0.3419543382525444
+8	variance	All Parcels	0.3223470827937126
+8	variance	All Parcels	0.30372522383928297
+8	variance	All Parcels	0.2069609272480011
+8	variance	All Parcels	0.320926051735878
+8	variance	All Parcels	0.3239445155858994
+8	variance	All Parcels	0.23260824635624885
+8	variance	All Parcels	0.18807780101895333
+8	variance	All Parcels	0.29054651081562044
+8	variance_mc	All Parcels	0.29041737407445906
+8	variance_mc	All Parcels	0.30374374449253083
+8	variance_mc	All Parcels	0.1830759048461914
+8	variance_mc	All Parcels	0.4032771036028862
+8	variance_mc	All Parcels	0.24961684897542
+8	variance_mc	All Parcels	0.3105186179280281
+8	variance_mc	All Parcels	0.403790268599987
+8	variance_mc	All Parcels	0.37424849957227707
+8	variance_mc	All Parcels	0.17782503187656404
+8	variance_mc	All Parcels	0.28849479675292966
+8	variance_mc	All Parcels	0.42239790588617326
+8	variance_mc	All Parcels	0.2372676183283329
+8	variance_mc	All Parcels	0.31051230102777483
+8	variance_mc	All Parcels	0.30524351000785827
+8	variance_mc	All Parcels	0.2432311362028122
+8	variance_mc	All Parcels	0.36428352415561677
+8	variance_mc	All Parcels	0.33764020055532457
+8	variance_mc	All Parcels	0.3286882707476616
+8	variance_mc	All Parcels	0.2138979034870863
+8	variance_mc	All Parcels	0.33699611335992813
+8	variance_mc	All Parcels	0.33044390112161637
+8	variance_mc	All Parcels	0.2444976057112217
+8	variance_mc	All Parcels	0.19269891664385796
+8	variance_mc	All Parcels	0.28971387520432473
+9	inverse_trace_mc	All Parcels	0.2851788085699081
+9	inverse_trace_mc	All Parcels	0.2922535713016987
+9	inverse_trace_mc	All Parcels	0.17417481511831284
+9	inverse_trace_mc	All Parcels	0.40300547659397123
+9	inverse_trace_mc	All Parcels	0.24589542627334596
+9	inverse_trace_mc	All Parcels	0.3030833512544632
+9	inverse_trace_mc	All Parcels	0.3866982212662697
+9	inverse_trace_mc	All Parcels	0.37178030133247375
+9	inverse_trace_mc	All Parcels	0.17664528027176857
+9	inverse_trace_mc	All Parcels	0.28869875997304917
+9	inverse_trace_mc	All Parcels	0.41905544757843016
+9	inverse_trace_mc	All Parcels	0.241471616178751
+9	inverse_trace_mc	All Parcels	0.2922379352152348
+9	inverse_trace_mc	All Parcels	0.2919610761106014
+9	inverse_trace_mc	All Parcels	0.25037505373358726
+9	inverse_trace_mc	All Parcels	0.3549419039487839
+9	inverse_trace_mc	All Parcels	0.32903003722429275
+9	inverse_trace_mc	All Parcels	0.3291061773896217
+9	inverse_trace_mc	All Parcels	0.20831548407673836
+9	inverse_trace_mc	All Parcels	0.32641479313373567
+9	inverse_trace_mc	All Parcels	0.31884450644254686
+9	inverse_trace_mc	All Parcels	0.25357384860515597
+9	inverse_trace_mc	All Parcels	0.19035120993852617
+9	inverse_trace_mc	All Parcels	0.2871294517815113
+9	log_det_mc	All Parcels	0.28917221367359164
+9	log_det_mc	All Parcels	0.2977978244423866
+9	log_det_mc	All Parcels	0.17782175049185753
+9	log_det_mc	All Parcels	0.4075493001937866
+9	log_det_mc	All Parcels	0.2500642342865467
+9	log_det_mc	All Parcels	0.3065279373526573
+9	log_det_mc	All Parcels	0.39594916373491285
+9	log_det_mc	All Parcels	0.3762591096758843
+9	log_det_mc	All Parcels	0.17822372451424598
+9	log_det_mc	All Parcels	0.2939573062956333
+9	log_det_mc	All Parcels	0.42635923326015474
+9	log_det_mc	All Parcels	0.2437923826277256
+9	log_det_mc	All Parcels	0.29920999735593795
+9	log_det_mc	All Parcels	0.30222039818763735
+9	log_det_mc	All Parcels	0.25239125356078146
+9	log_det_mc	All Parcels	0.3586685389280319
+9	log_det_mc	All Parcels	0.3341586402058601
+9	log_det_mc	All Parcels	0.33266399294137955
+9	log_det_mc	All Parcels	0.21038262136280536
+9	log_det_mc	All Parcels	0.3343547570705414
+9	log_det_mc	All Parcels	0.3314751461148262
+9	log_det_mc	All Parcels	0.2532818950712681
+9	log_det_mc	All Parcels	0.19281227841973306
+9	log_det_mc	All Parcels	0.29464470282197
+9	random	All Parcels	0.26155861139297487
+9	random	All Parcels	0.28094544872641564
+9	random	All Parcels	0.16195932075381278
+9	random	All Parcels	0.35956148147583006
+9	random	All Parcels	0.22313639521598816
+9	random	All Parcels	0.26792738199234006
+9	random	All Parcels	0.3559939903020859
+9	random	All Parcels	0.3467774909734726
+9	random	All Parcels	0.17775942146778106
+9	random	All Parcels	0.2616913414001465
+9	random	All Parcels	0.38058299362659453
+9	random	All Parcels	0.20446449249982834
+9	random	All Parcels	0.2626616595685482
+9	random	All Parcels	0.26366120219230654
+9	random	All Parcels	0.22492005959153175
+9	random	All Parcels	0.32862531661987304
+9	random	All Parcels	0.3116627760231495
+9	random	All Parcels	0.2910652346909046
+9	random	All Parcels	0.19674306750297546
+9	random	All Parcels	0.2955023303627968
+9	random	All Parcels	0.2938235738873482
+9	random	All Parcels	0.21314605504274367
+9	random	All Parcels	0.15550336189568043
+9	random	All Parcels	0.26419887036085127
+9	variance	All Parcels	0.269446829110384
+9	variance	All Parcels	0.286267676204443
+9	variance	All Parcels	0.17169899702072144
+9	variance	All Parcels	0.37552227765321733
+9	variance	All Parcels	0.23510993495583535
+9	variance	All Parcels	0.27767839282751083
+9	variance	All Parcels	0.3692458626627922
+9	variance	All Parcels	0.3626387646794319
+9	variance	All Parcels	0.17618678346276284
+9	variance	All Parcels	0.26383986994624137
+9	variance	All Parcels	0.39932835549116136
+9	variance	All Parcels	0.22026212438941
+9	variance	All Parcels	0.2851511262357235
+9	variance	All Parcels	0.29115271821618083
+9	variance	All Parcels	0.22909518867731093
+9	variance	All Parcels	0.33789813458919526
+9	variance	All Parcels	0.31962485760450365
+9	variance	All Parcels	0.2959568428993225
+9	variance	All Parcels	0.2050214946269989
+9	variance	All Parcels	0.311252289712429
+9	variance	All Parcels	0.31645644307136533
+9	variance	All Parcels	0.2247125366330147
+9	variance	All Parcels	0.17806313961744308
+9	variance	All Parcels	0.28224662140011786
+9	variance_mc	All Parcels	0.28863883659243583
+9	variance_mc	All Parcels	0.295411324352026
+9	variance_mc	All Parcels	0.17745388627052308
+9	variance_mc	All Parcels	0.3960787981748581
+9	variance_mc	All Parcels	0.24583077505230905
+9	variance_mc	All Parcels	0.30397741615772245
+9	variance_mc	All Parcels	0.3964106771349907
+9	variance_mc	All Parcels	0.36921213418245313
+9	variance_mc	All Parcels	0.1773872794210911
+9	variance_mc	All Parcels	0.28335399836301806
+9	variance_mc	All Parcels	0.4156963327527046
+9	variance_mc	All Parcels	0.23166123002767564
+9	variance_mc	All Parcels	0.30013820335268976
+9	variance_mc	All Parcels	0.30044989570975306
+9	variance_mc	All Parcels	0.23800358280539513
+9	variance_mc	All Parcels	0.3591945514082909
+9	variance_mc	All Parcels	0.33102888107299805
+9	variance_mc	All Parcels	0.3240390720963478
+9	variance_mc	All Parcels	0.21161943882703782
+9	variance_mc	All Parcels	0.32952922731637957
+9	variance_mc	All Parcels	0.32491024196147916
+9	variance_mc	All Parcels	0.24380171775817872
+9	variance_mc	All Parcels	0.1865031573176384
+9	variance_mc	All Parcels	0.2845628958940506
+10	inverse_trace_mc	All Parcels	0.28405691862106325
+10	inverse_trace_mc	All Parcels	0.2929344798624516
+10	inverse_trace_mc	All Parcels	0.17432139605283736
+10	inverse_trace_mc	All Parcels	0.40326532334089277
+10	inverse_trace_mc	All Parcels	0.24700516790151597
+10	inverse_trace_mc	All Parcels	0.3023909577727318
+10	inverse_trace_mc	All Parcels	0.3888619309663773
+10	inverse_trace_mc	All Parcels	0.3735664501786232
+10	inverse_trace_mc	All Parcels	0.1763000974059105
+10	inverse_trace_mc	All Parcels	0.29081312611699106
+10	inverse_trace_mc	All Parcels	0.4194957798719406
+10	inverse_trace_mc	All Parcels	0.236893417686224
+10	inverse_trace_mc	All Parcels	0.2912048752605915
+10	inverse_trace_mc	All Parcels	0.29562834933400156
+10	inverse_trace_mc	All Parcels	0.24708061501383782
+10	inverse_trace_mc	All Parcels	0.35630349278450013
+10	inverse_trace_mc	All Parcels	0.33005574107170105
+10	inverse_trace_mc	All Parcels	0.3270468133687973
+10	inverse_trace_mc	All Parcels	0.20937592163681984
+10	inverse_trace_mc	All Parcels	0.32587623536586763
+10	inverse_trace_mc	All Parcels	0.32068476229906084
+10	inverse_trace_mc	All Parcels	0.2549384409189224
+10	inverse_trace_mc	All Parcels	0.18754707247018815
+10	inverse_trace_mc	All Parcels	0.2871920350193977
+10	log_det_mc	All Parcels	0.28731881082057953
+10	log_det_mc	All Parcels	0.2957800853252411
+10	log_det_mc	All Parcels	0.17592412874102592
+10	log_det_mc	All Parcels	0.404268479347229
+10	log_det_mc	All Parcels	0.24741157859563828
+10	log_det_mc	All Parcels	0.30524566531181335
+10	log_det_mc	All Parcels	0.38907856613397596
+10	log_det_mc	All Parcels	0.3720999637246132
+10	log_det_mc	All Parcels	0.17750561118125915
+10	log_det_mc	All Parcels	0.2894579224288464
+10	log_det_mc	All Parcels	0.42062427192926405
+10	log_det_mc	All Parcels	0.238262557387352
+10	log_det_mc	All Parcels	0.29559101834893226
+10	log_det_mc	All Parcels	0.29521431401371956
+10	log_det_mc	All Parcels	0.2492164708673954
+10	log_det_mc	All Parcels	0.3580712750554085
+10	log_det_mc	All Parcels	0.32906253963708876
+10	log_det_mc	All Parcels	0.3312023013830185
+10	log_det_mc	All Parcels	0.2149209676682949
+10	log_det_mc	All Parcels	0.3273754820227623
+10	log_det_mc	All Parcels	0.32663613468408587
+10	log_det_mc	All Parcels	0.25349703833460807
+10	log_det_mc	All Parcels	0.19263786226511
+10	log_det_mc	All Parcels	0.2879171696305275
+10	random	All Parcels	0.258343505859375
+10	random	All Parcels	0.27235599905252456
+10	random	All Parcels	0.16116988398134707
+10	random	All Parcels	0.3582886180281639
+10	random	All Parcels	0.220190407037735
+10	random	All Parcels	0.26772239193320274
+10	random	All Parcels	0.35548209726810454
+10	random	All Parcels	0.34708537817001345
+10	random	All Parcels	0.17551366448402406
+10	random	All Parcels	0.2587967918813229
+10	random	All Parcels	0.37761539041996
+10	random	All Parcels	0.20153063923120498
+10	random	All Parcels	0.255842300504446
+10	random	All Parcels	0.2600655378401279
+10	random	All Parcels	0.2247557020187378
+10	random	All Parcels	0.32758798599243166
+10	random	All Parcels	0.3061555825173855
+10	random	All Parcels	0.28709434524178506
+10	random	All Parcels	0.19751848489046098
+10	random	All Parcels	0.2954417824745178
+10	random	All Parcels	0.29259675577282906
+10	random	All Parcels	0.21731971845030784
+10	random	All Parcels	0.15437063865363598
+10	random	All Parcels	0.2620905292034149
+10	variance	All Parcels	0.2747109438478947
+10	variance	All Parcels	0.2878427278995514
+10	variance	All Parcels	0.17123062938451766
+10	variance	All Parcels	0.37773522078990934
+10	variance	All Parcels	0.2372133632004261
+10	variance	All Parcels	0.28380506843328474
+10	variance	All Parcels	0.3726935389637947
+10	variance	All Parcels	0.3642930880188942
+10	variance	All Parcels	0.17322462305426597
+10	variance	All Parcels	0.2705133821070194
+10	variance	All Parcels	0.40298388749361036
+10	variance	All Parcels	0.22142108529806137
+10	variance	All Parcels	0.28931565657258035
+10	variance	All Parcels	0.2896894533932209
+10	variance	All Parcels	0.2318309073150158
+10	variance	All Parcels	0.33947870969772337
+10	variance	All Parcels	0.32037232011556627
+10	variance	All Parcels	0.3006595402956009
+10	variance	All Parcels	0.20785709753632545
+10	variance	All Parcels	0.3141624629497528
+10	variance	All Parcels	0.31572154253721235
+10	variance	All Parcels	0.23000816538929938
+10	variance	All Parcels	0.1812292967736721
+10	variance	All Parcels	0.2836672009527683
+10	variance_mc	All Parcels	0.28536869019269945
+10	variance_mc	All Parcels	0.29028870359063147
+10	variance_mc	All Parcels	0.17826128363609314
+10	variance_mc	All Parcels	0.3958950233459473
+10	variance_mc	All Parcels	0.2444809630513191
+10	variance_mc	All Parcels	0.29860411703586576
+10	variance_mc	All Parcels	0.3917504444718361
+10	variance_mc	All Parcels	0.36752905786037443
+10	variance_mc	All Parcels	0.17598555594682694
+10	variance_mc	All Parcels	0.2827297224104404
+10	variance_mc	All Parcels	0.4156688588857651
+10	variance_mc	All Parcels	0.23193621575832368
+10	variance_mc	All Parcels	0.3028057524561882
+10	variance_mc	All Parcels	0.2992598186433315
+10	variance_mc	All Parcels	0.23333382457494736
+10	variance_mc	All Parcels	0.3598691985011101
+10	variance_mc	All Parcels	0.32757869124412536
+10	variance_mc	All Parcels	0.32148948311805725
+10	variance_mc	All Parcels	0.21436292052268982
+10	variance_mc	All Parcels	0.3299137967824936
+10	variance_mc	All Parcels	0.3228293678164482
+10	variance_mc	All Parcels	0.24011223182082175
+10	variance_mc	All Parcels	0.18484320506453514
+10	variance_mc	All Parcels	0.2848371364176273
+11	inverse_trace_mc	All Parcels	0.2854889839887619
+11	inverse_trace_mc	All Parcels	0.29316835224628446
+11	inverse_trace_mc	All Parcels	0.1736929313838482
+11	inverse_trace_mc	All Parcels	0.3985499608516693
+11	inverse_trace_mc	All Parcels	0.24695455849170686
+11	inverse_trace_mc	All Parcels	0.3008701941370964
+11	inverse_trace_mc	All Parcels	0.38608586937189104
+11	inverse_trace_mc	All Parcels	0.3696701085567474
+11	inverse_trace_mc	All Parcels	0.17268541425466538
+11	inverse_trace_mc	All Parcels	0.2839184169471264
+11	inverse_trace_mc	All Parcels	0.4152561667561531
+11	inverse_trace_mc	All Parcels	0.23403725579380988
+11	inverse_trace_mc	All Parcels	0.289916150867939
+11	inverse_trace_mc	All Parcels	0.288627572953701
+11	inverse_trace_mc	All Parcels	0.24179776266217232
+11	inverse_trace_mc	All Parcels	0.35362098038196565
+11	inverse_trace_mc	All Parcels	0.32272336035966875
+11	inverse_trace_mc	All Parcels	0.3249630329012871
+11	inverse_trace_mc	All Parcels	0.20675616949796677
+11	inverse_trace_mc	All Parcels	0.32371520906686785
+11	inverse_trace_mc	All Parcels	0.31861075296998026
+11	inverse_trace_mc	All Parcels	0.2525271798670292
+11	inverse_trace_mc	All Parcels	0.1812320339679718
+11	inverse_trace_mc	All Parcels	0.2828832197189331
+11	log_det_mc	All Parcels	0.2846092721819878
+11	log_det_mc	All Parcels	0.29121730998158457
+11	log_det_mc	All Parcels	0.17649924680590628
+11	log_det_mc	All Parcels	0.3987905269861221
+11	log_det_mc	All Parcels	0.2439245502650738
+11	log_det_mc	All Parcels	0.30468122065067293
+11	log_det_mc	All Parcels	0.38808665484189986
+11	log_det_mc	All Parcels	0.36775926768779754
+11	log_det_mc	All Parcels	0.17355317652225494
+11	log_det_mc	All Parcels	0.2854364559054375
+11	log_det_mc	All Parcels	0.4185749211907387
+11	log_det_mc	All Parcels	0.23407071098685264
+11	log_det_mc	All Parcels	0.2887170647084713
+11	log_det_mc	All Parcels	0.28959644243121146
+11	log_det_mc	All Parcels	0.24379375115036964
+11	log_det_mc	All Parcels	0.3546590676903725
+11	log_det_mc	All Parcels	0.3270801857113838
+11	log_det_mc	All Parcels	0.3260281780362129
+11	log_det_mc	All Parcels	0.204928280711174
+11	log_det_mc	All Parcels	0.3250628358125687
+11	log_det_mc	All Parcels	0.3196080505847931
+11	log_det_mc	All Parcels	0.2480061335861683
+11	log_det_mc	All Parcels	0.1828191451728344
+11	log_det_mc	All Parcels	0.284571675658226
+11	random	All Parcels	0.2587504425644875
+11	random	All Parcels	0.2717197862267494
+11	random	All Parcels	0.1593018800765276
+11	random	All Parcels	0.3602041813731194
+11	random	All Parcels	0.21894317358732224
+11	random	All Parcels	0.2717415115237236
+11	random	All Parcels	0.358057946562767
+11	random	All Parcels	0.3461875879764557
+11	random	All Parcels	0.17750312104821206
+11	random	All Parcels	0.2589713133871555
+11	random	All Parcels	0.3791689756512642
+11	random	All Parcels	0.20413998499512673
+11	random	All Parcels	0.25695829078555105
+11	random	All Parcels	0.2614676196873188
+11	random	All Parcels	0.224914278537035
+11	random	All Parcels	0.3280224162340164
+11	random	All Parcels	0.3088105717301369
+11	random	All Parcels	0.29025195360183714
+11	random	All Parcels	0.19763358987867832
+11	random	All Parcels	0.2944759947061539
+11	random	All Parcels	0.29386914014816284
+11	random	All Parcels	0.21465151533484458
+11	random	All Parcels	0.15177903726696967
+11	random	All Parcels	0.26165021434426305
+11	variance	All Parcels	0.2722958379983902
+11	variance	All Parcels	0.2819182114303112
+11	variance	All Parcels	0.16804909229278564
+11	variance	All Parcels	0.3741929143667221
+11	variance	All Parcels	0.2330083504319191
+11	variance	All Parcels	0.28048770755529406
+11	variance	All Parcels	0.3689843156933785
+11	variance	All Parcels	0.3610285797715187
+11	variance	All Parcels	0.17749800115823747
+11	variance	All Parcels	0.26429231852293017
+11	variance	All Parcels	0.39922285556793213
+11	variance	All Parcels	0.21661337986588478
+11	variance	All Parcels	0.282414194047451
+11	variance	All Parcels	0.28583544105291364
+11	variance	All Parcels	0.22592221558094025
+11	variance	All Parcels	0.33834137946367265
+11	variance	All Parcels	0.3156535768508911
+11	variance	All Parcels	0.2966078197956085
+11	variance	All Parcels	0.20421660482883452
+11	variance	All Parcels	0.3100093001127243
+11	variance	All Parcels	0.31384061366319654
+11	variance	All Parcels	0.2248232454061508
+11	variance	All Parcels	0.17210786581039428
+11	variance	All Parcels	0.2820171235501766
+11	variance_mc	All Parcels	0.2849402877688408
+11	variance_mc	All Parcels	0.28512020125985144
+11	variance_mc	All Parcels	0.17383801072835922
+11	variance_mc	All Parcels	0.3907355904579163
+11	variance_mc	All Parcels	0.24174053087830544
+11	variance_mc	All Parcels	0.2993954598903656
+11	variance_mc	All Parcels	0.3887341970205307
+11	variance_mc	All Parcels	0.3639281004667282
+11	variance_mc	All Parcels	0.17742842063307762
+11	variance_mc	All Parcels	0.27650138929486273
+11	variance_mc	All Parcels	0.4089884346723556
+11	variance_mc	All Parcels	0.22289592579007148
+11	variance_mc	All Parcels	0.2953572769463062
+11	variance_mc	All Parcels	0.2881728458404541
+11	variance_mc	All Parcels	0.23142341166734695
+11	variance_mc	All Parcels	0.3551598024368286
+11	variance_mc	All Parcels	0.3263006049394608
+11	variance_mc	All Parcels	0.31488974213600157
+11	variance_mc	All Parcels	0.2103631967306137
+11	variance_mc	All Parcels	0.32367669224739076
+11	variance_mc	All Parcels	0.3189614662528038
+11	variance_mc	All Parcels	0.2344293136894703
+11	variance_mc	All Parcels	0.1793972969055176
+11	variance_mc	All Parcels	0.2830284722149372
+12	inverse_trace_mc	All Parcels	0.2808779416978359
+12	inverse_trace_mc	All Parcels	0.29000885009765626
+12	inverse_trace_mc	All Parcels	0.17297992780804633
+12	inverse_trace_mc	All Parcels	0.3943473115563393
+12	inverse_trace_mc	All Parcels	0.24304169401526451
+12	inverse_trace_mc	All Parcels	0.2989319610595703
+12	inverse_trace_mc	All Parcels	0.38253086775541306
+12	inverse_trace_mc	All Parcels	0.36640315294265746
+12	inverse_trace_mc	All Parcels	0.17662010982632637
+12	inverse_trace_mc	All Parcels	0.2800447362661362
+12	inverse_trace_mc	All Parcels	0.40785997211933134
+12	inverse_trace_mc	All Parcels	0.22858176589012147
+12	inverse_trace_mc	All Parcels	0.2841251078248024
+12	inverse_trace_mc	All Parcels	0.2858654446899891
+12	inverse_trace_mc	All Parcels	0.23858153373003005
+12	inverse_trace_mc	All Parcels	0.35333759158849715
+12	inverse_trace_mc	All Parcels	0.3192777326703072
+12	inverse_trace_mc	All Parcels	0.32006638288497924
+12	inverse_trace_mc	All Parcels	0.19959047555923462
+12	inverse_trace_mc	All Parcels	0.32000969231128695
+12	inverse_trace_mc	All Parcels	0.3160760462284088
+12	inverse_trace_mc	All Parcels	0.24521568417549133
+12	inverse_trace_mc	All Parcels	0.176568860411644
+12	inverse_trace_mc	All Parcels	0.27895067289471626
+12	log_det_mc	All Parcels	0.28358392283320427
+12	log_det_mc	All Parcels	0.2886313982307911
+12	log_det_mc	All Parcels	0.1736718626320362
+12	log_det_mc	All Parcels	0.397433947622776
+12	log_det_mc	All Parcels	0.2425520561635494
+12	log_det_mc	All Parcels	0.30116349309682844
+12	log_det_mc	All Parcels	0.3849367168545723
+12	log_det_mc	All Parcels	0.3685484278202057
+12	log_det_mc	All Parcels	0.17585479974746704
+12	log_det_mc	All Parcels	0.2854697695374489
+12	log_det_mc	All Parcels	0.413646939098835
+12	log_det_mc	All Parcels	0.23187823250889777
+12	log_det_mc	All Parcels	0.2916928289830685
+12	log_det_mc	All Parcels	0.28780500128865244
+12	log_det_mc	All Parcels	0.2396206295490265
+12	log_det_mc	All Parcels	0.3528681343793869
+12	log_det_mc	All Parcels	0.32408435463905333
+12	log_det_mc	All Parcels	0.3209106785058975
+12	log_det_mc	All Parcels	0.21141485199332238
+12	log_det_mc	All Parcels	0.32449068754911425
+12	log_det_mc	All Parcels	0.3180710509419441
+12	log_det_mc	All Parcels	0.2456174971163273
+12	log_det_mc	All Parcels	0.17817601829767227
+12	log_det_mc	All Parcels	0.27975193336606025
+12	random	All Parcels	0.2596079717576504
+12	random	All Parcels	0.2753261838853359
+12	random	All Parcels	0.16156173914670943
+12	random	All Parcels	0.3608807677030563
+12	random	All Parcels	0.22274054184556008
+12	random	All Parcels	0.27271450161933897
+12	random	All Parcels	0.36085631102323534
+12	random	All Parcels	0.3493058577179909
+12	random	All Parcels	0.17544618487358093
+12	random	All Parcels	0.2606563538312912
+12	random	All Parcels	0.37964633345603943
+12	random	All Parcels	0.20095205500721933
+12	random	All Parcels	0.2606876426935196
+12	random	All Parcels	0.262704221457243
+12	random	All Parcels	0.22536508917808531
+12	random	All Parcels	0.3306413182616234
+12	random	All Parcels	0.30684212401509287
+12	random	All Parcels	0.2914554192125797
+12	random	All Parcels	0.1967347577214241
+12	random	All Parcels	0.29955499470233915
+12	random	All Parcels	0.29373104840517045
+12	random	All Parcels	0.2224633627384901
+12	random	All Parcels	0.15374332964420317
+12	random	All Parcels	0.2626262781023979
+12	variance	All Parcels	0.2677157574892044
+12	variance	All Parcels	0.2780664061009884
+12	variance	All Parcels	0.16455848529934883
+12	variance	All Parcels	0.37184244751930234
+12	variance	All Parcels	0.23218336686491967
+12	variance	All Parcels	0.2782361124455929
+12	variance	All Parcels	0.36583917945623395
+12	variance	All Parcels	0.35840426087379457
+12	variance	All Parcels	0.1723090735077858
+12	variance	All Parcels	0.26180063918232915
+12	variance	All Parcels	0.3952395549416542
+12	variance	All Parcels	0.21517404809594154
+12	variance	All Parcels	0.28004442736506463
+12	variance	All Parcels	0.28069486275315286
+12	variance	All Parcels	0.22293680772185326
+12	variance	All Parcels	0.33827781558036807
+12	variance	All Parcels	0.3098278778791428
+12	variance	All Parcels	0.29499139457941054
+12	variance	All Parcels	0.20903005480766296
+12	variance	All Parcels	0.30755021661520004
+12	variance	All Parcels	0.31076107382774354
+12	variance	All Parcels	0.22481692492961883
+12	variance	All Parcels	0.1696117904037237
+12	variance	All Parcels	0.2774305552244186
+12	variance_mc	All Parcels	0.28524056196212766
+12	variance_mc	All Parcels	0.28729187324643135
+12	variance_mc	All Parcels	0.17195896074175834
+12	variance_mc	All Parcels	0.3908028081059456
+12	variance_mc	All Parcels	0.2439948733150959
+12	variance_mc	All Parcels	0.2964126464724541
+12	variance_mc	All Parcels	0.3897698777914047
+12	variance_mc	All Parcels	0.3650432097911835
+12	variance_mc	All Parcels	0.1763879443705082
+12	variance_mc	All Parcels	0.2774770177900791
+12	variance_mc	All Parcels	0.40981994837522506
+12	variance_mc	All Parcels	0.22294261083006858
+12	variance_mc	All Parcels	0.28900277510285377
+12	variance_mc	All Parcels	0.2920525178313255
+12	variance_mc	All Parcels	0.23225051254034043
+12	variance_mc	All Parcels	0.3570826962590218
+12	variance_mc	All Parcels	0.3228208181262016
+12	variance_mc	All Parcels	0.31476238489151
+12	variance_mc	All Parcels	0.21100619778037072
+12	variance_mc	All Parcels	0.32345829516649244
+12	variance_mc	All Parcels	0.317783545255661
+12	variance_mc	All Parcels	0.23597775593400003
+12	variance_mc	All Parcels	0.17597797214984895
+12	variance_mc	All Parcels	0.27922896698117255
+13	inverse_trace_mc	All Parcels	0.2740894292294979
+13	inverse_trace_mc	All Parcels	0.28753442466259005
+13	inverse_trace_mc	All Parcels	0.1718124634027481
+13	inverse_trace_mc	All Parcels	0.39435903131961825
+13	inverse_trace_mc	All Parcels	0.24108119130134584
+13	inverse_trace_mc	All Parcels	0.30132346361875534
+13	inverse_trace_mc	All Parcels	0.38034974098205565
+13	inverse_trace_mc	All Parcels	0.3670698615908623
+13	inverse_trace_mc	All Parcels	0.1744028440862894
+13	inverse_trace_mc	All Parcels	0.27947211742401123
+13	inverse_trace_mc	All Parcels	0.4104530745744705
+13	inverse_trace_mc	All Parcels	0.23152838304638862
+13	inverse_trace_mc	All Parcels	0.2854920597374439
+13	inverse_trace_mc	All Parcels	0.28122047752141954
+13	inverse_trace_mc	All Parcels	0.2402890832722187
+13	inverse_trace_mc	All Parcels	0.35369393825531004
+13	inverse_trace_mc	All Parcels	0.3193402659893036
+13	inverse_trace_mc	All Parcels	0.3193016240000725
+13	inverse_trace_mc	All Parcels	0.20172828570008278
+13	inverse_trace_mc	All Parcels	0.32135890543460843
+13	inverse_trace_mc	All Parcels	0.31371983259916303
+13	inverse_trace_mc	All Parcels	0.24108158081769943
+13	inverse_trace_mc	All Parcels	0.1739512787014246
+13	inverse_trace_mc	All Parcels	0.2781302098929882
+13	log_det_mc	All Parcels	0.28093084424734116
+13	log_det_mc	All Parcels	0.2869402803480625
+13	log_det_mc	All Parcels	0.17227748863399028
+13	log_det_mc	All Parcels	0.3958271047472954
+13	log_det_mc	All Parcels	0.24340000227093697
+13	log_det_mc	All Parcels	0.3034567365050316
+13	log_det_mc	All Parcels	0.3839359390735626
+13	log_det_mc	All Parcels	0.36769864708185196
+13	log_det_mc	All Parcels	0.17528929963707923
+13	log_det_mc	All Parcels	0.2849447920918465
+13	log_det_mc	All Parcels	0.41282358556985854
+13	log_det_mc	All Parcels	0.22882805675268172
+13	log_det_mc	All Parcels	0.29173981830477713
+13	log_det_mc	All Parcels	0.2854540120065212
+13	log_det_mc	All Parcels	0.2411099722981453
+13	log_det_mc	All Parcels	0.3533744263648987
+13	log_det_mc	All Parcels	0.3243518328666687
+13	log_det_mc	All Parcels	0.31971564412117004
+13	log_det_mc	All Parcels	0.2036862452328205
+13	log_det_mc	All Parcels	0.32127420485019687
+13	log_det_mc	All Parcels	0.31631985515356065
+13	log_det_mc	All Parcels	0.24003200232982635
+13	log_det_mc	All Parcels	0.17325110405683516
+13	log_det_mc	All Parcels	0.2808004952967167
+13	random	All Parcels	0.26006666079163554
+13	random	All Parcels	0.27277118697762487
+13	random	All Parcels	0.1591985472291708
+13	random	All Parcels	0.360895157456398
+13	random	All Parcels	0.22532711535692215
+13	random	All Parcels	0.26824811443686486
+13	random	All Parcels	0.357418931722641
+13	random	All Parcels	0.3484665617346764
+13	random	All Parcels	0.17473507657647133
+13	random	All Parcels	0.25886353209614754
+13	random	All Parcels	0.38091511398553846
+13	random	All Parcels	0.20272935897111893
+13	random	All Parcels	0.2610316263139248
+13	random	All Parcels	0.26381285563111306
+13	random	All Parcels	0.22551304668188096
+13	random	All Parcels	0.3262577599287033
+13	random	All Parcels	0.30012646928429604
+13	random	All Parcels	0.2917125660181046
+13	random	All Parcels	0.18653514713048935
+13	random	All Parcels	0.295571336299181
+13	random	All Parcels	0.2913586466014385
+13	random	All Parcels	0.2138225132226944
+13	random	All Parcels	0.15313214175403117
+13	random	All Parcels	0.2630744037032127
+13	variance	All Parcels	0.26633568346500397
+13	variance	All Parcels	0.2801636989414692
+13	variance	All Parcels	0.16693076878786087
+13	variance	All Parcels	0.3728685995936394
+13	variance	All Parcels	0.23158096864819527
+13	variance	All Parcels	0.2786380012333393
+13	variance	All Parcels	0.3677157598733902
+13	variance	All Parcels	0.3586408159136772
+13	variance	All Parcels	0.17525212056934833
+13	variance	All Parcels	0.26534866079688074
+13	variance	All Parcels	0.3955054396390915
+13	variance	All Parcels	0.21513665050268174
+13	variance	All Parcels	0.2789859661459923
+13	variance	All Parcels	0.27967250198125837
+13	variance	All Parcels	0.2278631016612053
+13	variance	All Parcels	0.3345320963859558
+13	variance	All Parcels	0.3160852587223053
+13	variance	All Parcels	0.2980568966269493
+13	variance	All Parcels	0.20259475484490394
+13	variance	All Parcels	0.3081580811738968
+13	variance	All Parcels	0.30931162789463995
+13	variance	All Parcels	0.2254772275686264
+13	variance	All Parcels	0.16976504899561407
+13	variance	All Parcels	0.27715049907565115
+13	variance_mc	All Parcels	0.2812135422229767
+13	variance_mc	All Parcels	0.28719466909766195
+13	variance_mc	All Parcels	0.17175935074687004
+13	variance_mc	All Parcels	0.39187319338321686
+13	variance_mc	All Parcels	0.23964833915233613
+13	variance_mc	All Parcels	0.2962874671816826
+13	variance_mc	All Parcels	0.39189776122570036
+13	variance_mc	All Parcels	0.3635445916652679
+13	variance_mc	All Parcels	0.17561644613742827
+13	variance_mc	All Parcels	0.2765529128909111
+13	variance_mc	All Parcels	0.4076765474677086
+13	variance_mc	All Parcels	0.225060408860445
+13	variance_mc	All Parcels	0.295742506980896
+13	variance_mc	All Parcels	0.29142736569046973
+13	variance_mc	All Parcels	0.2302243448793888
+13	variance_mc	All Parcels	0.3550540733337402
+13	variance_mc	All Parcels	0.32273663237690925
+13	variance_mc	All Parcels	0.31914773195981977
+13	variance_mc	All Parcels	0.2106101793050766
+13	variance_mc	All Parcels	0.3237211373448372
+13	variance_mc	All Parcels	0.3154292032122612
+13	variance_mc	All Parcels	0.23403674110770226
+13	variance_mc	All Parcels	0.18045803755521775
+13	variance_mc	All Parcels	0.2805893261730671
+14	inverse_trace_mc	All Parcels	0.2784154219925404
+14	inverse_trace_mc	All Parcels	0.2857644107937813
+14	inverse_trace_mc	All Parcels	0.17179825142025948
+14	inverse_trace_mc	All Parcels	0.39262481540441513
+14	inverse_trace_mc	All Parcels	0.24278051078319549
+14	inverse_trace_mc	All Parcels	0.29975195944309235
+14	inverse_trace_mc	All Parcels	0.38314154773950576
+14	inverse_trace_mc	All Parcels	0.36528509855270386
+14	inverse_trace_mc	All Parcels	0.1730878558754921
+14	inverse_trace_mc	All Parcels	0.2807500098645687
+14	inverse_trace_mc	All Parcels	0.4074377164244652
+14	inverse_trace_mc	All Parcels	0.23004864796996116
+14	inverse_trace_mc	All Parcels	0.2834569202363491
+14	inverse_trace_mc	All Parcels	0.28093659952282907
+14	inverse_trace_mc	All Parcels	0.23778592124581338
+14	inverse_trace_mc	All Parcels	0.3523282301425934
+14	inverse_trace_mc	All Parcels	0.319251235127449
+14	inverse_trace_mc	All Parcels	0.31832887411117555
+14	inverse_trace_mc	All Parcels	0.20472526788711548
+14	inverse_trace_mc	All Parcels	0.32059912502765653
+14	inverse_trace_mc	All Parcels	0.31184487760066987
+14	inverse_trace_mc	All Parcels	0.24369435101747514
+14	inverse_trace_mc	All Parcels	0.1707287011295557
+14	inverse_trace_mc	All Parcels	0.27719511464238167
+14	log_det_mc	All Parcels	0.2813133645057678
+14	log_det_mc	All Parcels	0.28515052154660225
+14	log_det_mc	All Parcels	0.17547382712364196
+14	log_det_mc	All Parcels	0.39340801745653153
+14	log_det_mc	All Parcels	0.2402544514834881
+14	log_det_mc	All Parcels	0.2998068454861641
+14	log_det_mc	All Parcels	0.3843218979239464
+14	log_det_mc	All Parcels	0.3687825572490692
+14	log_det_mc	All Parcels	0.1760036478936672
+14	log_det_mc	All Parcels	0.2792479635775089
+14	log_det_mc	All Parcels	0.4088392463326454
+14	log_det_mc	All Parcels	0.22698124930262564
+14	log_det_mc	All Parcels	0.28517488002777097
+14	log_det_mc	All Parcels	0.28705455735325813
+14	log_det_mc	All Parcels	0.23803273379802703
+14	log_det_mc	All Parcels	0.353814095556736
+14	log_det_mc	All Parcels	0.32137420535087585
+14	log_det_mc	All Parcels	0.31603264808654785
+14	log_det_mc	All Parcels	0.20648959174752235
+14	log_det_mc	All Parcels	0.3217987298965454
+14	log_det_mc	All Parcels	0.3143377175927162
+14	log_det_mc	All Parcels	0.24046694606542587
+14	log_det_mc	All Parcels	0.17658347927033902
+14	log_det_mc	All Parcels	0.2756016907095909
+14	random	All Parcels	0.2590400968492031
+14	random	All Parcels	0.273490000218153
+14	random	All Parcels	0.16115932695567609
+14	random	All Parcels	0.36154729276895525
+14	random	All Parcels	0.22317365065217018
+14	random	All Parcels	0.27340937361121176
+14	random	All Parcels	0.36098782360553744
+14	random	All Parcels	0.34794713884592054
+14	random	All Parcels	0.172928476780653
+14	random	All Parcels	0.2597824543714523
+14	random	All Parcels	0.3770775008201599
+14	random	All Parcels	0.20310364305973053
+14	random	All Parcels	0.25996328353881837
+14	random	All Parcels	0.26416002348065376
+14	random	All Parcels	0.22176256462931632
+14	random	All Parcels	0.32988962084054946
+14	random	All Parcels	0.3002540981769562
+14	random	All Parcels	0.2899224269390106
+14	random	All Parcels	0.1930755354464054
+14	random	All Parcels	0.2968975335359573
+14	random	All Parcels	0.2915331695973873
+14	random	All Parcels	0.2168780329823494
+14	random	All Parcels	0.15197744816541672
+14	random	All Parcels	0.26106167301535604
+14	variance	All Parcels	0.26400156036019323
+14	variance	All Parcels	0.27585141092538834
+14	variance	All Parcels	0.16516633450984955
+14	variance	All Parcels	0.3741150039434433
+14	variance	All Parcels	0.23669317558407785
+14	variance	All Parcels	0.2831791841983795
+14	variance	All Parcels	0.36683571577072144
+14	variance	All Parcels	0.3595571544766426
+14	variance	All Parcels	0.1740931123495102
+14	variance	All Parcels	0.2642459005117416
+14	variance	All Parcels	0.395434108376503
+14	variance	All Parcels	0.21707694113254547
+14	variance	All Parcels	0.27922975122928617
+14	variance	All Parcels	0.2784797795116901
+14	variance	All Parcels	0.22831260204315185
+14	variance	All Parcels	0.3343322783708572
+14	variance	All Parcels	0.3118735560774803
+14	variance	All Parcels	0.2990000641345978
+14	variance	All Parcels	0.20083802923560143
+14	variance	All Parcels	0.30913511842489244
+14	variance	All Parcels	0.3095222935080528
+14	variance	All Parcels	0.22446515753865243
+14	variance	All Parcels	0.16287502899765968
+14	variance	All Parcels	0.27580215454101564
+14	variance_mc	All Parcels	0.2845118170976639
+14	variance_mc	All Parcels	0.2880895717442036
+14	variance_mc	All Parcels	0.17455384910106658
+14	variance_mc	All Parcels	0.39107187747955324
+14	variance_mc	All Parcels	0.24346351221203805
+14	variance_mc	All Parcels	0.30091132909059526
+14	variance_mc	All Parcels	0.39087696582078935
+14	variance_mc	All Parcels	0.36471503734588623
+14	variance_mc	All Parcels	0.17491216465830803
+14	variance_mc	All Parcels	0.2798345170915127
+14	variance_mc	All Parcels	0.4090333807468414
+14	variance_mc	All Parcels	0.22495149299502373
+14	variance_mc	All Parcels	0.29005330577492716
+14	variance_mc	All Parcels	0.29321657478809354
+14	variance_mc	All Parcels	0.23075849130749704
+14	variance_mc	All Parcels	0.3594792321324348
+14	variance_mc	All Parcels	0.3234376239776611
+14	variance_mc	All Parcels	0.31695289015769956
+14	variance_mc	All Parcels	0.21074875131249426
+14	variance_mc	All Parcels	0.3241103383898735
+14	variance_mc	All Parcels	0.316854527592659
+14	variance_mc	All Parcels	0.23773774817585946
+14	variance_mc	All Parcels	0.177833261936903
+14	variance_mc	All Parcels	0.2786395671963692
+15	inverse_trace_mc	All Parcels	0.2736318799853325
+15	inverse_trace_mc	All Parcels	0.28384296610951426
+15	inverse_trace_mc	All Parcels	0.16956410214304923
+15	inverse_trace_mc	All Parcels	0.389207327067852
+15	inverse_trace_mc	All Parcels	0.238549412637949
+15	inverse_trace_mc	All Parcels	0.29790699392557146
+15	inverse_trace_mc	All Parcels	0.3835058000683784
+15	inverse_trace_mc	All Parcels	0.3642342135310173
+15	inverse_trace_mc	All Parcels	0.1727789284288883
+15	inverse_trace_mc	All Parcels	0.2776978749036789
+15	inverse_trace_mc	All Parcels	0.40506714820861817
+15	inverse_trace_mc	All Parcels	0.22588661909103394
+15	inverse_trace_mc	All Parcels	0.28197019174695015
+15	inverse_trace_mc	All Parcels	0.28120371714234355
+15	inverse_trace_mc	All Parcels	0.23287715569138526
+15	inverse_trace_mc	All Parcels	0.35272946029901503
+15	inverse_trace_mc	All Parcels	0.31917741656303406
+15	inverse_trace_mc	All Parcels	0.31368770271539687
+15	inverse_trace_mc	All Parcels	0.20499814435839653
+15	inverse_trace_mc	All Parcels	0.31720817774534227
+15	inverse_trace_mc	All Parcels	0.31046688079833984
+15	inverse_trace_mc	All Parcels	0.23939381048083305
+15	inverse_trace_mc	All Parcels	0.17248897932469845
+15	inverse_trace_mc	All Parcels	0.2735497497022152
+15	log_det_mc	All Parcels	0.27909183502197266
+15	log_det_mc	All Parcels	0.2812566789984703
+15	log_det_mc	All Parcels	0.1743430970609188
+15	log_det_mc	All Parcels	0.39090244501829147
+15	log_det_mc	All Parcels	0.24346869349479675
+15	log_det_mc	All Parcels	0.29969099804759025
+15	log_det_mc	All Parcels	0.38127215892076494
+15	log_det_mc	All Parcels	0.3645755925774574
+15	log_det_mc	All Parcels	0.17408269733190537
+15	log_det_mc	All Parcels	0.28025366201996804
+15	log_det_mc	All Parcels	0.4060045570135117
+15	log_det_mc	All Parcels	0.2252576717734337
+15	log_det_mc	All Parcels	0.28502127081155776
+15	log_det_mc	All Parcels	0.2853466661274433
+15	log_det_mc	All Parcels	0.23267310947179795
+15	log_det_mc	All Parcels	0.35275003671646116
+15	log_det_mc	All Parcels	0.3118518848717213
+15	log_det_mc	All Parcels	0.31626654028892515
+15	log_det_mc	All Parcels	0.2080371618270874
+15	log_det_mc	All Parcels	0.31664846271276476
+15	log_det_mc	All Parcels	0.31161086589097975
+15	log_det_mc	All Parcels	0.23950539097189905
+15	log_det_mc	All Parcels	0.17063027128577232
+15	log_det_mc	All Parcels	0.27659506544470785
+15	random	All Parcels	0.25986118242144585
+15	random	All Parcels	0.2711661809682846
+15	random	All Parcels	0.15991116382181644
+15	random	All Parcels	0.36185869842767715
+15	random	All Parcels	0.22490450486540794
+15	random	All Parcels	0.2721500727534294
+15	random	All Parcels	0.3590956342220306
+15	random	All Parcels	0.34895055294036864
+15	random	All Parcels	0.17202123284339904
+15	random	All Parcels	0.26103546619415285
+15	random	All Parcels	0.37943578243255616
+15	random	All Parcels	0.20338207677006723
+15	random	All Parcels	0.26057542249560356
+15	random	All Parcels	0.26178123474121096
+15	random	All Parcels	0.2220768566429615
+15	random	All Parcels	0.33008845686912536
+15	random	All Parcels	0.3007233802974224
+15	random	All Parcels	0.29101256012916565
+15	random	All Parcels	0.19342141717672348
+15	random	All Parcels	0.2952973958849907
+15	random	All Parcels	0.29273409619927404
+15	random	All Parcels	0.21981799393892287
+15	random	All Parcels	0.14998579248785973
+15	random	All Parcels	0.2627925270795822
+15	variance	All Parcels	0.26480578631162643
+15	variance	All Parcels	0.27481042355298996
+15	variance	All Parcels	0.16586952283978462
+15	variance	All Parcels	0.3717346313595772
+15	variance	All Parcels	0.23176196679472924
+15	variance	All Parcels	0.2771805912256241
+15	variance	All Parcels	0.36503799468278886
+15	variance	All Parcels	0.35641567438840865
+15	variance	All Parcels	0.1716599091887474
+15	variance	All Parcels	0.2623522563278675
+15	variance	All Parcels	0.39486900478601455
+15	variance	All Parcels	0.2139265063405037
+15	variance	All Parcels	0.2784230054914951
+15	variance	All Parcels	0.2762840983271599
+15	variance	All Parcels	0.2237844479084015
+15	variance	All Parcels	0.3345002460479736
+15	variance	All Parcels	0.30802075773477555
+15	variance	All Parcels	0.296405485868454
+15	variance	All Parcels	0.2025227789580822
+15	variance	All Parcels	0.306619755923748
+15	variance	All Parcels	0.30829573452472686
+15	variance	All Parcels	0.22227660804986954
+15	variance	All Parcels	0.16402694717049598
+15	variance	All Parcels	0.2742135959863663
+15	variance_mc	All Parcels	0.2795314222574234
+15	variance_mc	All Parcels	0.2868108604848385
+15	variance_mc	All Parcels	0.1729769876599312
+15	variance_mc	All Parcels	0.3905583596229553
+15	variance_mc	All Parcels	0.24157339721918106
+15	variance_mc	All Parcels	0.2974881243705749
+15	variance_mc	All Parcels	0.388933345079422
+15	variance_mc	All Parcels	0.3666689774394035
+15	variance_mc	All Parcels	0.17499980613589286
+15	variance_mc	All Parcels	0.2794105878472328
+15	variance_mc	All Parcels	0.4098986554145813
+15	variance_mc	All Parcels	0.22479107558727265
+15	variance_mc	All Parcels	0.29643800765275957
+15	variance_mc	All Parcels	0.2940159974992275
+15	variance_mc	All Parcels	0.2310814616084099
+15	variance_mc	All Parcels	0.357111319899559
+15	variance_mc	All Parcels	0.3231982323527336
+15	variance_mc	All Parcels	0.31626260697841646
+15	variance_mc	All Parcels	0.20954593926668166
+15	variance_mc	All Parcels	0.3244735550880432
+15	variance_mc	All Parcels	0.31781957417726514
+15	variance_mc	All Parcels	0.2326678991317749
+15	variance_mc	All Parcels	0.17458581998944284
+15	variance_mc	All Parcels	0.28022128239274025
+16	inverse_trace_mc	All Parcels	0.27324765264987944
+16	inverse_trace_mc	All Parcels	0.28010707676410673
+16	inverse_trace_mc	All Parcels	0.17069413781166076
+16	inverse_trace_mc	All Parcels	0.3891747707128525
+16	inverse_trace_mc	All Parcels	0.23902755826711655
+16	inverse_trace_mc	All Parcels	0.2962496492266655
+16	inverse_trace_mc	All Parcels	0.37837245464324953
+16	inverse_trace_mc	All Parcels	0.3628644394874573
+16	inverse_trace_mc	All Parcels	0.17510723941028117
+16	inverse_trace_mc	All Parcels	0.2760451854765415
+16	inverse_trace_mc	All Parcels	0.4021040239930153
+16	inverse_trace_mc	All Parcels	0.22135857328772546
+16	inverse_trace_mc	All Parcels	0.28238254979252814
+16	inverse_trace_mc	All Parcels	0.2809888359904289
+16	inverse_trace_mc	All Parcels	0.23189169481396676
+16	inverse_trace_mc	All Parcels	0.349530571103096
+16	inverse_trace_mc	All Parcels	0.3174799984693527
+16	inverse_trace_mc	All Parcels	0.31430946916341784
+16	inverse_trace_mc	All Parcels	0.2084817671775818
+16	inverse_trace_mc	All Parcels	0.3138310694694519
+16	inverse_trace_mc	All Parcels	0.30898583322763445
+16	inverse_trace_mc	All Parcels	0.2367309656739235
+16	inverse_trace_mc	All Parcels	0.17037270314991473
+16	inverse_trace_mc	All Parcels	0.27177356868982316
+16	log_det_mc	All Parcels	0.2781920993328095
+16	log_det_mc	All Parcels	0.2861989066004753
+16	log_det_mc	All Parcels	0.17302470073103904
+16	log_det_mc	All Parcels	0.390117347240448
+16	log_det_mc	All Parcels	0.24086504131555558
+16	log_det_mc	All Parcels	0.29847202748060225
+16	log_det_mc	All Parcels	0.3824671238660812
+16	log_det_mc	All Parcels	0.36374309301376345
+16	log_det_mc	All Parcels	0.17281265676021576
+16	log_det_mc	All Parcels	0.2799775859713554
+16	log_det_mc	All Parcels	0.40678125888109207
+16	log_det_mc	All Parcels	0.22659286841750145
+16	log_det_mc	All Parcels	0.2853453654050827
+16	log_det_mc	All Parcels	0.28511696591973307
+16	log_det_mc	All Parcels	0.2351573561131954
+16	log_det_mc	All Parcels	0.35155830591917037
+16	log_det_mc	All Parcels	0.3170440821349621
+16	log_det_mc	All Parcels	0.31670011013746263
+16	log_det_mc	All Parcels	0.20422321639955043
+16	log_det_mc	All Parcels	0.31705431401729584
+16	log_det_mc	All Parcels	0.3119596165418625
+16	log_det_mc	All Parcels	0.24127001583576202
+16	log_det_mc	All Parcels	0.17176929645240308
+16	log_det_mc	All Parcels	0.2754347337782383
+16	random	All Parcels	0.2596051768958569
+16	random	All Parcels	0.2741796478629112
+16	random	All Parcels	0.1607234477251768
+16	random	All Parcels	0.3644861003756523
+16	random	All Parcels	0.22517674818634986
+16	random	All Parcels	0.2736097599565983
+16	random	All Parcels	0.35670230865478514
+16	random	All Parcels	0.34837995022535323
+16	random	All Parcels	0.17244281217455865
+16	random	All Parcels	0.2583633454144001
+16	random	All Parcels	0.3800166893005371
+16	random	All Parcels	0.20608683794736862
+16	random	All Parcels	0.26129902973771096
+16	random	All Parcels	0.2597841116786003
+16	random	All Parcels	0.22140924632549286
+16	random	All Parcels	0.3318085491657257
+16	random	All Parcels	0.3039531236886978
+16	random	All Parcels	0.29209898591041566
+16	random	All Parcels	0.18787309013307094
+16	random	All Parcels	0.29599845841526984
+16	random	All Parcels	0.29431116551160813
+16	random	All Parcels	0.21760109990835189
+16	random	All Parcels	0.15079318068921566
+16	random	All Parcels	0.26130708172917366
+16	variance	All Parcels	0.26684564143419265
+16	variance	All Parcels	0.2790627755224705
+16	variance	All Parcels	0.16514051482081413
+16	variance	All Parcels	0.3768078735470772
+16	variance	All Parcels	0.23472711309790611
+16	variance	All Parcels	0.28333189472556114
+16	variance	All Parcels	0.3682145309448242
+16	variance	All Parcels	0.36005849480628965
+16	variance	All Parcels	0.17297605022788048
+16	variance	All Parcels	0.2655118604004383
+16	variance	All Parcels	0.3967653626203537
+16	variance	All Parcels	0.2166120770573616
+16	variance	All Parcels	0.2806611952185631
+16	variance	All Parcels	0.28372445598244667
+16	variance	All Parcels	0.22980647906661034
+16	variance	All Parcels	0.339519789814949
+16	variance	All Parcels	0.3122027450799942
+16	variance	All Parcels	0.30099780231714246
+16	variance	All Parcels	0.2020624740421772
+16	variance	All Parcels	0.3132911404967308
+16	variance	All Parcels	0.31095343351364135
+16	variance	All Parcels	0.22418234661221503
+16	variance	All Parcels	0.16576495215296747
+16	variance	All Parcels	0.27674306333065035
+16	variance_mc	All Parcels	0.2810755728185177
+16	variance_mc	All Parcels	0.28588221967220306
+16	variance_mc	All Parcels	0.1741685289889574
+16	variance_mc	All Parcels	0.39225146114826204
+16	variance_mc	All Parcels	0.2395908135175705
+16	variance_mc	All Parcels	0.2995443999767303
+16	variance_mc	All Parcels	0.38778636962175367
+16	variance_mc	All Parcels	0.3679472556710243
+16	variance_mc	All Parcels	0.17696678161621093
+16	variance_mc	All Parcels	0.278975925296545
+16	variance_mc	All Parcels	0.4081998535990715
+16	variance_mc	All Parcels	0.2252503016591072
+16	variance_mc	All Parcels	0.2937441509962082
+16	variance_mc	All Parcels	0.2865953941643238
+16	variance_mc	All Parcels	0.23131561383605004
+16	variance_mc	All Parcels	0.3558676612377167
+16	variance_mc	All Parcels	0.31831869155168535
+16	variance_mc	All Parcels	0.31735842615365983
+16	variance_mc	All Parcels	0.2052031399309635
+16	variance_mc	All Parcels	0.3249647316336632
+16	variance_mc	All Parcels	0.3152064642310142
+16	variance_mc	All Parcels	0.23628345087170602
+16	variance_mc	All Parcels	0.1747842302173376
+16	variance_mc	All Parcels	0.27749245256185534
+3	inverse_trace_mc	PFC	0.2360602581501007
+3	inverse_trace_mc	PFC	0.15318177483975887
+3	inverse_trace_mc	PFC	0.12241950318217278
+3	inverse_trace_mc	PFC	0.2722143389284611
+3	inverse_trace_mc	PFC	0.15526848554611206
+3	inverse_trace_mc	PFC	0.17712721467018128
+3	inverse_trace_mc	PFC	0.2773803427815437
+3	inverse_trace_mc	PFC	0.297171079814434
+3	inverse_trace_mc	PFC	0.2015182749927044
+3	inverse_trace_mc	PFC	0.20142755836248397
+3	inverse_trace_mc	PFC	0.3801774737238884
+3	inverse_trace_mc	PFC	0.12967688612639905
+3	inverse_trace_mc	PFC	0.2869960533082485
+3	inverse_trace_mc	PFC	0.24070365697145463
+3	inverse_trace_mc	PFC	0.16625386983156204
+3	inverse_trace_mc	PFC	0.23056759998202325
+3	inverse_trace_mc	PFC	0.2612214832007885
+3	inverse_trace_mc	PFC	0.2101423579454422
+3	inverse_trace_mc	PFC	0.16331249445676804
+3	inverse_trace_mc	PFC	0.22092792600393296
+3	inverse_trace_mc	PFC	0.17360159128904343
+3	inverse_trace_mc	PFC	0.16859349474310875
+3	inverse_trace_mc	PFC	0.12881572358310223
+3	inverse_trace_mc	PFC	0.20777384281158448
+3	log_det_mc	PFC	0.23298937425017358
+3	log_det_mc	PFC	0.19207519501447679
+3	log_det_mc	PFC	0.13619287684559822
+3	log_det_mc	PFC	0.2576474671065807
+3	log_det_mc	PFC	0.16293369352817536
+3	log_det_mc	PFC	0.20468676045536996
+3	log_det_mc	PFC	0.3456814375519752
+3	log_det_mc	PFC	0.31827360957860945
+3	log_det_mc	PFC	0.17148651123046876
+3	log_det_mc	PFC	0.19364321157336234
+3	log_det_mc	PFC	0.37895294308662414
+3	log_det_mc	PFC	0.14326150536537172
+3	log_det_mc	PFC	0.3000199136137962
+3	log_det_mc	PFC	0.25611770451068877
+3	log_det_mc	PFC	0.1472823528200388
+3	log_det_mc	PFC	0.2293263244628906
+3	log_det_mc	PFC	0.24690851762890817
+3	log_det_mc	PFC	0.20926536589860917
+3	log_det_mc	PFC	0.12852142192423344
+3	log_det_mc	PFC	0.20389846831560135
+3	log_det_mc	PFC	0.18368672892451288
+3	log_det_mc	PFC	0.1730663251876831
+3	log_det_mc	PFC	0.15622693359851836
+3	log_det_mc	PFC	0.19798247009515763
+3	random	PFC	0.2049140614271164
+3	random	PFC	0.13338278397917747
+3	random	PFC	0.09542807020246982
+3	random	PFC	0.20316109120845793
+3	random	PFC	0.12602266013622285
+3	random	PFC	0.1628737723082304
+3	random	PFC	0.2373746907711029
+3	random	PFC	0.25123042732477185
+3	random	PFC	0.17730917081236838
+3	random	PFC	0.15730660565197468
+3	random	PFC	0.3107323102653027
+3	random	PFC	0.06901749859331176
+3	random	PFC	0.20618899092078208
+3	random	PFC	0.17830534636974335
+3	random	PFC	0.1351405731216073
+3	random	PFC	0.17557331643998622
+3	random	PFC	0.22503252550959588
+3	random	PFC	0.1774681272357702
+3	random	PFC	0.09946454376913608
+3	random	PFC	0.16059689529240131
+3	random	PFC	0.13282208286225797
+3	random	PFC	0.122198636084795
+3	random	PFC	0.08231588821858167
+3	random	PFC	0.17533528938889503
+3	variance	PFC	0.22254936143755913
+3	variance	PFC	0.14429933696985245
+3	variance	PFC	0.11285164959728718
+3	variance	PFC	0.20684335142374038
+3	variance	PFC	0.13868025496602057
+3	variance	PFC	0.15781365633010863
+3	variance	PFC	0.2286139215528965
+3	variance	PFC	0.2593235522508621
+3	variance	PFC	0.21986307501792907
+3	variance	PFC	0.1574171605706215
+3	variance	PFC	0.3238526272773743
+3	variance	PFC	0.09467622108757495
+3	variance	PFC	0.25223017543554305
+3	variance	PFC	0.19247227996587754
+3	variance	PFC	0.1612043373286724
+3	variance	PFC	0.1800624893605709
+3	variance	PFC	0.21528818532824517
+3	variance	PFC	0.1424048797786236
+3	variance	PFC	0.10583967685699464
+3	variance	PFC	0.1595129771530628
+3	variance	PFC	0.13014993876218794
+3	variance	PFC	0.12345297671854497
+3	variance	PFC	0.10495139859616756
+3	variance	PFC	0.19703037440776824
+3	variance_mc	PFC	0.23300660863518716
+3	variance_mc	PFC	0.19056417778134346
+3	variance_mc	PFC	0.1367048913240433
+3	variance_mc	PFC	0.2575321345031261
+3	variance_mc	PFC	0.16417674198746682
+3	variance_mc	PFC	0.20450955554842948
+3	variance_mc	PFC	0.34606600016355515
+3	variance_mc	PFC	0.31766370207071304
+3	variance_mc	PFC	0.17145495221018792
+3	variance_mc	PFC	0.19447763457894326
+3	variance_mc	PFC	0.37845168977975846
+3	variance_mc	PFC	0.14292549043893815
+3	variance_mc	PFC	0.3012354975938797
+3	variance_mc	PFC	0.25576119795441626
+3	variance_mc	PFC	0.1484009563922882
+3	variance_mc	PFC	0.2291915675997734
+3	variance_mc	PFC	0.24486741155385972
+3	variance_mc	PFC	0.21092067033052445
+3	variance_mc	PFC	0.12572796545922757
+3	variance_mc	PFC	0.20307565689086915
+3	variance_mc	PFC	0.18318590134382248
+3	variance_mc	PFC	0.17470483645796775
+3	variance_mc	PFC	0.1584460009634495
+3	variance_mc	PFC	0.2009077773988247
+4	inverse_trace_mc	PFC	0.26879523128271104
+4	inverse_trace_mc	PFC	0.21876407772302628
+4	inverse_trace_mc	PFC	0.16271442160010338
+4	inverse_trace_mc	PFC	0.320183707177639
+4	inverse_trace_mc	PFC	0.2224980627000332
+4	inverse_trace_mc	PFC	0.25249348565936086
+4	inverse_trace_mc	PFC	0.3867921656370163
+4	inverse_trace_mc	PFC	0.3336508932709694
+4	inverse_trace_mc	PFC	0.18129713714122772
+4	inverse_trace_mc	PFC	0.22777414694428444
+4	inverse_trace_mc	PFC	0.4147145649790764
+4	inverse_trace_mc	PFC	0.1948451417684555
+4	inverse_trace_mc	PFC	0.32178460627794264
+4	inverse_trace_mc	PFC	0.2807548223435879
+4	inverse_trace_mc	PFC	0.17420195862650872
+4	inverse_trace_mc	PFC	0.2904153072834015
+4	inverse_trace_mc	PFC	0.2736994092166424
+4	inverse_trace_mc	PFC	0.278378639370203
+4	inverse_trace_mc	PFC	0.14806389398872852
+4	inverse_trace_mc	PFC	0.28368400812149047
+4	inverse_trace_mc	PFC	0.22111473485827446
+4	inverse_trace_mc	PFC	0.22504279866814614
+4	inverse_trace_mc	PFC	0.1647743922472
+4	inverse_trace_mc	PFC	0.20864452183246612
+4	log_det_mc	PFC	0.2693969070911407
+4	log_det_mc	PFC	0.21927171483635902
+4	log_det_mc	PFC	0.16188100919127466
+4	log_det_mc	PFC	0.31997217804193495
+4	log_det_mc	PFC	0.22167547836899756
+4	log_det_mc	PFC	0.2526639461517334
+4	log_det_mc	PFC	0.3889378464221954
+4	log_det_mc	PFC	0.33453901678323744
+4	log_det_mc	PFC	0.1807556000351906
+4	log_det_mc	PFC	0.22674620971083642
+4	log_det_mc	PFC	0.41553622037172316
+4	log_det_mc	PFC	0.19478466361761093
+4	log_det_mc	PFC	0.32076322823762893
+4	log_det_mc	PFC	0.28329175159335135
+4	log_det_mc	PFC	0.17275207951664925
+4	log_det_mc	PFC	0.2900607079267502
+4	log_det_mc	PFC	0.2752337512373924
+4	log_det_mc	PFC	0.28322296008467673
+4	log_det_mc	PFC	0.1512580505758524
+4	log_det_mc	PFC	0.2836830835044384
+4	log_det_mc	PFC	0.22222300961613656
+4	log_det_mc	PFC	0.22560397699475288
+4	log_det_mc	PFC	0.16606393545866013
+4	log_det_mc	PFC	0.2080877700448036
+4	random	PFC	0.2170264472067356
+4	random	PFC	0.1532047225534916
+4	random	PFC	0.1092613834142685
+4	random	PFC	0.22595395892858505
+4	random	PFC	0.1412686075270176
+4	random	PFC	0.18437582604587077
+4	random	PFC	0.26881182357668876
+4	random	PFC	0.2668259461224079
+4	random	PFC	0.1732323654741049
+4	random	PFC	0.16964088797569274
+4	random	PFC	0.3317455789446831
+4	random	PFC	0.09372122946195305
+4	random	PFC	0.2260341775417328
+4	random	PFC	0.19701039634644985
+4	random	PFC	0.14871075063943862
+4	random	PFC	0.1998049695789814
+4	random	PFC	0.23556810677051543
+4	random	PFC	0.20168757662177086
+4	random	PFC	0.11691251777112484
+4	random	PFC	0.18799983501434325
+4	random	PFC	0.15371033042669296
+4	random	PFC	0.14967376671731472
+4	random	PFC	0.10128602910786867
+4	random	PFC	0.18333444014191627
+4	variance	PFC	0.22790088534355163
+4	variance	PFC	0.13760813571512698
+4	variance	PFC	0.11290880396962166
+4	variance	PFC	0.22510527864098548
+4	variance	PFC	0.14058360308408738
+4	variance	PFC	0.16953006222844125
+4	variance	PFC	0.2372833113372326
+4	variance	PFC	0.28046798050403593
+4	variance	PFC	0.1937755586206913
+4	variance	PFC	0.1664981685578823
+4	variance	PFC	0.34281147867441175
+4	variance	PFC	0.11292054697871208
+4	variance	PFC	0.27225645899772644
+4	variance	PFC	0.19210343852639197
+4	variance	PFC	0.14618685230612755
+4	variance	PFC	0.17884464144706727
+4	variance	PFC	0.25493186131119727
+4	variance	PFC	0.1758093638718128
+4	variance	PFC	0.12152213655412197
+4	variance	PFC	0.17760738715529442
+4	variance	PFC	0.14728699564933778
+4	variance	PFC	0.11096857748925686
+4	variance	PFC	0.1231827413290739
+4	variance	PFC	0.1901559665799141
+4	variance_mc	PFC	0.2695376704633236
+4	variance_mc	PFC	0.22134648084640504
+4	variance_mc	PFC	0.16156897760927677
+4	variance_mc	PFC	0.31743584007024767
+4	variance_mc	PFC	0.21985525339841844
+4	variance_mc	PFC	0.2523196132481098
+4	variance_mc	PFC	0.38934259086847306
+4	variance_mc	PFC	0.3343039685487747
+4	variance_mc	PFC	0.18092716604471207
+4	variance_mc	PFC	0.2266930918395519
+4	variance_mc	PFC	0.4130604949593544
+4	variance_mc	PFC	0.19480033203959465
+4	variance_mc	PFC	0.32070539355278016
+4	variance_mc	PFC	0.2815938614308834
+4	variance_mc	PFC	0.17613904803991318
+4	variance_mc	PFC	0.2912137649953365
+4	variance_mc	PFC	0.26993035480380057
+4	variance_mc	PFC	0.282864837795496
+4	variance_mc	PFC	0.14743481524288654
+4	variance_mc	PFC	0.2796753703057766
+4	variance_mc	PFC	0.221287412494421
+4	variance_mc	PFC	0.22574514001607895
+4	variance_mc	PFC	0.16845913790166378
+4	variance_mc	PFC	0.20808672845363618
+5	inverse_trace_mc	PFC	0.2584678217768669
+5	inverse_trace_mc	PFC	0.21814756989479064
+5	inverse_trace_mc	PFC	0.1349898537248373
+5	inverse_trace_mc	PFC	0.2959395518898964
+5	inverse_trace_mc	PFC	0.1998839968442917
+5	inverse_trace_mc	PFC	0.2446701356768608
+5	inverse_trace_mc	PFC	0.3555378931760788
+5	inverse_trace_mc	PFC	0.3206550687551498
+5	inverse_trace_mc	PFC	0.16199606724083424
+5	inverse_trace_mc	PFC	0.21879033878445625
+5	inverse_trace_mc	PFC	0.38069537609815596
+5	inverse_trace_mc	PFC	0.17747522324323653
+5	inverse_trace_mc	PFC	0.2853469394147396
+5	inverse_trace_mc	PFC	0.26202430710196495
+5	inverse_trace_mc	PFC	0.16085407175123692
+5	inverse_trace_mc	PFC	0.2573549960553646
+5	inverse_trace_mc	PFC	0.25740045949816703
+5	inverse_trace_mc	PFC	0.27806425526738165
+5	inverse_trace_mc	PFC	0.113486437946558
+5	inverse_trace_mc	PFC	0.26671522960066796
+5	inverse_trace_mc	PFC	0.19650552056729795
+5	inverse_trace_mc	PFC	0.1966661874949932
+5	inverse_trace_mc	PFC	0.14456763431429864
+5	inverse_trace_mc	PFC	0.20911190018057824
+5	log_det_mc	PFC	0.26114807441830634
+5	log_det_mc	PFC	0.2182351393997669
+5	log_det_mc	PFC	0.14141837671399116
+5	log_det_mc	PFC	0.3024798461794853
+5	log_det_mc	PFC	0.2009975190460682
+5	log_det_mc	PFC	0.24713833168148994
+5	log_det_mc	PFC	0.36152794510126113
+5	log_det_mc	PFC	0.3234138387441635
+5	log_det_mc	PFC	0.1622632383555174
+5	log_det_mc	PFC	0.22367213979363443
+5	log_det_mc	PFC	0.39093192040920255
+5	log_det_mc	PFC	0.18537091806530953
+5	log_det_mc	PFC	0.2931572100520134
+5	log_det_mc	PFC	0.2692476712167263
+5	log_det_mc	PFC	0.16519353441894055
+5	log_det_mc	PFC	0.2674907438457012
+5	log_det_mc	PFC	0.2610497125983238
+5	log_det_mc	PFC	0.27643552169203756
+5	log_det_mc	PFC	0.1167310987971723
+5	log_det_mc	PFC	0.26708600774407387
+5	log_det_mc	PFC	0.20038418278098105
+5	log_det_mc	PFC	0.20589990451931953
+5	log_det_mc	PFC	0.15531427472829817
+5	log_det_mc	PFC	0.21231963440775872
+5	random	PFC	0.2165740218758583
+5	random	PFC	0.15419393554329872
+5	random	PFC	0.10616251479834318
+5	random	PFC	0.22925277575850486
+5	random	PFC	0.14180894583463668
+5	random	PFC	0.1913258856534958
+5	random	PFC	0.2742002165317535
+5	random	PFC	0.27373800560832023
+5	random	PFC	0.17122808679938317
+5	random	PFC	0.17423971906304359
+5	random	PFC	0.3322591398656368
+5	random	PFC	0.10071209468878806
+5	random	PFC	0.22325872361660004
+5	random	PFC	0.1980541855096817
+5	random	PFC	0.14522997319698333
+5	random	PFC	0.19978253662586212
+5	random	PFC	0.2298468431830406
+5	random	PFC	0.2036942009627819
+5	random	PFC	0.10877382095903158
+5	random	PFC	0.18700227074325085
+5	random	PFC	0.14734175339341163
+5	random	PFC	0.14478972367942333
+5	random	PFC	0.09601099943742156
+5	random	PFC	0.18465276941657066
+5	variance	PFC	0.24496260568499564
+5	variance	PFC	0.1591849897056818
+5	variance	PFC	0.12548197411000728
+5	variance	PFC	0.268482878357172
+5	variance	PFC	0.1607044045627117
+5	variance	PFC	0.1891457225382328
+5	variance	PFC	0.2780134154856205
+5	variance	PFC	0.29651897817850115
+5	variance	PFC	0.1890412138402462
+5	variance	PFC	0.1988424275815487
+5	variance	PFC	0.37597226560115815
+5	variance	PFC	0.12901627123355866
+5	variance	PFC	0.28655938044190404
+5	variance	PFC	0.21463657036423683
+5	variance	PFC	0.15346858881413936
+5	variance	PFC	0.2198300389945507
+5	variance	PFC	0.26197098270058633
+5	variance	PFC	0.21575781539082528
+5	variance	PFC	0.1484217645227909
+5	variance	PFC	0.2220684492588043
+5	variance	PFC	0.17238350063562394
+5	variance	PFC	0.14901685282588006
+5	variance	PFC	0.12566927440464495
+5	variance	PFC	0.2003130406141281
+5	variance_mc	PFC	0.2648812524974346
+5	variance_mc	PFC	0.21815300717949868
+5	variance_mc	PFC	0.15553256422281264
+5	variance_mc	PFC	0.30812182247638703
+5	variance_mc	PFC	0.20635854125022887
+5	variance_mc	PFC	0.24521153703331947
+5	variance_mc	PFC	0.3724138566851616
+5	variance_mc	PFC	0.32941842317581177
+5	variance_mc	PFC	0.16971381708979608
+5	variance_mc	PFC	0.2235685709118843
+5	variance_mc	PFC	0.40593175679445265
+5	variance_mc	PFC	0.17987449944019318
+5	variance_mc	PFC	0.30931122958660123
+5	variance_mc	PFC	0.2686066158115864
+5	variance_mc	PFC	0.16680068656802177
+5	variance_mc	PFC	0.27699549302458765
+5	variance_mc	PFC	0.26508929252624513
+5	variance_mc	PFC	0.2702294884622097
+5	variance_mc	PFC	0.1419914985820651
+5	variance_mc	PFC	0.26845274776220324
+5	variance_mc	PFC	0.20942146882414817
+5	variance_mc	PFC	0.20951809018850326
+5	variance_mc	PFC	0.15865849293768405
+5	variance_mc	PFC	0.2079061348736286
+6	inverse_trace_mc	PFC	0.2514311873912811
+6	inverse_trace_mc	PFC	0.1919618193805218
+6	inverse_trace_mc	PFC	0.1287369556725025
+6	inverse_trace_mc	PFC	0.2884351469576359
+6	inverse_trace_mc	PFC	0.19554419666528702
+6	inverse_trace_mc	PFC	0.2337109361588955
+6	inverse_trace_mc	PFC	0.33610696375370025
+6	inverse_trace_mc	PFC	0.31408811986446383
+6	inverse_trace_mc	PFC	0.16621800415217877
+6	inverse_trace_mc	PFC	0.21023009791970254
+6	inverse_trace_mc	PFC	0.3778081515431404
+6	inverse_trace_mc	PFC	0.15882688712328671
+6	inverse_trace_mc	PFC	0.2681253306567669
+6	inverse_trace_mc	PFC	0.2479878118634224
+6	inverse_trace_mc	PFC	0.1630912119150162
+6	inverse_trace_mc	PFC	0.2563354912400246
+6	inverse_trace_mc	PFC	0.24841948568820954
+6	inverse_trace_mc	PFC	0.2630972637236118
+6	inverse_trace_mc	PFC	0.10751929629594087
+6	inverse_trace_mc	PFC	0.2478425332903862
+6	inverse_trace_mc	PFC	0.1874598291516304
+6	inverse_trace_mc	PFC	0.18390726462006568
+6	inverse_trace_mc	PFC	0.1295752254128456
+6	inverse_trace_mc	PFC	0.20763613060116767
+6	log_det_mc	PFC	0.2584868563711643
+6	log_det_mc	PFC	0.20049403488636017
+6	log_det_mc	PFC	0.1401887083053589
+6	log_det_mc	PFC	0.29723194301128386
+6	log_det_mc	PFC	0.1980074554681778
+6	log_det_mc	PFC	0.23805042147636413
+6	log_det_mc	PFC	0.3487389340996742
+6	log_det_mc	PFC	0.31951024442911147
+6	log_det_mc	PFC	0.17204886555671692
+6	log_det_mc	PFC	0.21832845449447633
+6	log_det_mc	PFC	0.3945933821797371
+6	log_det_mc	PFC	0.17066538229584693
+6	log_det_mc	PFC	0.284656547755003
+6	log_det_mc	PFC	0.2601478153467178
+6	log_det_mc	PFC	0.1661791492253542
+6	log_det_mc	PFC	0.26542537063360216
+6	log_det_mc	PFC	0.2563657088577747
+6	log_det_mc	PFC	0.2671948182582855
+6	log_det_mc	PFC	0.11983363009989262
+6	log_det_mc	PFC	0.2527100858092308
+6	log_det_mc	PFC	0.19652313217520714
+6	log_det_mc	PFC	0.19331334605813028
+6	log_det_mc	PFC	0.14130073942244054
+6	log_det_mc	PFC	0.2089175356924534
+6	random	PFC	0.21574001923203467
+6	random	PFC	0.15896549448370934
+6	random	PFC	0.1082587457075715
+6	random	PFC	0.230620094537735
+6	random	PFC	0.13819946482777595
+6	random	PFC	0.1944100646674633
+6	random	PFC	0.2708106105029583
+6	random	PFC	0.27011526823043824
+6	random	PFC	0.17067302860319614
+6	random	PFC	0.17613774240016938
+6	random	PFC	0.3359931781888008
+6	random	PFC	0.09946636313572527
+6	random	PFC	0.2190390284359455
+6	random	PFC	0.197940860837698
+6	random	PFC	0.1506126057356596
+6	random	PFC	0.19979240775108337
+6	random	PFC	0.23466279372572899
+6	random	PFC	0.20568083539605142
+6	random	PFC	0.10837266206741333
+6	random	PFC	0.191256550103426
+6	random	PFC	0.15369597285985948
+6	random	PFC	0.14689369786530734
+6	random	PFC	0.09333784346468747
+6	random	PFC	0.1856598238646984
+6	variance	PFC	0.24919710278511048
+6	variance	PFC	0.17523142777383327
+6	variance	PFC	0.13127847224473954
+6	variance	PFC	0.27636975154280663
+6	variance	PFC	0.17406278505921363
+6	variance	PFC	0.2033314996957779
+6	variance	PFC	0.3006737779080868
+6	variance	PFC	0.3018984392285347
+6	variance	PFC	0.18503321468830108
+6	variance	PFC	0.20706132128834726
+6	variance	PFC	0.3888672435283661
+6	variance	PFC	0.1362229371070862
+6	variance	PFC	0.28303770393133165
+6	variance	PFC	0.22892735928297042
+6	variance	PFC	0.15826072983443737
+6	variance	PFC	0.23776113077998162
+6	variance	PFC	0.2617456978559494
+6	variance	PFC	0.223396225720644
+6	variance	PFC	0.1458511947840452
+6	variance	PFC	0.2264852660894394
+6	variance	PFC	0.18258390456438064
+6	variance	PFC	0.1689060316979885
+6	variance	PFC	0.12793758094310761
+6	variance	PFC	0.20057492211461067
+6	variance_mc	PFC	0.2620974685251713
+6	variance_mc	PFC	0.20538082897663115
+6	variance_mc	PFC	0.14875629484653474
+6	variance_mc	PFC	0.30367344826459886
+6	variance_mc	PFC	0.20352301314473153
+6	variance_mc	PFC	0.2392025649547577
+6	variance_mc	PFC	0.3601153901219368
+6	variance_mc	PFC	0.3280542838573456
+6	variance_mc	PFC	0.17440405756235122
+6	variance_mc	PFC	0.2229587982594967
+6	variance_mc	PFC	0.40229311972856524
+6	variance_mc	PFC	0.17177644051611424
+6	variance_mc	PFC	0.29902289390563963
+6	variance_mc	PFC	0.2606554001569748
+6	variance_mc	PFC	0.16272479750216007
+6	variance_mc	PFC	0.275373782068491
+6	variance_mc	PFC	0.2637638917565346
+6	variance_mc	PFC	0.266201059371233
+6	variance_mc	PFC	0.14125827260315418
+6	variance_mc	PFC	0.26391474798321723
+6	variance_mc	PFC	0.20215800076723098
+6	variance_mc	PFC	0.2017260894179344
+6	variance_mc	PFC	0.14998291186988355
+6	variance_mc	PFC	0.210976452678442
+7	inverse_trace_mc	PFC	0.25046645134687423
+7	inverse_trace_mc	PFC	0.19161363437771797
+7	inverse_trace_mc	PFC	0.13198209777474404
+7	inverse_trace_mc	PFC	0.28432034656405447
+7	inverse_trace_mc	PFC	0.1898559620976448
+7	inverse_trace_mc	PFC	0.23262181192636489
+7	inverse_trace_mc	PFC	0.33291462153196333
+7	inverse_trace_mc	PFC	0.312624007165432
+7	inverse_trace_mc	PFC	0.16600402809679507
+7	inverse_trace_mc	PFC	0.21153032243251801
+7	inverse_trace_mc	PFC	0.38412183076143264
+7	inverse_trace_mc	PFC	0.1552256701886654
+7	inverse_trace_mc	PFC	0.2694319798052311
+7	inverse_trace_mc	PFC	0.2458227664232254
+7	inverse_trace_mc	PFC	0.16058647498488426
+7	inverse_trace_mc	PFC	0.2600044210255146
+7	inverse_trace_mc	PFC	0.25568979263305663
+7	inverse_trace_mc	PFC	0.25437093287706375
+7	inverse_trace_mc	PFC	0.11899883486330509
+7	inverse_trace_mc	PFC	0.24747767329216003
+7	inverse_trace_mc	PFC	0.19029007241129875
+7	inverse_trace_mc	PFC	0.18661339715123176
+7	inverse_trace_mc	PFC	0.12941803768277169
+7	inverse_trace_mc	PFC	0.20947545096278192
+7	log_det_mc	PFC	0.2531828135251999
+7	log_det_mc	PFC	0.1991090404987335
+7	log_det_mc	PFC	0.13809919655323027
+7	log_det_mc	PFC	0.2884168937802315
+7	log_det_mc	PFC	0.19013231933116914
+7	log_det_mc	PFC	0.2342813304066658
+7	log_det_mc	PFC	0.3377713879942894
+7	log_det_mc	PFC	0.31533210158348085
+7	log_det_mc	PFC	0.17048951864242554
+7	log_det_mc	PFC	0.2140868879854679
+7	log_det_mc	PFC	0.390470118522644
+7	log_det_mc	PFC	0.15754508160054684
+7	log_det_mc	PFC	0.27734494298696516
+7	log_det_mc	PFC	0.25425677075982095
+7	log_det_mc	PFC	0.16303239099681377
+7	log_det_mc	PFC	0.2647490553557873
+7	log_det_mc	PFC	0.25299609869718553
+7	log_det_mc	PFC	0.2560135917365551
+7	log_det_mc	PFC	0.12201812135055662
+7	log_det_mc	PFC	0.25057508796453476
+7	log_det_mc	PFC	0.1972564472258091
+7	log_det_mc	PFC	0.1941347160935402
+7	log_det_mc	PFC	0.12925979129970075
+7	log_det_mc	PFC	0.21000878691673278
+7	random	PFC	0.21631481274962425
+7	random	PFC	0.15674540147185326
+7	random	PFC	0.10851459115743638
+7	random	PFC	0.22717263281345368
+7	random	PFC	0.1391026308387518
+7	random	PFC	0.19189960658550262
+7	random	PFC	0.27722691997885707
+7	random	PFC	0.27413332343101504
+7	random	PFC	0.16259370900690556
+7	random	PFC	0.17293890848755836
+7	random	PFC	0.3331240862607956
+7	random	PFC	0.09549490904901177
+7	random	PFC	0.22049606293439866
+7	random	PFC	0.19789478838443755
+7	random	PFC	0.14009036898612975
+7	random	PFC	0.19899488538503646
+7	random	PFC	0.22575312346220017
+7	random	PFC	0.2088059076666832
+7	random	PFC	0.10346039863303304
+7	random	PFC	0.19180630467832088
+7	random	PFC	0.14934711128473283
+7	random	PFC	0.14336593851447105
+7	random	PFC	0.0991453005373478
+7	random	PFC	0.18407821878790856
+7	variance	PFC	0.24903281673789024
+7	variance	PFC	0.1803741142898798
+7	variance	PFC	0.1323531448096037
+7	variance	PFC	0.2768912082910538
+7	variance	PFC	0.17096559047698975
+7	variance	PFC	0.2081950195133686
+7	variance	PFC	0.30680979311466217
+7	variance	PFC	0.3028418213129044
+7	variance	PFC	0.17958575397729873
+7	variance	PFC	0.20504421174526213
+7	variance	PFC	0.3887272489070892
+7	variance	PFC	0.13756062135100364
+7	variance	PFC	0.27807587236166
+7	variance	PFC	0.2346993626654148
+7	variance	PFC	0.15744669876992703
+7	variance	PFC	0.2442934712767601
+7	variance	PFC	0.2585951647162437
+7	variance	PFC	0.22760532587766646
+7	variance	PFC	0.1454315248131752
+7	variance	PFC	0.2284712526202202
+7	variance	PFC	0.183665591776371
+7	variance	PFC	0.17446660362184047
+7	variance	PFC	0.1255831129103899
+7	variance	PFC	0.20512837246060373
+7	variance_mc	PFC	0.25800486639142034
+7	variance_mc	PFC	0.20124776735901834
+7	variance_mc	PFC	0.1447449903935194
+7	variance_mc	PFC	0.2942437961697578
+7	variance_mc	PFC	0.19772288978099822
+7	variance_mc	PFC	0.23631650373339652
+7	variance_mc	PFC	0.35046916127204897
+7	variance_mc	PFC	0.322809536755085
+7	variance_mc	PFC	0.16877994604408741
+7	variance_mc	PFC	0.21748818427324296
+7	variance_mc	PFC	0.3983907413482666
+7	variance_mc	PFC	0.15939539603888989
+7	variance_mc	PFC	0.28534888550639154
+7	variance_mc	PFC	0.25725867435336114
+7	variance_mc	PFC	0.16138045571744442
+7	variance_mc	PFC	0.27191297367215156
+7	variance_mc	PFC	0.25605315387248995
+7	variance_mc	PFC	0.2569259437918663
+7	variance_mc	PFC	0.1363888518512249
+7	variance_mc	PFC	0.2532894322276115
+7	variance_mc	PFC	0.19935142889618873
+7	variance_mc	PFC	0.19918987423181533
+7	variance_mc	PFC	0.13527787193655968
+7	variance_mc	PFC	0.206681709587574
+8	inverse_trace_mc	PFC	0.2508433982729912
+8	inverse_trace_mc	PFC	0.1880493950843811
+8	inverse_trace_mc	PFC	0.1335740602016449
+8	inverse_trace_mc	PFC	0.2853357318043709
+8	inverse_trace_mc	PFC	0.18295198425650597
+8	inverse_trace_mc	PFC	0.22656029120087623
+8	inverse_trace_mc	PFC	0.33068844556808474
+8	inverse_trace_mc	PFC	0.3115546116232872
+8	inverse_trace_mc	PFC	0.1710362260043621
+8	inverse_trace_mc	PFC	0.20768340259790422
+8	inverse_trace_mc	PFC	0.38544884204864505
+8	inverse_trace_mc	PFC	0.15422074213624
+8	inverse_trace_mc	PFC	0.26762240901589396
+8	inverse_trace_mc	PFC	0.24483489394187927
+8	inverse_trace_mc	PFC	0.16661316514015198
+8	inverse_trace_mc	PFC	0.25898399487137796
+8	inverse_trace_mc	PFC	0.24751042634248732
+8	inverse_trace_mc	PFC	0.25428553923964503
+8	inverse_trace_mc	PFC	0.12716888669878246
+8	inverse_trace_mc	PFC	0.24447012081742286
+8	inverse_trace_mc	PFC	0.19482214361429215
+8	inverse_trace_mc	PFC	0.18297028720378875
+8	inverse_trace_mc	PFC	0.12292825192213058
+8	inverse_trace_mc	PFC	0.20838210061192514
+8	log_det_mc	PFC	0.24932747691869736
+8	log_det_mc	PFC	0.19530111089348792
+8	log_det_mc	PFC	0.1340360450744629
+8	log_det_mc	PFC	0.2859094089269638
+8	log_det_mc	PFC	0.1852478252351284
+8	log_det_mc	PFC	0.2305669069290161
+8	log_det_mc	PFC	0.33468760818243026
+8	log_det_mc	PFC	0.3128072091937065
+8	log_det_mc	PFC	0.17004257068037987
+8	log_det_mc	PFC	0.21099121645092964
+8	log_det_mc	PFC	0.38754272103309634
+8	log_det_mc	PFC	0.15873813211917878
+8	log_det_mc	PFC	0.274595081359148
+8	log_det_mc	PFC	0.2468750734627247
+8	log_det_mc	PFC	0.1638622611761093
+8	log_det_mc	PFC	0.26018113777041435
+8	log_det_mc	PFC	0.24611896514892578
+8	log_det_mc	PFC	0.254526846408844
+8	log_det_mc	PFC	0.12266626555472612
+8	log_det_mc	PFC	0.24790007412433623
+8	log_det_mc	PFC	0.1950274559855461
+8	log_det_mc	PFC	0.1907829624414444
+8	log_det_mc	PFC	0.12495663970708847
+8	log_det_mc	PFC	0.20700975954532624
+8	random	PFC	0.21632971867918968
+8	random	PFC	0.1603966685384512
+8	random	PFC	0.10931414544582367
+8	random	PFC	0.23076947554945945
+8	random	PFC	0.1462126498669386
+8	random	PFC	0.1969400668144226
+8	random	PFC	0.28274341091513633
+8	random	PFC	0.27862673029303553
+8	random	PFC	0.15958011031150818
+8	random	PFC	0.1756338270008564
+8	random	PFC	0.3383397677540779
+8	random	PFC	0.10200209038332105
+8	random	PFC	0.22334727197885512
+8	random	PFC	0.19967668570578098
+8	random	PFC	0.14511025838553906
+8	random	PFC	0.20631305158138274
+8	random	PFC	0.2253950273245573
+8	random	PFC	0.21250360310077668
+8	random	PFC	0.10820431530475616
+8	random	PFC	0.19671505376696585
+8	random	PFC	0.1563140495866537
+8	random	PFC	0.15404897414147853
+8	random	PFC	0.10271816957741976
+8	random	PFC	0.18460101895034314
+8	variance	PFC	0.24914685592055322
+8	variance	PFC	0.1820040625333786
+8	variance	PFC	0.13037579350173473
+8	variance	PFC	0.27638899236917497
+8	variance	PFC	0.17632221706211568
+8	variance	PFC	0.20774881273508072
+8	variance	PFC	0.302610279917717
+8	variance	PFC	0.30326101183891296
+8	variance	PFC	0.18047909513115884
+8	variance	PFC	0.2013447491824627
+8	variance	PFC	0.3853358763456345
+8	variance	PFC	0.13787078127264976
+8	variance	PFC	0.2755915829539299
+8	variance	PFC	0.23575048834085466
+8	variance	PFC	0.15903612188994884
+8	variance	PFC	0.24336565271019936
+8	variance	PFC	0.25627507627010343
+8	variance	PFC	0.2289523459970951
+8	variance	PFC	0.13648549176752567
+8	variance	PFC	0.22455470204353334
+8	variance	PFC	0.1805610729753971
+8	variance	PFC	0.17516261093318464
+8	variance	PFC	0.12613803151994943
+8	variance	PFC	0.20149628728628158
+8	variance_mc	PFC	0.2549455015361309
+8	variance_mc	PFC	0.20125736966729163
+8	variance_mc	PFC	0.14153446473181247
+8	variance_mc	PFC	0.29121257543563844
+8	variance_mc	PFC	0.19198075845837592
+8	variance_mc	PFC	0.23527589425444603
+8	variance_mc	PFC	0.34325943648815155
+8	variance_mc	PFC	0.3187262111902237
+8	variance_mc	PFC	0.1711334479600191
+8	variance_mc	PFC	0.21312912061810493
+8	variance_mc	PFC	0.39439557790756224
+8	variance_mc	PFC	0.1592686600238085
+8	variance_mc	PFC	0.2841252076625824
+8	variance_mc	PFC	0.2541691944003105
+8	variance_mc	PFC	0.16364929653704166
+8	variance_mc	PFC	0.2691217929124832
+8	variance_mc	PFC	0.24998485907912255
+8	variance_mc	PFC	0.26032235607504844
+8	variance_mc	PFC	0.1403703337162733
+8	variance_mc	PFC	0.25018345803022385
+8	variance_mc	PFC	0.19650981217622757
+8	variance_mc	PFC	0.1959966938197613
+8	variance_mc	PFC	0.13397636648267508
+8	variance_mc	PFC	0.2078451445698738
+9	inverse_trace_mc	PFC	0.2415971115231514
+9	inverse_trace_mc	PFC	0.17636429496109485
+9	inverse_trace_mc	PFC	0.12756394617259503
+9	inverse_trace_mc	PFC	0.2698916806280613
+9	inverse_trace_mc	PFC	0.17550441458821298
+9	inverse_trace_mc	PFC	0.2147533719241619
+9	inverse_trace_mc	PFC	0.3095093002915382
+9	inverse_trace_mc	PFC	0.29994032680988314
+9	inverse_trace_mc	PFC	0.17044208861887455
+9	inverse_trace_mc	PFC	0.20052816957235337
+9	inverse_trace_mc	PFC	0.3691515302658081
+9	inverse_trace_mc	PFC	0.13676793716847896
+9	inverse_trace_mc	PFC	0.2578530275821686
+9	inverse_trace_mc	PFC	0.22956692919135094
+9	inverse_trace_mc	PFC	0.16607286654412745
+9	inverse_trace_mc	PFC	0.2467892937362194
+9	inverse_trace_mc	PFC	0.24454451516270637
+9	inverse_trace_mc	PFC	0.2414778459072113
+9	inverse_trace_mc	PFC	0.11404084669426083
+9	inverse_trace_mc	PFC	0.22495218023657798
+9	inverse_trace_mc	PFC	0.18411851346492766
+9	inverse_trace_mc	PFC	0.17545295745134354
+9	inverse_trace_mc	PFC	0.11300447592511773
+9	inverse_trace_mc	PFC	0.2015554629266262
+9	log_det_mc	PFC	0.24520758137106896
+9	log_det_mc	PFC	0.18980812668800354
+9	log_det_mc	PFC	0.13233126543462276
+9	log_det_mc	PFC	0.27684742599725726
+9	log_det_mc	PFC	0.1803056302666664
+9	log_det_mc	PFC	0.22481408402323722
+9	log_det_mc	PFC	0.3237124374508858
+9	log_det_mc	PFC	0.3078956723213196
+9	log_det_mc	PFC	0.17064403146505355
+9	log_det_mc	PFC	0.20552229955792428
+9	log_det_mc	PFC	0.3790000885725021
+9	log_det_mc	PFC	0.14442534036934376
+9	log_det_mc	PFC	0.26372398719191553
+9	log_det_mc	PFC	0.2365947373211384
+9	log_det_mc	PFC	0.1661943969130516
+9	log_det_mc	PFC	0.25667617172002793
+9	log_det_mc	PFC	0.2472628976404667
+9	log_det_mc	PFC	0.24696504190564156
+9	log_det_mc	PFC	0.11824115831404924
+9	log_det_mc	PFC	0.2369985404610634
+9	log_det_mc	PFC	0.1881606375426054
+9	log_det_mc	PFC	0.17943833157420158
+9	log_det_mc	PFC	0.11637977190315724
+9	log_det_mc	PFC	0.20484572842717172
+9	random	PFC	0.2148245619237423
+9	random	PFC	0.16010495595633983
+9	random	PFC	0.10931344583630562
+9	random	PFC	0.22898269101977348
+9	random	PFC	0.14595185793936252
+9	random	PFC	0.1947767849266529
+9	random	PFC	0.27747403010725974
+9	random	PFC	0.2742516055703163
+9	random	PFC	0.1624508771300316
+9	random	PFC	0.17409006506204605
+9	random	PFC	0.33169732242822647
+9	random	PFC	0.10110690489411354
+9	random	PFC	0.230040520131588
+9	random	PFC	0.20289312459528447
+9	random	PFC	0.1419000432640314
+9	random	PFC	0.2116609527170658
+9	random	PFC	0.21876545771956443
+9	random	PFC	0.20886845588684083
+9	random	PFC	0.1102419986622408
+9	random	PFC	0.19363589264452458
+9	random	PFC	0.1587812751531601
+9	random	PFC	0.15353331543505191
+9	random	PFC	0.09470850795507431
+9	random	PFC	0.18362029239535332
+9	variance	PFC	0.24510870948433877
+9	variance	PFC	0.18076513305306435
+9	variance	PFC	0.12964288398623466
+9	variance	PFC	0.26957676842808725
+9	variance	PFC	0.16995705969631672
+9	variance	PFC	0.20869703844189644
+9	variance	PFC	0.2963567169010639
+9	variance	PFC	0.2975326944887638
+9	variance	PFC	0.18138778164982797
+9	variance	PFC	0.19906250029802322
+9	variance	PFC	0.3790914461016655
+9	variance	PFC	0.13080972626805307
+9	variance	PFC	0.26700567424297333
+9	variance	PFC	0.2252626274526119
+9	variance	PFC	0.1571294815838337
+9	variance	PFC	0.24011155173182488
+9	variance	PFC	0.24743956565856934
+9	variance	PFC	0.22523955017328262
+9	variance	PFC	0.13096118934452533
+9	variance	PFC	0.21616244465112686
+9	variance	PFC	0.17690246298909187
+9	variance	PFC	0.16897039629518987
+9	variance	PFC	0.11664303444325924
+9	variance	PFC	0.2002616333961487
+9	variance_mc	PFC	0.24823976054787636
+9	variance_mc	PFC	0.1917594462633133
+9	variance_mc	PFC	0.13843438863754273
+9	variance_mc	PFC	0.2814216236770153
+9	variance_mc	PFC	0.184194997549057
+9	variance_mc	PFC	0.22647823944687842
+9	variance_mc	PFC	0.32848664045333864
+9	variance_mc	PFC	0.3107776966691017
+9	variance_mc	PFC	0.16815881118178366
+9	variance_mc	PFC	0.2086302401125431
+9	variance_mc	PFC	0.3866741222143173
+9	variance_mc	PFC	0.14562582343816757
+9	variance_mc	PFC	0.2734681113064289
+9	variance_mc	PFC	0.24119308233261108
+9	variance_mc	PFC	0.15444134742021562
+9	variance_mc	PFC	0.2596083529293537
+9	variance_mc	PFC	0.24890928760170936
+9	variance_mc	PFC	0.2472764554619789
+9	variance_mc	PFC	0.1318969377875328
+9	variance_mc	PFC	0.234543467015028
+9	variance_mc	PFC	0.1881771482527256
+9	variance_mc	PFC	0.18608749456703663
+9	variance_mc	PFC	0.1231817353144288
+9	variance_mc	PFC	0.20672476440668106
+10	inverse_trace_mc	PFC	0.2388826598227024
+10	inverse_trace_mc	PFC	0.18116337813436986
+10	inverse_trace_mc	PFC	0.12596498720347882
+10	inverse_trace_mc	PFC	0.269478562772274
+10	inverse_trace_mc	PFC	0.1759336394816637
+10	inverse_trace_mc	PFC	0.2181811711192131
+10	inverse_trace_mc	PFC	0.30985026895999906
+10	inverse_trace_mc	PFC	0.2982939001917839
+10	inverse_trace_mc	PFC	0.16564428061246872
+10	inverse_trace_mc	PFC	0.2005082392692566
+10	inverse_trace_mc	PFC	0.3689654031395912
+10	inverse_trace_mc	PFC	0.1407346197217703
+10	inverse_trace_mc	PFC	0.2606729383766651
+10	inverse_trace_mc	PFC	0.23019497156143187
+10	inverse_trace_mc	PFC	0.16109714433550834
+10	inverse_trace_mc	PFC	0.2482347822189331
+10	inverse_trace_mc	PFC	0.24234336435794832
+10	inverse_trace_mc	PFC	0.24496023684740068
+10	inverse_trace_mc	PFC	0.12157081462442874
+10	inverse_trace_mc	PFC	0.22684955954551697
+10	inverse_trace_mc	PFC	0.1856536976993084
+10	inverse_trace_mc	PFC	0.18074951983988286
+10	inverse_trace_mc	PFC	0.11754752937704324
+10	inverse_trace_mc	PFC	0.20010052233934403
+10	log_det_mc	PFC	0.24076684400439263
+10	log_det_mc	PFC	0.18470490261912345
+10	log_det_mc	PFC	0.12895653069019317
+10	log_det_mc	PFC	0.2752585385739803
+10	log_det_mc	PFC	0.1800080455094576
+10	log_det_mc	PFC	0.22062931567430497
+10	log_det_mc	PFC	0.3187956792116165
+10	log_det_mc	PFC	0.30388249188661576
+10	log_det_mc	PFC	0.1646307899057865
+10	log_det_mc	PFC	0.20337164998054505
+10	log_det_mc	PFC	0.3766133412718773
+10	log_det_mc	PFC	0.14393852416425942
+10	log_det_mc	PFC	0.26497987255454064
+10	log_det_mc	PFC	0.233697988986969
+10	log_det_mc	PFC	0.16197924710810185
+10	log_det_mc	PFC	0.25083633661270144
+10	log_det_mc	PFC	0.2437525787949562
+10	log_det_mc	PFC	0.24863398760557176
+10	log_det_mc	PFC	0.11654216121882201
+10	log_det_mc	PFC	0.23270004943013192
+10	log_det_mc	PFC	0.18574671298265458
+10	log_det_mc	PFC	0.18233629792928696
+10	log_det_mc	PFC	0.12214654274284839
+10	log_det_mc	PFC	0.20433507710695267
+10	random	PFC	0.2157656030356884
+10	random	PFC	0.1587129597365856
+10	random	PFC	0.10963662639260292
+10	random	PFC	0.2329764422774315
+10	random	PFC	0.14675257861614227
+10	random	PFC	0.19955141454935074
+10	random	PFC	0.27439736485481264
+10	random	PFC	0.27496966198086736
+10	random	PFC	0.16466979414224625
+10	random	PFC	0.17454965613782406
+10	random	PFC	0.33340408369898794
+10	random	PFC	0.09958659806288779
+10	random	PFC	0.22648968890309334
+10	random	PFC	0.1982211785018444
+10	random	PFC	0.14493418082594872
+10	random	PFC	0.21460370674729348
+10	random	PFC	0.228532552421093
+10	random	PFC	0.2084626790881157
+10	random	PFC	0.11132180197164417
+10	random	PFC	0.19619911998510361
+10	random	PFC	0.15786853842437268
+10	random	PFC	0.15291667670011522
+10	random	PFC	0.09440334321931004
+10	random	PFC	0.1836242723464966
+10	variance	PFC	0.24243465080857277
+10	variance	PFC	0.1787682517617941
+10	variance	PFC	0.12792170949280263
+10	variance	PFC	0.2695093201100826
+10	variance	PFC	0.16975582391023636
+10	variance	PFC	0.20675191700458526
+10	variance	PFC	0.29869627818465233
+10	variance	PFC	0.296202989667654
+10	variance	PFC	0.1782146365940571
+10	variance	PFC	0.19783276677131653
+10	variance	PFC	0.3783117768168449
+10	variance	PFC	0.12913495000451802
+10	variance	PFC	0.2630841456353664
+10	variance	PFC	0.22553747057914733
+10	variance	PFC	0.15632143788039685
+10	variance	PFC	0.24042498216032981
+10	variance	PFC	0.24584821373224258
+10	variance	PFC	0.22307172313332557
+10	variance	PFC	0.13083025969564915
+10	variance	PFC	0.22025126367807388
+10	variance	PFC	0.1792740911245346
+10	variance	PFC	0.16880991823971273
+10	variance	PFC	0.11205375075340271
+10	variance	PFC	0.1975450672209263
+10	variance_mc	PFC	0.24367345586419106
+10	variance_mc	PFC	0.18584983840584754
+10	variance_mc	PFC	0.13353975109755992
+10	variance_mc	PFC	0.27710029810667036
+10	variance_mc	PFC	0.18472174406051636
+10	variance_mc	PFC	0.2253522704541683
+10	variance_mc	PFC	0.32965256422758105
+10	variance_mc	PFC	0.31225029051303865
+10	variance_mc	PFC	0.16709970809519292
+10	variance_mc	PFC	0.20111721858382225
+10	variance_mc	PFC	0.3804453471302986
+10	variance_mc	PFC	0.14186782538890838
+10	variance_mc	PFC	0.27142064943909644
+10	variance_mc	PFC	0.23779356077313424
+10	variance_mc	PFC	0.1557451354712248
+10	variance_mc	PFC	0.2550319591164589
+10	variance_mc	PFC	0.24276938170194626
+10	variance_mc	PFC	0.24608033701777457
+10	variance_mc	PFC	0.1302708223089576
+10	variance_mc	PFC	0.23376817643642425
+10	variance_mc	PFC	0.18715539708733558
+10	variance_mc	PFC	0.1811638955771923
+10	variance_mc	PFC	0.12106815747916698
+10	variance_mc	PFC	0.20044087186455728
+11	inverse_trace_mc	PFC	0.2345030628144741
+11	inverse_trace_mc	PFC	0.17446886867284775
+11	inverse_trace_mc	PFC	0.12335340492427349
+11	inverse_trace_mc	PFC	0.2614757061004639
+11	inverse_trace_mc	PFC	0.16990262225270272
+11	inverse_trace_mc	PFC	0.2119257828593254
+11	inverse_trace_mc	PFC	0.3079076398909092
+11	inverse_trace_mc	PFC	0.2983955194056034
+11	inverse_trace_mc	PFC	0.16091859705746173
+11	inverse_trace_mc	PFC	0.1965283039212227
+11	inverse_trace_mc	PFC	0.3635802659392357
+11	inverse_trace_mc	PFC	0.12950409676879646
+11	inverse_trace_mc	PFC	0.2535556718707085
+11	inverse_trace_mc	PFC	0.22506457969546317
+11	inverse_trace_mc	PFC	0.1545737072825432
+11	inverse_trace_mc	PFC	0.24288008987903595
+11	inverse_trace_mc	PFC	0.2385745459794998
+11	inverse_trace_mc	PFC	0.2430067789554596
+11	inverse_trace_mc	PFC	0.1151589609310031
+11	inverse_trace_mc	PFC	0.22045631363987922
+11	inverse_trace_mc	PFC	0.17802747204899788
+11	inverse_trace_mc	PFC	0.17202093288302422
+11	inverse_trace_mc	PFC	0.11339796118438245
+11	inverse_trace_mc	PFC	0.2004367357492447
+11	log_det_mc	PFC	0.2338651056587696
+11	log_det_mc	PFC	0.180251874178648
+11	log_det_mc	PFC	0.1258719763159752
+11	log_det_mc	PFC	0.26354221269488337
+11	log_det_mc	PFC	0.17749446600675584
+11	log_det_mc	PFC	0.21223780229687692
+11	log_det_mc	PFC	0.3099735325574875
+11	log_det_mc	PFC	0.2976756763458252
+11	log_det_mc	PFC	0.16162526577711106
+11	log_det_mc	PFC	0.1977660945057869
+11	log_det_mc	PFC	0.36721953123807904
+11	log_det_mc	PFC	0.1304743657633662
+11	log_det_mc	PFC	0.2588685895502567
+11	log_det_mc	PFC	0.22507890701293945
+11	log_det_mc	PFC	0.15642969466745854
+11	log_det_mc	PFC	0.24644328460097312
+11	log_det_mc	PFC	0.23940400540828705
+11	log_det_mc	PFC	0.24350756764411927
+11	log_det_mc	PFC	0.1167208506539464
+11	log_det_mc	PFC	0.2212381826341152
+11	log_det_mc	PFC	0.18292025923728944
+11	log_det_mc	PFC	0.17159618444740773
+11	log_det_mc	PFC	0.11496900018304586
+11	log_det_mc	PFC	0.19905535638332367
+11	random	PFC	0.21851736709475517
+11	random	PFC	0.15624034523963928
+11	random	PFC	0.10657364644110202
+11	random	PFC	0.22460341274738313
+11	random	PFC	0.14414854630827903
+11	random	PFC	0.19382161661982536
+11	random	PFC	0.2753946271538734
+11	random	PFC	0.2711243133246899
+11	random	PFC	0.1578413414210081
+11	random	PFC	0.17134525023400785
+11	random	PFC	0.3275079169869423
+11	random	PFC	0.08904465271160006
+11	random	PFC	0.21712441638112068
+11	random	PFC	0.1945061992108822
+11	random	PFC	0.13996745251119136
+11	random	PFC	0.21398039251565934
+11	random	PFC	0.21243083782494068
+11	random	PFC	0.2063664697855711
+11	random	PFC	0.10528390722349286
+11	random	PFC	0.1908502434939146
+11	random	PFC	0.15698121175169943
+11	random	PFC	0.14561304554343224
+11	random	PFC	0.08077691889367998
+11	random	PFC	0.1787634712457657
+11	variance	PFC	0.24010472908616065
+11	variance	PFC	0.1762763185799122
+11	variance	PFC	0.12599064841866492
+11	variance	PFC	0.2618082630634308
+11	variance	PFC	0.16659123994410038
+11	variance	PFC	0.20746955171227455
+11	variance	PFC	0.29581991001963615
+11	variance	PFC	0.2951736183464527
+11	variance	PFC	0.17635113291442395
+11	variance	PFC	0.1951807475090027
+11	variance	PFC	0.3729971319437027
+11	variance	PFC	0.12147116214036942
+11	variance	PFC	0.25808264806866643
+11	variance	PFC	0.22053006365895272
+11	variance	PFC	0.15562032975256443
+11	variance	PFC	0.24008268043398856
+11	variance	PFC	0.23925379231572153
+11	variance	PFC	0.22547343298792838
+11	variance	PFC	0.13149645887315273
+11	variance	PFC	0.21660888865590094
+11	variance	PFC	0.18079459592700003
+11	variance	PFC	0.1671420372277498
+11	variance	PFC	0.10683640755712986
+11	variance	PFC	0.19731291770935058
+11	variance_mc	PFC	0.24187331035733223
+11	variance_mc	PFC	0.1816736251860857
+11	variance_mc	PFC	0.13086241759359837
+11	variance_mc	PFC	0.27211385026574136
+11	variance_mc	PFC	0.17907049268484115
+11	variance_mc	PFC	0.2179410859942436
+11	variance_mc	PFC	0.327525332570076
+11	variance_mc	PFC	0.3060636040568352
+11	variance_mc	PFC	0.16910630971193313
+11	variance_mc	PFC	0.20100967794656754
+11	variance_mc	PFC	0.37571974605321884
+11	variance_mc	PFC	0.13382199071347714
+11	variance_mc	PFC	0.26749886602163314
+11	variance_mc	PFC	0.23566731125116347
+11	variance_mc	PFC	0.14620565049350262
+11	variance_mc	PFC	0.2528384445607662
+11	variance_mc	PFC	0.23935695931315423
+11	variance_mc	PFC	0.24543590396642684
+11	variance_mc	PFC	0.1307214331254363
+11	variance_mc	PFC	0.23273021191358567
+11	variance_mc	PFC	0.18372539311647415
+11	variance_mc	PFC	0.1721213774383068
+11	variance_mc	PFC	0.1104113058373332
+11	variance_mc	PFC	0.2012490612268448
+12	inverse_trace_mc	PFC	0.23245939880609512
+12	inverse_trace_mc	PFC	0.1763084403425455
+12	inverse_trace_mc	PFC	0.12207449510693551
+12	inverse_trace_mc	PFC	0.25743003278970716
+12	inverse_trace_mc	PFC	0.16983324959874152
+12	inverse_trace_mc	PFC	0.20961571231484413
+12	inverse_trace_mc	PFC	0.30636594086885455
+12	inverse_trace_mc	PFC	0.2950131957232952
+12	inverse_trace_mc	PFC	0.16214741252362727
+12	inverse_trace_mc	PFC	0.19403294950723649
+12	inverse_trace_mc	PFC	0.3592607668042183
+12	inverse_trace_mc	PFC	0.13231913320720196
+12	inverse_trace_mc	PFC	0.24856628462672234
+12	inverse_trace_mc	PFC	0.21829429402947426
+12	inverse_trace_mc	PFC	0.1544648626446724
+12	inverse_trace_mc	PFC	0.23682751268148422
+12	inverse_trace_mc	PFC	0.2338210554420948
+12	inverse_trace_mc	PFC	0.2390644983947277
+12	inverse_trace_mc	PFC	0.12251326198223979
+12	inverse_trace_mc	PFC	0.22274489119648933
+12	inverse_trace_mc	PFC	0.17421867609024047
+12	inverse_trace_mc	PFC	0.16680292040109634
+12	inverse_trace_mc	PFC	0.10643633317202329
+12	inverse_trace_mc	PFC	0.19839085698127745
+12	log_det_mc	PFC	0.23382398828864098
+12	log_det_mc	PFC	0.18029824107885362
+12	log_det_mc	PFC	0.12367072947323322
+12	log_det_mc	PFC	0.25955092772841454
+12	log_det_mc	PFC	0.17285960525274277
+12	log_det_mc	PFC	0.214432552754879
+12	log_det_mc	PFC	0.3100319004058838
+12	log_det_mc	PFC	0.29641409024596216
+12	log_det_mc	PFC	0.15981084562838077
+12	log_det_mc	PFC	0.19800523161888123
+12	log_det_mc	PFC	0.36257130712270735
+12	log_det_mc	PFC	0.13364662989974022
+12	log_det_mc	PFC	0.2556515046954155
+12	log_det_mc	PFC	0.22174182862043382
+12	log_det_mc	PFC	0.15197941951453686
+12	log_det_mc	PFC	0.24554417341947554
+12	log_det_mc	PFC	0.23485042974352838
+12	log_det_mc	PFC	0.23761636421084403
+12	log_det_mc	PFC	0.11804817835800349
+12	log_det_mc	PFC	0.22119030311703683
+12	log_det_mc	PFC	0.17876916214823724
+12	log_det_mc	PFC	0.17462803676724434
+12	log_det_mc	PFC	0.10703346123918892
+12	log_det_mc	PFC	0.19723038673400878
+12	random	PFC	0.21688336059451102
+12	random	PFC	0.15830388687551022
+12	random	PFC	0.1109475601091981
+12	random	PFC	0.2330375887453556
+12	random	PFC	0.14960777625441551
+12	random	PFC	0.1995478968322277
+12	random	PFC	0.28373471707105635
+12	random	PFC	0.28020552173256874
+12	random	PFC	0.16020131953060626
+12	random	PFC	0.17364096477627755
+12	random	PFC	0.33309509947896004
+12	random	PFC	0.09954284369945526
+12	random	PFC	0.22926202967762946
+12	random	PFC	0.20612175829708576
+12	random	PFC	0.1419131774827838
+12	random	PFC	0.21683303788304328
+12	random	PFC	0.21598925828933715
+12	random	PFC	0.2127012725174427
+12	random	PFC	0.1087573601026088
+12	random	PFC	0.1969051519036293
+12	random	PFC	0.16051225401461125
+12	random	PFC	0.15380017194896936
+12	random	PFC	0.08698759775608778
+12	random	PFC	0.18601684913039207
+12	variance	PFC	0.2396697348356247
+12	variance	PFC	0.17607908248901366
+12	variance	PFC	0.12601918153464794
+12	variance	PFC	0.26200792863965033
+12	variance	PFC	0.1657252761721611
+12	variance	PFC	0.20856259539723396
+12	variance	PFC	0.29982916250824926
+12	variance	PFC	0.2979655930399895
+12	variance	PFC	0.1730128127336502
+12	variance	PFC	0.19331003069877625
+12	variance	PFC	0.3701022678613663
+12	variance	PFC	0.1252146418392658
+12	variance	PFC	0.25921873763203623
+12	variance	PFC	0.2176137910783291
+12	variance	PFC	0.14739513978362084
+12	variance	PFC	0.24009989991784095
+12	variance	PFC	0.23988014340400696
+12	variance	PFC	0.22521381348371505
+12	variance	PFC	0.1253164253011346
+12	variance	PFC	0.20948173910379408
+12	variance	PFC	0.1750128049403429
+12	variance	PFC	0.16438663609325885
+12	variance	PFC	0.1073965087160468
+12	variance	PFC	0.19545472651720047
+12	variance_mc	PFC	0.24228226155042648
+12	variance_mc	PFC	0.1831862810999155
+12	variance_mc	PFC	0.13045954644680025
+12	variance_mc	PFC	0.2694557666778564
+12	variance_mc	PFC	0.18080610185861587
+12	variance_mc	PFC	0.21840253889560698
+12	variance_mc	PFC	0.32767445474863055
+12	variance_mc	PFC	0.3084083208441734
+12	variance_mc	PFC	0.15931759126484393
+12	variance_mc	PFC	0.19780801400542258
+12	variance_mc	PFC	0.3712499961256981
+12	variance_mc	PFC	0.12788714542984964
+12	variance_mc	PFC	0.2666540202498436
+12	variance_mc	PFC	0.23480296909809112
+12	variance_mc	PFC	0.14880771689116956
+12	variance_mc	PFC	0.25309956654906274
+12	variance_mc	PFC	0.23868172466754914
+12	variance_mc	PFC	0.2406980350613594
+12	variance_mc	PFC	0.12706810306757688
+12	variance_mc	PFC	0.22626300454139708
+12	variance_mc	PFC	0.18249009490013124
+12	variance_mc	PFC	0.17120656460523606
+12	variance_mc	PFC	0.11188616823405027
+12	variance_mc	PFC	0.1961455076932907
+13	inverse_trace_mc	PFC	0.23116850450634957
+13	inverse_trace_mc	PFC	0.17277781575918197
+13	inverse_trace_mc	PFC	0.12269965708255767
+13	inverse_trace_mc	PFC	0.25600261464715
+13	inverse_trace_mc	PFC	0.16812632240355016
+13	inverse_trace_mc	PFC	0.21107273384928704
+13	inverse_trace_mc	PFC	0.306836546510458
+13	inverse_trace_mc	PFC	0.2941798481345177
+13	inverse_trace_mc	PFC	0.15576463416218758
+13	inverse_trace_mc	PFC	0.19300055280327796
+13	inverse_trace_mc	PFC	0.35912922978401185
+13	inverse_trace_mc	PFC	0.12568180479109287
+13	inverse_trace_mc	PFC	0.2517450238764286
+13	inverse_trace_mc	PFC	0.220411946028471
+13	inverse_trace_mc	PFC	0.1481585531681776
+13	inverse_trace_mc	PFC	0.24173470690846444
+13	inverse_trace_mc	PFC	0.23341315165162085
+13	inverse_trace_mc	PFC	0.24148733034729958
+13	inverse_trace_mc	PFC	0.11835916792973876
+13	inverse_trace_mc	PFC	0.21998781070113183
+13	inverse_trace_mc	PFC	0.1785666186362505
+13	inverse_trace_mc	PFC	0.1714186643064022
+13	inverse_trace_mc	PFC	0.1133091601356864
+13	inverse_trace_mc	PFC	0.19650782376527787
+13	log_det_mc	PFC	0.23096628814935685
+13	log_det_mc	PFC	0.17913047954440117
+13	log_det_mc	PFC	0.1229847177863121
+13	log_det_mc	PFC	0.2573783588409424
+13	log_det_mc	PFC	0.1712648831307888
+13	log_det_mc	PFC	0.2149984958767891
+13	log_det_mc	PFC	0.31076908454298974
+13	log_det_mc	PFC	0.2974199226498604
+13	log_det_mc	PFC	0.15912125565111637
+13	log_det_mc	PFC	0.19588501647114753
+13	log_det_mc	PFC	0.3598402366042137
+13	log_det_mc	PFC	0.1282436277717352
+13	log_det_mc	PFC	0.25431459441781046
+13	log_det_mc	PFC	0.2239965805411339
+13	log_det_mc	PFC	0.1525783845037222
+13	log_det_mc	PFC	0.24290265679359435
+13	log_det_mc	PFC	0.23171151503920556
+13	log_det_mc	PFC	0.24408030092716218
+13	log_det_mc	PFC	0.11723084529861807
+13	log_det_mc	PFC	0.2211271920800209
+13	log_det_mc	PFC	0.18128979146480562
+13	log_det_mc	PFC	0.17242722488939763
+13	log_det_mc	PFC	0.11307343445718289
+13	log_det_mc	PFC	0.19589805409312247
+13	random	PFC	0.21619697988033296
+13	random	PFC	0.15862185075879098
+13	random	PFC	0.10830559149384499
+13	random	PFC	0.2273716352880001
+13	random	PFC	0.14685386151075364
+13	random	PFC	0.19921562433242798
+13	random	PFC	0.27832373321056364
+13	random	PFC	0.27646909445524215
+13	random	PFC	0.15760316707193853
+13	random	PFC	0.17492414325475691
+13	random	PFC	0.33238477557897567
+13	random	PFC	0.0979147870093584
+13	random	PFC	0.2267620275914669
+13	random	PFC	0.19336316630244255
+13	random	PFC	0.13972131676971913
+13	random	PFC	0.21605367332696915
+13	random	PFC	0.2146497882902622
+13	random	PFC	0.21323522314429283
+13	random	PFC	0.1085874693095684
+13	random	PFC	0.18718700379133224
+13	random	PFC	0.15841688968241216
+13	random	PFC	0.15114356376230717
+13	random	PFC	0.08801532052457332
+13	random	PFC	0.1852202333509922
+13	variance	PFC	0.23787887036800384
+13	variance	PFC	0.1816302451491356
+13	variance	PFC	0.12452336125075818
+13	variance	PFC	0.2624081462621689
+13	variance	PFC	0.16602091148495673
+13	variance	PFC	0.20613922387361527
+13	variance	PFC	0.2930986855924129
+13	variance	PFC	0.2939478686451912
+13	variance	PFC	0.17251083992421626
+13	variance	PFC	0.18993630841374398
+13	variance	PFC	0.36866134315729143
+13	variance	PFC	0.1262700068205595
+13	variance	PFC	0.2590223452448845
+13	variance	PFC	0.2146030741930008
+13	variance	PFC	0.15380873501300812
+13	variance	PFC	0.23860004618763925
+13	variance	PFC	0.23198671385645867
+13	variance	PFC	0.2284611113369465
+13	variance	PFC	0.12210173439234495
+13	variance	PFC	0.21200355827808381
+13	variance	PFC	0.17176094695925712
+13	variance	PFC	0.16450435765087604
+13	variance	PFC	0.10552156176418066
+13	variance	PFC	0.19544467493891715
+13	variance_mc	PFC	0.23570110365748406
+13	variance_mc	PFC	0.18124548837542534
+13	variance_mc	PFC	0.12928559824824334
+13	variance_mc	PFC	0.2639047744870186
+13	variance_mc	PFC	0.177909786850214
+13	variance_mc	PFC	0.21933846443891525
+13	variance_mc	PFC	0.319973452091217
+13	variance_mc	PFC	0.3055058318376541
+13	variance_mc	PFC	0.1583505713939667
+13	variance_mc	PFC	0.19716280594468116
+13	variance_mc	PFC	0.3700560116767883
+13	variance_mc	PFC	0.12913158647716044
+13	variance_mc	PFC	0.2641094136238098
+13	variance_mc	PFC	0.23093328267335891
+13	variance_mc	PFC	0.1470422551780939
+13	variance_mc	PFC	0.24998871862888336
+13	variance_mc	PFC	0.23622477412223816
+13	variance_mc	PFC	0.23876517564058303
+13	variance_mc	PFC	0.12798794865608215
+13	variance_mc	PFC	0.22225666478276251
+13	variance_mc	PFC	0.18078287407755853
+13	variance_mc	PFC	0.17186593070626258
+13	variance_mc	PFC	0.11101833324879408
+13	variance_mc	PFC	0.19788203075528144
+14	inverse_trace_mc	PFC	0.22871441200375556
+14	inverse_trace_mc	PFC	0.17210201293230057
+14	inverse_trace_mc	PFC	0.12293270111083984
+14	inverse_trace_mc	PFC	0.2527179957926273
+14	inverse_trace_mc	PFC	0.17014498069882392
+14	inverse_trace_mc	PFC	0.20731781527400017
+14	inverse_trace_mc	PFC	0.3034377457201481
+14	inverse_trace_mc	PFC	0.2948152431845665
+14	inverse_trace_mc	PFC	0.16042874209582805
+14	inverse_trace_mc	PFC	0.19031255520880222
+14	inverse_trace_mc	PFC	0.35551593750715255
+14	inverse_trace_mc	PFC	0.1255839778110385
+14	inverse_trace_mc	PFC	0.24636684566736222
+14	inverse_trace_mc	PFC	0.2188086275756359
+14	inverse_trace_mc	PFC	0.15467695377767085
+14	inverse_trace_mc	PFC	0.2409258683025837
+14	inverse_trace_mc	PFC	0.22908346012234687
+14	inverse_trace_mc	PFC	0.23500300511717798
+14	inverse_trace_mc	PFC	0.11477469731122256
+14	inverse_trace_mc	PFC	0.21603097885847092
+14	inverse_trace_mc	PFC	0.1775384695827961
+14	inverse_trace_mc	PFC	0.17015355311334132
+14	inverse_trace_mc	PFC	0.10740252040326595
+14	inverse_trace_mc	PFC	0.19536466971039773
+14	log_det_mc	PFC	0.22785428211092948
+14	log_det_mc	PFC	0.1747067940235138
+14	log_det_mc	PFC	0.12334071427583694
+14	log_det_mc	PFC	0.25464039340615274
+14	log_det_mc	PFC	0.16769684940576554
+14	log_det_mc	PFC	0.21015446200966836
+14	log_det_mc	PFC	0.3053338998556137
+14	log_det_mc	PFC	0.2953203944861889
+14	log_det_mc	PFC	0.15618627957999706
+14	log_det_mc	PFC	0.19285107225179673
+14	log_det_mc	PFC	0.3584975159168243
+14	log_det_mc	PFC	0.12871406361460686
+14	log_det_mc	PFC	0.24684823229908942
+14	log_det_mc	PFC	0.2247299347817898
+14	log_det_mc	PFC	0.15223534487187862
+14	log_det_mc	PFC	0.2431897233426571
+14	log_det_mc	PFC	0.2340267203748226
+14	log_det_mc	PFC	0.24303474456071852
+14	log_det_mc	PFC	0.11810611952096224
+14	log_det_mc	PFC	0.2168662989139557
+14	log_det_mc	PFC	0.1765381106734276
+14	log_det_mc	PFC	0.17429846040904523
+14	log_det_mc	PFC	0.11239950180053711
+14	log_det_mc	PFC	0.19676536798477173
+14	random	PFC	0.21831706330180167
+14	random	PFC	0.1626815951615572
+14	random	PFC	0.11077371537685395
+14	random	PFC	0.23156366646289825
+14	random	PFC	0.1499788186699152
+14	random	PFC	0.20374277099967003
+14	random	PFC	0.2805580665171146
+14	random	PFC	0.2782365942001343
+14	random	PFC	0.1561914550513029
+14	random	PFC	0.1708974365890026
+14	random	PFC	0.3332974809408188
+14	random	PFC	0.10063948238268494
+14	random	PFC	0.22544681295752525
+14	random	PFC	0.20135977633297444
+14	random	PFC	0.1450280725210905
+14	random	PFC	0.22013414293527603
+14	random	PFC	0.21361029013991356
+14	random	PFC	0.21253071770071982
+14	random	PFC	0.111024015173316
+14	random	PFC	0.1965041559934616
+14	random	PFC	0.16365472346544266
+14	random	PFC	0.15413279131054877
+14	random	PFC	0.08737862592563034
+14	random	PFC	0.18716336846351622
+14	variance	PFC	0.23823494389653205
+14	variance	PFC	0.17705423831939698
+14	variance	PFC	0.12543608978390694
+14	variance	PFC	0.25511662036180494
+14	variance	PFC	0.16359189055860043
+14	variance	PFC	0.20522779941558839
+14	variance	PFC	0.2948970207571983
+14	variance	PFC	0.2927894234657288
+14	variance	PFC	0.16522679060697557
+14	variance	PFC	0.18760510072112083
+14	variance	PFC	0.36452198415994647
+14	variance	PFC	0.11874218348413706
+14	variance	PFC	0.25408206284046175
+14	variance	PFC	0.21806375302374362
+14	variance	PFC	0.15169694975018502
+14	variance	PFC	0.24024586886167526
+14	variance	PFC	0.2296657891571522
+14	variance	PFC	0.2277986513078213
+14	variance	PFC	0.13173317249864339
+14	variance	PFC	0.21278824910521507
+14	variance	PFC	0.1736643722653389
+14	variance	PFC	0.16053305499255657
+14	variance	PFC	0.10466614466160536
+14	variance	PFC	0.1967770092189312
+14	variance_mc	PFC	0.23477833837270737
+14	variance_mc	PFC	0.17740626342594623
+14	variance_mc	PFC	0.12690782099962233
+14	variance_mc	PFC	0.2613973498344421
+14	variance_mc	PFC	0.17314952954649926
+14	variance_mc	PFC	0.21859065681695938
+14	variance_mc	PFC	0.3185367846488953
+14	variance_mc	PFC	0.3059165096282959
+14	variance_mc	PFC	0.155480784624815
+14	variance_mc	PFC	0.1966928942501545
+14	variance_mc	PFC	0.36651907533407213
+14	variance_mc	PFC	0.12584400959312916
+14	variance_mc	PFC	0.2614833363890648
+14	variance_mc	PFC	0.2312687563896179
+14	variance_mc	PFC	0.14867059238255023
+14	variance_mc	PFC	0.24794934675097466
+14	variance_mc	PFC	0.22940397515892982
+14	variance_mc	PFC	0.24068015694618225
+14	variance_mc	PFC	0.12186801113188267
+14	variance_mc	PFC	0.2234120012819767
+14	variance_mc	PFC	0.1825389187037945
+14	variance_mc	PFC	0.16876061342656612
+14	variance_mc	PFC	0.11372655667364598
+14	variance_mc	PFC	0.19936122968792916
+15	inverse_trace_mc	PFC	0.22567932978272437
+15	inverse_trace_mc	PFC	0.17087783269584178
+15	inverse_trace_mc	PFC	0.12042652778327465
+15	inverse_trace_mc	PFC	0.2524854663014412
+15	inverse_trace_mc	PFC	0.16867763549089432
+15	inverse_trace_mc	PFC	0.20905944406986238
+15	inverse_trace_mc	PFC	0.3086047939956188
+15	inverse_trace_mc	PFC	0.29510763481259344
+15	inverse_trace_mc	PFC	0.15714880116283894
+15	inverse_trace_mc	PFC	0.19156390637159348
+15	inverse_trace_mc	PFC	0.35430126428604125
+15	inverse_trace_mc	PFC	0.12138414340093732
+15	inverse_trace_mc	PFC	0.24935024350881577
+15	inverse_trace_mc	PFC	0.21772232174873352
+15	inverse_trace_mc	PFC	0.149942941442132
+15	inverse_trace_mc	PFC	0.24200175032019616
+15	inverse_trace_mc	PFC	0.23025776639580728
+15	inverse_trace_mc	PFC	0.23969783410429954
+15	inverse_trace_mc	PFC	0.11340771317481994
+15	inverse_trace_mc	PFC	0.21672584757208824
+15	inverse_trace_mc	PFC	0.17512790888547897
+15	inverse_trace_mc	PFC	0.16734450429677963
+15	inverse_trace_mc	PFC	0.1062844629958272
+15	inverse_trace_mc	PFC	0.19304044276475907
+15	log_det_mc	PFC	0.22645228654146193
+15	log_det_mc	PFC	0.173093666061759
+15	log_det_mc	PFC	0.1226789802312851
+15	log_det_mc	PFC	0.25233602300286295
+15	log_det_mc	PFC	0.16703554995357991
+15	log_det_mc	PFC	0.2122380840778351
+15	log_det_mc	PFC	0.31049827605485913
+15	log_det_mc	PFC	0.2931070172786713
+15	log_det_mc	PFC	0.15440660603344442
+15	log_det_mc	PFC	0.19201722711324692
+15	log_det_mc	PFC	0.35716733753681185
+15	log_det_mc	PFC	0.13327480882406234
+15	log_det_mc	PFC	0.24920348793268204
+15	log_det_mc	PFC	0.2251874716579914
+15	log_det_mc	PFC	0.15057796582579613
+15	log_det_mc	PFC	0.2400040704011917
+15	log_det_mc	PFC	0.23329933673143388
+15	log_det_mc	PFC	0.2392203025519848
+15	log_det_mc	PFC	0.11411462657153607
+15	log_det_mc	PFC	0.21981118083000184
+15	log_det_mc	PFC	0.17354924120008947
+15	log_det_mc	PFC	0.17065889157354833
+15	log_det_mc	PFC	0.11032748198136687
+15	log_det_mc	PFC	0.19357652068138123
+15	random	PFC	0.22021427854895592
+15	random	PFC	0.16244932025671005
+15	random	PFC	0.11115306742489338
+15	random	PFC	0.23033608242869377
+15	random	PFC	0.14832553043961524
+15	random	PFC	0.20676948487758637
+15	random	PFC	0.2840335042774677
+15	random	PFC	0.2834780043363571
+15	random	PFC	0.15168871805071832
+15	random	PFC	0.17620783753693103
+15	random	PFC	0.3319952718913555
+15	random	PFC	0.10061398923397064
+15	random	PFC	0.22903283342719077
+15	random	PFC	0.2019234548509121
+15	random	PFC	0.14068480722606183
+15	random	PFC	0.22358665466308594
+15	random	PFC	0.21586322471499442
+15	random	PFC	0.21630986630916596
+15	random	PFC	0.1141505859605968
+15	random	PFC	0.19747573599219323
+15	random	PFC	0.16479642488062382
+15	random	PFC	0.1571077261120081
+15	random	PFC	0.08694343857467174
+15	random	PFC	0.1844972351193428
+15	variance	PFC	0.23628102913498877
+15	variance	PFC	0.18010284073650837
+15	variance	PFC	0.12538765549659728
+15	variance	PFC	0.25657959014177323
+15	variance	PFC	0.1651185503602028
+15	variance	PFC	0.20844808965921402
+15	variance	PFC	0.295025330632925
+15	variance	PFC	0.29341022819280627
+15	variance	PFC	0.1672033827006817
+15	variance	PFC	0.19063057422637938
+15	variance	PFC	0.36668367087841036
+15	variance	PFC	0.12191569991409779
+15	variance	PFC	0.2532184974849224
+15	variance	PFC	0.21708547368645667
+15	variance	PFC	0.1516750818490982
+15	variance	PFC	0.23975712448358535
+15	variance	PFC	0.23177967652678488
+15	variance	PFC	0.22358953148126604
+15	variance	PFC	0.12397049281746149
+15	variance	PFC	0.2105771531164646
+15	variance	PFC	0.1729419393092394
+15	variance	PFC	0.16347924068570138
+15	variance	PFC	0.09788107438012958
+15	variance	PFC	0.19313835740089416
+15	variance_mc	PFC	0.23308213397860528
+15	variance_mc	PFC	0.17871870182454586
+15	variance_mc	PFC	0.12739694111049174
+15	variance_mc	PFC	0.26063142135739326
+15	variance_mc	PFC	0.17577858239412308
+15	variance_mc	PFC	0.21663325771689415
+15	variance_mc	PFC	0.3179742619395256
+15	variance_mc	PFC	0.3058172073960304
+15	variance_mc	PFC	0.1572013381123543
+15	variance_mc	PFC	0.19491712734103203
+15	variance_mc	PFC	0.36879291117191315
+15	variance_mc	PFC	0.13099336847662926
+15	variance_mc	PFC	0.2606328216195106
+15	variance_mc	PFC	0.2281462788581848
+15	variance_mc	PFC	0.14826559327542782
+15	variance_mc	PFC	0.24623633414506912
+15	variance_mc	PFC	0.23085449412465095
+15	variance_mc	PFC	0.23972069412469865
+15	variance_mc	PFC	0.12889760423451663
+15	variance_mc	PFC	0.22255048394203186
+15	variance_mc	PFC	0.1818403670191765
+15	variance_mc	PFC	0.17437630347907543
+15	variance_mc	PFC	0.11359176598489285
+15	variance_mc	PFC	0.19900128185749055
+16	inverse_trace_mc	PFC	0.22294983208179475
+16	inverse_trace_mc	PFC	0.16981645554304123
+16	inverse_trace_mc	PFC	0.11848526209592819
+16	inverse_trace_mc	PFC	0.24867362141609192
+16	inverse_trace_mc	PFC	0.16371681608259678
+16	inverse_trace_mc	PFC	0.20812318056821824
+16	inverse_trace_mc	PFC	0.30431350365281107
+16	inverse_trace_mc	PFC	0.2920807844400406
+16	inverse_trace_mc	PFC	0.14755495443940161
+16	inverse_trace_mc	PFC	0.18855984449386598
+16	inverse_trace_mc	PFC	0.3482746613025665
+16	inverse_trace_mc	PFC	0.11788649376481772
+16	inverse_trace_mc	PFC	0.2425225368142128
+16	inverse_trace_mc	PFC	0.21903744779527187
+16	inverse_trace_mc	PFC	0.1448045388609171
+16	inverse_trace_mc	PFC	0.23601753860712052
+16	inverse_trace_mc	PFC	0.22460191786289216
+16	inverse_trace_mc	PFC	0.23342793107032775
+16	inverse_trace_mc	PFC	0.11402635399252176
+16	inverse_trace_mc	PFC	0.215118108689785
+16	inverse_trace_mc	PFC	0.17443459928035737
+16	inverse_trace_mc	PFC	0.16478373445570468
+16	inverse_trace_mc	PFC	0.10818036515265703
+16	inverse_trace_mc	PFC	0.19082231745123862
+16	log_det_mc	PFC	0.22591661438345909
+16	log_det_mc	PFC	0.1702970312535763
+16	log_det_mc	PFC	0.12048610553145409
+16	log_det_mc	PFC	0.25228403493762014
+16	log_det_mc	PFC	0.16919667154550552
+16	log_det_mc	PFC	0.20968296781182288
+16	log_det_mc	PFC	0.3135047271847725
+16	log_det_mc	PFC	0.2985237890481949
+16	log_det_mc	PFC	0.15541206493973733
+16	log_det_mc	PFC	0.18726877942681314
+16	log_det_mc	PFC	0.3551530003547668
+16	log_det_mc	PFC	0.12361746948212385
+16	log_det_mc	PFC	0.24678008377552033
+16	log_det_mc	PFC	0.21942308232188223
+16	log_det_mc	PFC	0.1492142042517662
+16	log_det_mc	PFC	0.2419276486337185
+16	log_det_mc	PFC	0.23274647504091261
+16	log_det_mc	PFC	0.2387223544716835
+16	log_det_mc	PFC	0.11345387000590562
+16	log_det_mc	PFC	0.21705225393176078
+16	log_det_mc	PFC	0.17532681487500668
+16	log_det_mc	PFC	0.16977523528039457
+16	log_det_mc	PFC	0.10310954306274653
+16	log_det_mc	PFC	0.19032021805644037
+16	random	PFC	0.21961541160941123
+16	random	PFC	0.1671117377281189
+16	random	PFC	0.11197997406125068
+16	random	PFC	0.23662889182567595
+16	random	PFC	0.1553853052854538
+16	random	PFC	0.2075266095995903
+16	random	PFC	0.2899069280922413
+16	random	PFC	0.28101673066616056
+16	random	PFC	0.15355539858341216
+16	random	PFC	0.17670851990580558
+16	random	PFC	0.33704492390155794
+16	random	PFC	0.10609332317486406
+16	random	PFC	0.2296614757180214
+16	random	PFC	0.20262745156884193
+16	random	PFC	0.14241459749639035
+16	random	PFC	0.2241308681666851
+16	random	PFC	0.217361953407526
+16	random	PFC	0.21663646265864372
+16	random	PFC	0.11989712033420802
+16	random	PFC	0.20311707779765129
+16	random	PFC	0.1631568430364132
+16	random	PFC	0.15953837253153325
+16	random	PFC	0.08945038618519902
+16	random	PFC	0.18308568954467774
+16	variance	PFC	0.2345504368841648
+16	variance	PFC	0.17777468457818033
+16	variance	PFC	0.12373789079487324
+16	variance	PFC	0.25646590486168863
+16	variance	PFC	0.1635335549712181
+16	variance	PFC	0.2057527247071266
+16	variance	PFC	0.29528979226946833
+16	variance	PFC	0.290674951672554
+16	variance	PFC	0.16441700756549835
+16	variance	PFC	0.18986198246479036
+16	variance	PFC	0.3634421616792679
+16	variance	PFC	0.11768278062343597
+16	variance	PFC	0.2529391026496887
+16	variance	PFC	0.2150424624979496
+16	variance	PFC	0.1482968521118164
+16	variance	PFC	0.2417140756547451
+16	variance	PFC	0.23215209051966668
+16	variance	PFC	0.2221351021528244
+16	variance	PFC	0.12371371291577817
+16	variance	PFC	0.2073043729364872
+16	variance	PFC	0.17523438960313797
+16	variance	PFC	0.16353546746075154
+16	variance	PFC	0.09832521133124829
+16	variance	PFC	0.19400745257735252
+16	variance_mc	PFC	0.23184911862015725
+16	variance_mc	PFC	0.18143488273024558
+16	variance_mc	PFC	0.12599536277353762
+16	variance_mc	PFC	0.2603769454360008
+16	variance_mc	PFC	0.17600056201219558
+16	variance_mc	PFC	0.21593985512852668
+16	variance_mc	PFC	0.3144564747810364
+16	variance_mc	PFC	0.3071277439594269
+16	variance_mc	PFC	0.1584316461533308
+16	variance_mc	PFC	0.1910443477332592
+16	variance_mc	PFC	0.3636364153027534
+16	variance_mc	PFC	0.12871418308466673
+16	variance_mc	PFC	0.25632701769471167
+16	variance_mc	PFC	0.2245360182225704
+16	variance_mc	PFC	0.15014772832393647
+16	variance_mc	PFC	0.24591156616806983
+16	variance_mc	PFC	0.23183994606137276
+16	variance_mc	PFC	0.2361036019027233
+16	variance_mc	PFC	0.12425673022866249
+16	variance_mc	PFC	0.22306346744298935
+16	variance_mc	PFC	0.1831800301373005
+16	variance_mc	PFC	0.17000971041619778
+16	variance_mc	PFC	0.10729636497795582
+16	variance_mc	PFC	0.19478428080677987

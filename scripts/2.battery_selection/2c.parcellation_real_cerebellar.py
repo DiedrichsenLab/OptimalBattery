@@ -5,7 +5,6 @@ import pandas as pd
 import OptimalBattery.evaluate as ev
 import Functional_Fusion.atlas_map as am
 from Functional_Fusion.dataset import DataSetMDTB
-import OptimalBattery.estimate as es
 import OptimalBattery.construct as ct
 import OptimalBattery.plot as plot
 from OptimalBattery.global_config import data_dir
@@ -98,6 +97,6 @@ final_results_df = pd.concat(all_results, ignore_index=True)
 
 # Save the results
 save_dir = os.path.abspath(os.path.join(os.getcwd(),'eval_tsvs'))
-save_path = os.path.join(save_dir, 'real_parcellation_cerebellum.tsv')
+save_path = os.path.join(save_dir, 'parcellation_real_cerebellum.tsv')
 final_results_df.to_csv(save_path, sep='\t', index=False)
 

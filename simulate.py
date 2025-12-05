@@ -610,7 +610,7 @@ def sim_parcellation(num_task_lib = 100,
                 V_battery = ut.normalize_matrix(V_battery,axis=0)
 
                 # Build the parcellation
-                U_hats = et.estimate_Us(Y_battery, V_battery, method='correlation', hard=True)
+                U_hats = et.estimate_Us(Y_battery, V_battery, method='cos_angle', hard=True)
 
                 # This is for the single region analysis (optional argument to collapsee the parcellation into two regions)
                 if collapsed_U_true is not None:

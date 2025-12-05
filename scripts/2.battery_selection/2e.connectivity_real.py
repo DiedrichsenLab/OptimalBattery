@@ -72,5 +72,5 @@ long_df['avg_correlation_per_subject'] = long_df['avg_correlation_per_subject'].
 
 # save
 save_dir = os.path.abspath(os.path.join(os.getcwd(),'eval_tsvs'))
-save_path = os.path.join(save_dir, 'real_connectivity.tsv')
+save_path = os.path.join(save_dir, 'connectivity_real.tsv')
 long_df.to_csv(save_path, sep='\t', index=False)
