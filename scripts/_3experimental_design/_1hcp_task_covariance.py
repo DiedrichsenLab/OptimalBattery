@@ -4,9 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import Functional_Fusion.dataset as ds
 import Functional_Fusion.atlas_map as am
-import os
-import random
 from scipy.stats import ttest_ind
+from OptimalBattery.global_config import data_dir
 
 
 def get_covariance_matrices(space = 'fs32k',tasks=None,base_dir = None):
@@ -46,7 +45,7 @@ def plot_all_covariances(COV,tasks,infos):
         scale= np.max(cov)
         plot_covariance(cov,task,infos[i],scale)
     plt.tight_layout()
-    plt.show()
+
 
 def plot_covariance(cov,task,info,scale):
     ax = plt.gca()
@@ -105,8 +104,7 @@ def estimate_all_components(COV,tasks,infos):
     return df
 
 if __name__=='__main__':
-    base_dir = 'Y:/data/FunctionalFusion_new'
-    COV, tasks, infos = get_covariance_matrices(space = 'fs32k',base_dir=base_dir)
+    COV, tasks, infos = get_covariance_matrices(space = 'fs32k',base_dir=data_dir)
     # plot_all_covariances(COV,tasks,infos)
     D = estimate_all_components(COV,tasks,infos)
     # get_covariance_matrices(space = 'fs32k')

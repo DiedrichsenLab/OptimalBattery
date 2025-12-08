@@ -17,13 +17,7 @@ import HierarchBayesParcel.util as util
 import OptimalBattery.simulate as sim
 import OptimalBattery.estimate as es
 from scipy.stats import pearsonr, ttest_rel
-
-# define paths
-base_dir = 'Y:/data/'
-if not os.path.exists(base_dir):
-    base_dir = '/cifs/diedrichsen/data/'
-func_fus_dir = os.path.join(base_dir, 'FunctionalFusion')
-
+from OptimalBattery.global_config import data_dir
 
 def get_prediction_error(ytest, vtest, U_hat, indices=None):
     """Compute the prediction error using
@@ -216,7 +210,7 @@ def real_connectivity(G_library, condition_df,
     # get the label files for the icosahedron parcels
     train_label_image = []
     for hemi in ['L', 'R']:
-        train_label_image.append(func_fus_dir + '/Atlases' + f'/tpl-fs32k' + f'/Icosahedron1002.{hemi}.label.gii')
+        train_label_image.append(data_dir +'/FunctionalFusion_new' + '/Atlases' + f'/tpl-fs32k' + f'/Icosahedron1002.{hemi}.label.gii')
 
     # get the atlases needed to average within the icosahedron parcels
     fs32k_atlas,_ = am.get_atlas('fs32k')
