@@ -712,7 +712,7 @@ def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_rat
         results_df: DataFrame with the results of the simulations
     """
     results_df = pd.DataFrame()
-    max_n_task = 10
+    max_n_task = 16
     types = ['contrast_fixed','multitask','contrast_adaptive']
 
     # fit gamma to snr ratios

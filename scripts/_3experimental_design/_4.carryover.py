@@ -283,6 +283,7 @@ ax.set_xticklabels(labels)
 ax.legend(frameon=False)
 ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
+ax.set_ylim(top=1250)
 plt.tight_layout()
 fig.savefig(f"{save_dir}/carryover_tempAutocorrelation/carryover.pdf", bbox_inches='tight')
 plt.show()
@@ -329,3 +330,34 @@ print(np.mean(ratio))
 print("standard error of the mean (SEM) of the percentage:")
 se = np.std(ratio, ddof=1) / np.sqrt(len(ratio))
 print(se)
+
+
+labels = ['Group', 'Individual']
+means_diff = [np.mean(cov_dif_group_nos), np.mean(cov_diff_indi_nos)]
+means_same = [np.mean(cov_same_group_nos), np.mean(cov_same_indi_nos)]
+
+sem_diff = [np.std(cov_dif_group_nos, ddof=1) / np.sqrt(len(cov_dif_group_nos)),
+            np.std(cov_diff_indi_nos, ddof=1) / np.sqrt(len(cov_diff_indi_nos))]
+sem_same = [np.std(cov_same_group_nos, ddof=1) / np.sqrt(len(cov_same_group_nos)),
+            np.std(cov_same_indi_nos, ddof=1) / np.sqrt(len(cov_same_indi_nos))]
+
+# Set up bar positions
+x = np.arange(len(labels))
+width = 0.35
+
+fig, ax = plt.subplots(figsize=(6, 5))
+bars1 = ax.bar(x - width/2, means_diff, width, yerr=sem_diff, label='Different previous', alpha=0.8, capsize=5)
+bars2 = ax.bar(x + width/2, means_same, width, yerr=sem_same, label='Same previous', alpha=0.8, capsize=5)
+
+# Labels and aesthetics
+ax.set_ylabel('Covariance')
+ax.set_title('Carry-over covariance decomposition')
+ax.set_xticks(x)
+ax.set_xticklabels(labels)
+ax.legend(frameon=False)
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.set_ylim(top=1250)
+plt.tight_layout()
+fig.savefig(f"{save_dir}/supp/carryover_nostart/carryover_no_start.pdf", bbox_inches='tight')
+plt.show()

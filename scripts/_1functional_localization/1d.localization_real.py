@@ -110,7 +110,7 @@ ROI_mask = pt.tensor(ROI_mask, dtype=pt.float32, device=device)
 # gets what the indices for each task are and the duration of each regressor
 condition_df= ct.get_condition_indices(info_run, task_column_name='task_name', cond_column_name='task_name')
 
-multi_combo = ['tongue_movement','theory_of_mind','demand_grid','sentence_reading']
+multi_combo = ['tongue_movement','theory_of_mind','demand_grid','sentence_reading','spatial_navigation']
 multi_combination = info_all.index[info_all["task_name"].isin(multi_combo)].tolist()
 
 

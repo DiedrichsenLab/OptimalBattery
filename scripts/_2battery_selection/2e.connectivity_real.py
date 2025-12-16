@@ -59,9 +59,9 @@ D = ev.real_connectivity(G_lib, condition_df,
                       data_mdtb_s1_all_fs,data_mdtb_s1_all_suit, # test data
                       battery_sizes = [3,4,5,6,7,8,9,10,11,12,13,14,15,16],
                       metrics  = ['random','variance','variance_mc','log_det_mc','inverse_trace_mc'],
-                      n_batteries = 10000,
+                      n_batteries = 20000,
                       rest_idx = 31,
-                      n_iter=10)
+                      n_iter=25)
 
 D_averaged_across_iter = averaged_df = plot.average_per_subject(D,'correlation') # lists of subjects are averaged across iterations
 long_df = averaged_df.explode('avg_correlation_per_subject') # expands the list of subjects into rows for each subject
