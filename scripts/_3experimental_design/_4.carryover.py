@@ -7,6 +7,8 @@ import os
 import OptimalBattery.util as ut
 from scipy.stats import ttest_1samp, ttest_rel
 from OptimalBattery.global_config import data_dir, save_dir
+from matplotlib.patches import Patch
+
 
 
 # build transition matrix for visualization only...
@@ -59,6 +61,8 @@ def make_prev_cond(cond_vec, part_vec):
             prev_vec[t] = cond_vec[t-1]
         # else → leave as -1 (first task in run)
     return prev_vec
+
+
  
 def decompose_carryover(data,info,cond_vec,part_vec, include_start=True, type = 'group', criterion="prev"):
     """
@@ -210,7 +214,30 @@ data_sorted = data_mdtb_s1_run[:, sort_order, :]
 
 
 cond_vec = info_sorted["cond_num"].values   # global condition ID
-part_vec  = info_sorted["run"].values  
+part_vec  = info_sorted["run"].values
+
+# percentage of same-previous-task pairs
+prev_vec = make_prev_cond(cond_vec, part_vec)
+
+# exclude first task in each run
+valid = prev_vec != -1
+curr = cond_vec[valid]
+prev = prev_vec[valid]
+
+# same-task pairs across runs
+same_task = curr[:, None] == curr[None, :]
+same_prev = prev[:, None] == prev[None, :]
+
+# remove self-pairs
+np.fill_diagonal(same_task, False)
+np.fill_diagonal(same_prev, False)
+
+# restrict to same-task comparisons
+mask = same_task
+
+percent_same_prev = 100 * np.mean(same_prev[mask])
+print(f"{percent_same_prev:.1f}% of same-task pairs share the same previous task")
+
 
 print('Including start task:')
 # including start task for group
@@ -257,38 +284,6 @@ se = np.std(ratio, ddof=1) / np.sqrt(len(ratio))
 print(se)
 
 
-# plot
-labels = ['Group', 'Individual']
-means_diff = [np.mean(cov_dif_group), np.mean(cov_diff_indi)]
-means_same = [np.mean(cov_same_group), np.mean(cov_same_indi)]
-
-sem_diff = [np.std(cov_dif_group, ddof=1) / np.sqrt(len(cov_dif_group)),
-            np.std(cov_diff_indi, ddof=1) / np.sqrt(len(cov_diff_indi))]
-sem_same = [np.std(cov_same_group, ddof=1) / np.sqrt(len(cov_same_group)),
-            np.std(cov_same_indi, ddof=1) / np.sqrt(len(cov_same_indi))]
-
-# Set up bar positions
-x = np.arange(len(labels))
-width = 0.35
-
-fig, ax = plt.subplots(figsize=(6, 5))
-bars1 = ax.bar(x - width/2, means_diff, width, yerr=sem_diff, label='Different previous', alpha=0.8, capsize=5)
-bars2 = ax.bar(x + width/2, means_same, width, yerr=sem_same, label='Same previous', alpha=0.8, capsize=5)
-
-# Labels and aesthetics
-ax.set_ylabel('Covariance')
-ax.set_title('Carry-over covariance decomposition')
-ax.set_xticks(x)
-ax.set_xticklabels(labels)
-ax.legend(frameon=False)
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.set_ylim(top=1250)
-plt.tight_layout()
-fig.savefig(f"{save_dir}/carryover_tempAutocorrelation/carryover.pdf", bbox_inches='tight')
-plt.show()
-
-
 print('Excluding start task:')
 # excluding start task for group
 print('group carryover')
@@ -332,32 +327,71 @@ se = np.std(ratio, ddof=1) / np.sqrt(len(ratio))
 print(se)
 
 
-labels = ['Group', 'Individual']
-means_diff = [np.mean(cov_dif_group_nos), np.mean(cov_diff_indi_nos)]
-means_same = [np.mean(cov_same_group_nos), np.mean(cov_same_indi_nos)]
+# data
+means = [
+    np.mean(cov_dif_group),        np.mean(cov_same_group),        # Group (start)
+    np.mean(cov_diff_indi),        np.mean(cov_same_indi),         # Individual (start)
+    np.mean(cov_dif_group_nos),    np.mean(cov_same_group_nos),    # Group (no start)
+    np.mean(cov_diff_indi_nos),    np.mean(cov_same_indi_nos)      # Individual (no start)
+]
 
-sem_diff = [np.std(cov_dif_group_nos, ddof=1) / np.sqrt(len(cov_dif_group_nos)),
-            np.std(cov_diff_indi_nos, ddof=1) / np.sqrt(len(cov_diff_indi_nos))]
-sem_same = [np.std(cov_same_group_nos, ddof=1) / np.sqrt(len(cov_same_group_nos)),
-            np.std(cov_same_indi_nos, ddof=1) / np.sqrt(len(cov_same_indi_nos))]
+sems = [
+    np.std(cov_dif_group, ddof=1) / np.sqrt(len(cov_dif_group)),
+    np.std(cov_same_group, ddof=1) / np.sqrt(len(cov_same_group)),
+    np.std(cov_diff_indi, ddof=1) / np.sqrt(len(cov_diff_indi)),
+    np.std(cov_same_indi, ddof=1) / np.sqrt(len(cov_same_indi)),
+    np.std(cov_dif_group_nos, ddof=1) / np.sqrt(len(cov_dif_group_nos)),
+    np.std(cov_same_group_nos, ddof=1) / np.sqrt(len(cov_same_group_nos)),
+    np.std(cov_diff_indi_nos, ddof=1) / np.sqrt(len(cov_diff_indi_nos)),
+    np.std(cov_same_indi_nos, ddof=1) / np.sqrt(len(cov_same_indi_nos))
+]
 
-# Set up bar positions
-x = np.arange(len(labels))
-width = 0.35
+# x positions (extra spacing between blocks) 
+x = np.array([0, 1,   3, 4,   7, 8,   10, 11])
+width = 0.8
 
-fig, ax = plt.subplots(figsize=(6, 5))
-bars1 = ax.bar(x - width/2, means_diff, width, yerr=sem_diff, label='Different previous', alpha=0.8, capsize=5)
-bars2 = ax.bar(x + width/2, means_same, width, yerr=sem_same, label='Same previous', alpha=0.8, capsize=5)
+color_diff = "#1f77b4"   # different previous (light gray)
+color_same = "#ff7f0e"   # same previous (dark)
 
-# Labels and aesthetics
-ax.set_ylabel('Covariance')
-ax.set_title('Carry-over covariance decomposition')
-ax.set_xticks(x)
-ax.set_xticklabels(labels)
-ax.legend(frameon=False)
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.set_ylim(top=1250)
+colors = [
+    color_diff, color_same,
+    color_diff, color_same,
+    color_diff, color_same,
+    color_diff, color_same
+]
+
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.bar(
+    x, means, yerr=sems,
+    width=width,
+    color=colors,
+    capsize=5,
+    alpha=0.9
+)
+
+
+ax.set_xticks([0.5, 3.5, 7.5, 10.5])
+ax.set_xticklabels([
+    "Group\n(start)",
+    "Individual\n(start)",
+    "Group\n(no start)",
+    "Individual\n(no start)"
+])
+ax.set_ylabel("Covariance")
+
+ax.spines["top"].set_visible(False)
+ax.spines["right"].set_visible(False)
+
+# legend (only what matters)
+legend_elements = [
+    Patch(facecolor=color_diff, label="Different previous"),
+    Patch(facecolor=color_same, label="Same previous")
+]
+ax.legend(handles=legend_elements, frameon=False)
+
 plt.tight_layout()
-fig.savefig(f"{save_dir}/supp/carryover_nostart/carryover_no_start.pdf", bbox_inches='tight')
+fig.savefig(
+    f"{save_dir}/carryover_tempAutocorrelation/carryover.pdf",
+    bbox_inches="tight"
+)
 plt.show()

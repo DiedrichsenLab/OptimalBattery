@@ -225,6 +225,53 @@ print(np.std(dice_adaptive_list)/np.sqrt(len(dice_adaptive_list)))
 t,p = ttest_1samp(dice_adaptive_list, 0.0)
 print(f"t={t:.3f}, p={p:.3f}")
 
+# Dice bar plot with SEM 
+
+palette = {
+    "multitask": "#A34700",
+    "contrast_fixed": "#005788",
+    "contrast_adaptive": "#007656"
+}
+
+# dice overlap plot
+labels = ["contrast_fixed", "contrast_adaptive", "multitask"]
+
+dice_lists = [
+    dice_fixed_list,
+    dice_adaptive_list,
+    dice_multi_list
+]
+
+means = [np.mean(d) for d in dice_lists]
+sems  = [sem(d) for d in dice_lists]
+
+colors = [palette[l] for l in labels]
+
+fig, ax = plt.subplots(figsize=(5, 4))
+x = np.arange(len(labels))
+
+bars = ax.bar(
+    x,
+    means,
+    yerr=sems,
+    capsize=5,
+    color=colors,
+    alpha=0.85
+)
+
+ax.set_xticks(x)
+ax.set_xticklabels(labels, rotation=20)
+ax.set_ylabel("Dice overlap")
+
+# clean aesthetics
+ax.spines["top"].set_visible(False)
+ax.spines["right"].set_visible(False)
+ax.set_ylim(0, 0.3)
+
+plt.tight_layout()
+fig.savefig(f"{save_dir}/single_vs_multi/real_dice_barplot.pdf", bbox_inches="tight")
+plt.show()
+
 #####################################################
 
 # Compute mean value of each test contrast in and out of roi defined by each localizer

@@ -19,13 +19,14 @@ base_dir = f'{data_dir}/FunctionalFusion_new'
 cort_dir = f'{data_dir}/Atlas_templates/fs_LR_32'
 
 #Load data
+sub_list = None
 MDTB_dataset = DataSetMDTB(f'{base_dir}/MDTB')
-data_mdtb_s1,info_mdtb_1  =MDTB_dataset.get_data(space=space,ses_id='ses-s1',type='CondRun')
+data_mdtb_s1,info_mdtb_1  =MDTB_dataset.get_data(space=space,ses_id='ses-s2',type='CondRun', subj=sub_list)
 data_mdtb_s1[np.isnan(data_mdtb_s1)] = 0
 task_names = info_mdtb_1.cond_name.values
 nconds = info_mdtb_1['cond_name'].nunique()
 nparts = info_mdtb_1['run'].nunique()
-cond_names = info_mdtb_1[:29].cond_name.values
+cond_names = info_mdtb_1[:32].cond_name.values
 
 # Load surface files for left and right hemispheres
 surfs = [f"{base_dir}/Atlases/tpl-fs32k/tpl-fs32k_hemi-{h}_inflated.surf.gii" for h in ['L', 'R']]
@@ -63,17 +64,17 @@ ROI_temporal = np.isin(parcels, [4]).astype(int)[np.newaxis, :]
 
 
 
-data_mdtb_s1_frontal = data_mdtb_s1[:,:,:] * ROI_frontal
-G_frontal = ct.get_G(data_mdtb_s1_frontal,nconds,nparts)
+# data_mdtb_s1_frontal = data_mdtb_s1[:,:,:] * ROI_frontal
+# G_frontal = ct.get_G(data_mdtb_s1_frontal,nconds,nparts)
 
-data_mdtb_s1_parietal = data_mdtb_s1[:,:,:] * ROI_parietal
-G_parietal = ct.get_G(data_mdtb_s1_parietal,nconds,nparts)
+# data_mdtb_s1_parietal = data_mdtb_s1[:,:,:] * ROI_parietal
+# G_parietal = ct.get_G(data_mdtb_s1_parietal,nconds,nparts)
 
-data_mdtb_s1_occipital = data_mdtb_s1[:,:,:] * ROI_occipital
-G_occipital = ct.get_G(data_mdtb_s1_occipital,nconds,nparts)
+# data_mdtb_s1_occipital = data_mdtb_s1[:,:,:] * ROI_occipital
+# G_occipital = ct.get_G(data_mdtb_s1_occipital,nconds,nparts)
 
-data_mdtb_s1_temporal = data_mdtb_s1[:,:,:] * ROI_temporal
-G_temporal = ct.get_G(data_mdtb_s1_temporal,nconds,nparts)
+# data_mdtb_s1_temporal = data_mdtb_s1[:,:,:] * ROI_temporal
+# G_temporal = ct.get_G(data_mdtb_s1_temporal,nconds,nparts)
 
 
 # Motor vs prefrontal cortex
@@ -88,51 +89,86 @@ ROI_PFC = np.isin(parcels, [74,81,82,83,84,86]).astype(int)[np.newaxis, :]
 data_mdtb_s1_motor = data_mdtb_s1[:,:,:] * ROI_motor
 G_motor = ct.get_G(data_mdtb_s1_motor,nconds,nparts)
 
+D = ct.build_combinations(G_motor, strategy='random',n_batteries=100000,n_tasks=8,seed = None,replacement=False,rest_idx= None)
+D_best = ct.choose_combination(D,'log_det')
+D_best_idx = D_best.combination.iloc[0]
+combo = cond_names[list(D_best_idx)]
+print(f"Motor best combo 8 tasks: {combo}")
+
+D = ct.build_combinations(G_motor, strategy='random',n_batteries=100000,n_tasks=6,seed = None,replacement=False,rest_idx= None)
+D_best = ct.choose_combination(D,'log_det')
+D_best_idx = D_best.combination.iloc[0]
+combo = cond_names[list(D_best_idx)]
+print(f"Motor best combo 6 tasks: {combo}")
+D = ct.build_combinations(G_motor, strategy='random',n_batteries=100000,n_tasks=4,seed = None,replacement=False,rest_idx= None)
+D_best = ct.choose_combination(D,'log_det')
+D_best_idx = D_best.combination.iloc[0]
+combo = cond_names[list(D_best_idx)]
+print(f"Motor best combo 4 tasks: {combo}")
+
 data_mdtb_s1_PFC = data_mdtb_s1[:,:,:] * ROI_PFC
 G_PFC = ct.get_G(data_mdtb_s1_PFC,nconds,nparts)
+D = ct.build_combinations(G_PFC, strategy='random',n_batteries=100000,n_tasks=8,seed = None,replacement=False,rest_idx= None)
+D_best = ct.choose_combination(D,'log_det')
+D_best_idx = D_best.combination.iloc[0]
+combo = cond_names[list(D_best_idx)]
+print(f"PFC best combo 8 tasks: {combo}")
+
+D = ct.build_combinations(G_PFC, strategy='random',n_batteries=100000,n_tasks=6,seed = None,replacement=False,rest_idx= None)
+D_best = ct.choose_combination(D,'log_det')
+D_best_idx = D_best.combination.iloc[0]
+combo = cond_names[list(D_best_idx)]
+print(f"PFC best combo 6 tasks: {combo}")
+D = ct.build_combinations(G_PFC, strategy='random',n_batteries=100000,n_tasks=4,seed = None,replacement=False,rest_idx= None)
+D_best = ct.choose_combination(D,'log_det')
+D_best_idx = D_best.combination.iloc[0]
+combo = cond_names[list(D_best_idx)]
+print(f"PFC best combo 4 tasks: {combo}")
 
 
-cov_mats = [
-    [G_frontal, G_parietal, G_occipital, G_temporal], 
-    [G_motor,   G_PFC] ]                                 
+# cov_mats = [
+#     [G_frontal, G_parietal, G_occipital, G_temporal], 
+#     [G_motor,   G_PFC] ]                                 
 
-titles = [
-    ["Frontal", "Parietal", "Occipital", "Temporal"],
-    ["Motor Cortex", "Prefrontal Cortex"]
-]
+# titles = [
+#     ["Frontal", "Parietal", "Occipital", "Temporal"],
+#     ["Motor Cortex", "Prefrontal Cortex"]
+# ]
 
-nrows = 2
-ncols = 4
+# nrows = 2
+# ncols = 4
 
-fig, axes = plt.subplots(
-    nrows, ncols, 
-    figsize=(4*ncols, 4*nrows),
-    squeeze=False
-)
+# fig, axes = plt.subplots(
+#     nrows, ncols, 
+#     figsize=(5*ncols, 5*nrows),
+#     squeeze=False
+# )
 
-for r in range(nrows):
-    for c in range(ncols):
-        ax = axes[r, c]
+# for r in range(nrows):
+#     for c in range(ncols):
+#         ax = axes[r, c]
 
-        if c >= len(cov_mats[r]):
-            ax.axis("off")
-            continue
+#         if c >= len(cov_mats[r]):
+#             ax.axis("off")
+#             continue
 
-        G = cov_mats[r][c]
-        title = titles[r][c]
+#         G = cov_mats[r][c]
+#         title = titles[r][c]
 
-        im = ax.imshow(G, cmap="viridis")
-        ax.set_title(title, fontsize=14)
+#         im = ax.imshow(G, cmap="viridis")
+#         ax.set_title(title, fontsize=14)
+        
 
-        # Tick labels (task names)
-        ax.set_xticks(np.arange(len(cond_names)))
-        ax.set_yticks(np.arange(len(cond_names)))
-        ax.set_xticklabels(cond_names, rotation=90, fontsize=6)
-        ax.set_yticklabels(cond_names, fontsize=6)
+#         # Tick labels (task names)
+#         ax.set_xticks(np.arange(len(cond_names)))
+#         ax.set_yticks(np.arange(len(cond_names)))
+#         ax.set_xticklabels(cond_names, rotation=90, fontsize=6)
+#         ax.set_yticklabels(cond_names, fontsize=6)
 
-        # Colorbar
-        plt.colorbar(im, ax=ax, fraction=0.046)
 
-plt.tight_layout()
-plt.savefig(f"{save_dir}/supp/region_covs.pdf")
-plt.show()
+#         # Colorbar
+#         plt.colorbar(im, ax=ax, fraction=0.046)
+
+# plt.tight_layout()
+# plt.savefig(f"{save_dir}/supp/region_cov/cortical_covs.pdf")
+# plt.show()

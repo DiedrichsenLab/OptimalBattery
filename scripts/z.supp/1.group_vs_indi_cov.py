@@ -10,21 +10,21 @@ from OptimalBattery.global_config import data_dir,save_dir
 
 # Constants
 base_dir = f'{data_dir}/FunctionalFusion_new'
-space = 'SUIT3'
+space = 'fs32k'
 device = pt.device('cuda' if pt.cuda.is_available() else 'cpu')
 
 
 
 # Load data
 MDTB_dataset = DataSetMDTB(f'{base_dir}/MDTB')
-data_mdtb_s1,info_mdtb_1  =MDTB_dataset.get_data(space=space,ses_id='ses-s1',type='CondRun')
+data_mdtb_s1,info_mdtb_1  =MDTB_dataset.get_data(space=space,ses_id='ses-s2',type='CondRun')
 data_mdtb_s1[np.isnan(data_mdtb_s1)] = 0
-task_names = info_mdtb_1['cond_name'][:29]
+task_names = info_mdtb_1['cond_name'][:32]
 
 
 # prep cond and part vecs
-cond_vec = np.tile(np.arange(1, 29 + 1), 16)
-part_vec = np.repeat(np.arange(1, 16 + 1), 29)
+cond_vec = np.tile(np.arange(1, 32 + 1), 16)
+part_vec = np.repeat(np.arange(1, 16 + 1), 32)
 
 
 # get averaged data cov matrix - > group cov
@@ -95,6 +95,11 @@ fig, axes = plt.subplots(1, 3, figsize=(18, 5))
 # 1. Group covariance
 im0 = axes[0].imshow(G_group, cmap='viridis')
 axes[0].set_title("Group Covariance")
+# x and y labels
+axes[0].set_xticks(np.arange(len(task_names)))
+axes[0].set_yticks(np.arange(len(task_names)))
+axes[0].set_xticklabels(task_names, rotation=90, fontsize=6)
+axes[0].set_yticklabels(task_names, fontsize=6)
 plt.colorbar(im0, ax=axes[0])
 
 # 2. Average Individual covariance
@@ -103,6 +108,11 @@ axes[1].set_title(
     f"Individual Covariance\n"
     f"corr = {corr_group_ind:.2f}, p = {p_group_ind:.1e}"
 )
+# x and y labels
+axes[1].set_xticks(np.arange(len(task_names)))
+axes[1].set_yticks(np.arange(len(task_names)))
+axes[1].set_xticklabels(task_names, rotation=90, fontsize=6)
+axes[1].set_yticklabels(task_names, fontsize=6)
 plt.colorbar(im1, ax=axes[1])
 
 # 3. Residual covariance
@@ -111,8 +121,13 @@ axes[2].set_title(
     f"Residual Covariance\n"
     f"corr = {corr_group_res:.2f}, p = {p_group_res:.1e}"
 )
+# x and y labels
+axes[2].set_xticks(np.arange(len(task_names)))
+axes[2].set_yticks(np.arange(len(task_names)))
+axes[2].set_xticklabels(task_names, rotation=90, fontsize=6)
+axes[2].set_yticklabels(task_names, fontsize=6)
 plt.colorbar(im2, ax=axes[2])
 
 plt.tight_layout()
-plt.savefig(f"{save_dir}/supp/group_vs_indi_residual_cov.pdf")
+plt.savefig(f"{save_dir}/supp/group_vs_individual_cov/group_vs_indi_residual_cov.pdf")
 plt.show()
