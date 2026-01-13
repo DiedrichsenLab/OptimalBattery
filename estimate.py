@@ -7,7 +7,6 @@ import torch as pt
 import numpy as np
 import OptimalBattery.evaluate as ev
 import OptimalBattery.util as ut
-import HierarchBayesParcel.emissions as em
 
 
 ######################### Parcellation U  Estimation #########################

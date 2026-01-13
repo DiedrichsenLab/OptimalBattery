@@ -13,7 +13,6 @@ import Functional_Fusion.dataset as fdata
 import os
 import cortico_cereb_connectivity.evaluation as con_ev
 import pandas as pd
-import HierarchBayesParcel.util as util
 import OptimalBattery.simulate as sim
 import OptimalBattery.estimate as es
 from scipy.stats import pearsonr, ttest_rel
