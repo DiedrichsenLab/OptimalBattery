@@ -37,54 +37,88 @@ def normalize_matrix(X,axis = 0):
     X = X / norm
     return X
 
-def recenter_fmri_data(data , info ,task_column_name = 'cond_name',center_condition='rest'): # tested and works but needs review..
+def recenter_data(data, info, center_full_code='rest_task', keep_center=False):
     """
-    Recenter fMRI data by subtracting the 'rest' condition from each run
+    Recenter  data by subtracting the center condition from each partition.
+    Works with CondAll, CondHalf, and CondRun data types.
+    
     Parameters:
-        data(np.ndarray): fMRI data of shape (n_subjects, n_conditions, n_voxels)
-        info(pd.DataFrame): task information tsv
-        task_column_name(str): column name in info that contains task names
-        center_condition(str): name of the condition to center the data around
+        data (np.ndarray):  data of shape (n_subjects, n_conditions x repititions, n_voxels)
+        info (pd.DataFrame): condition information with columns like 'task_code', 'cond_code', 'half', 'run'
+        center_full_code (str): full task condition code to center around as 'taskcode_condcode' (default: 'rest_task')
+        keep_center (bool): if True, keep center condition as zeros; if False, remove it
+    
     Returns:
-        processed_data(np.ndarray): recentered fMRI data
-        updated_info(pd.DataFrame): updated task information tsv
+        processed_data (np.ndarray): recentered fMRI data
+        updated_info (pd.DataFrame): updated info
     """
-
-    n_subjects, n_conditions, n_voxels = data.shape
-    if 'run' in info.columns:
-        runs = info['run'].unique()
+    n_subjects, _, _ = data.shape
+    
+    # Split on first underscore only
+    center_task, center_cond = center_full_code.split('_', 1)
+    
+    # Determine partition column
+    if 'half' in info.columns:
+        partition_col = 'half'
+        partitions = info['half'].unique()
+    elif 'run' in info.columns:
+        partition_col = 'run'
+        partitions = info['run'].unique()
     else:
-        runs = [1]
-
-    # Find indices of 'centering' condition for the different runs
-    center_condition_indices= info[info[task_column_name] == center_condition].index
-
-    # initlize data
-    processed_data = np.zeros((n_subjects, n_conditions, n_voxels))
-
+        partition_col = None
+        partitions = [None]
+    
+    # Find center condition indices (match both task_code and cond_code)
+    center_mask = (info['task_code'] == center_task) & (info['cond_code'] == center_cond)
+    
+    if not center_mask.any():
+        raise ValueError(f"Center condition with task_code='{center_task}' and cond_code='{center_cond}' not found in data")
+    
+    # Process each subject
+    processed_data_list = []
     for subject_idx in range(n_subjects):
-        subject_data = data[subject_idx] 
-        subject_recentered_data = []
+        subject_data = data[subject_idx]
+        subject_recentered = []
         
-        # Subtract centering conition from each run
-        for run in runs:
-            if 'run' in info.columns:
-                run_mask = info['run'] == run
+        for partition in partitions:
+            # Get partition mask
+            if partition_col is not None:
+                partition_mask = (info[partition_col] == partition)
             else:
-                run_mask = np.ones(len(info), dtype=bool)
-            run_data = subject_data[run_mask]
-             
-            # Subtract centering condition from the run
-            centering_cond_idx_run = center_condition_indices[0]
-            rest_data = run_data[centering_cond_idx_run]
-            adjusted_run_data = run_data - rest_data
-
-            # Append recentered run data and updated info
-            subject_recentered_data.append(adjusted_run_data)
-
-        # Combine processed runs for the subject
-        processed_data[subject_idx] = np.vstack(subject_recentered_data)
-    return processed_data
+                partition_mask = np.ones(len(info), dtype=bool)
+            
+            # Find center condition for this partition
+            center_idx_partition = np.where(partition_mask & center_mask)[0]
+            
+            if len(center_idx_partition) == 0:
+                raise ValueError(f"No center condition '{center_full_code}' found for partition {partition}")
+            
+            # Get center condition data
+            center_data = subject_data[center_idx_partition[0]]
+            
+            if keep_center:
+                # Keep all conditions including center (as zeros)
+                partition_indices = np.where(partition_mask)[0]
+                recentered = subject_data[partition_indices] - center_data
+            else:
+                # Remove center condition
+                task_mask = partition_mask & ~center_mask
+                partition_indices = np.where(task_mask)[0]
+                recentered = subject_data[partition_indices] - center_data
+            
+            subject_recentered.append(recentered)
+        
+        processed_data_list.append(np.vstack(subject_recentered))
+    
+    processed_data = np.stack(processed_data_list, axis=0)
+    
+    # Update info
+    if keep_center:
+        updated_info = info.copy()
+    else:
+        updated_info = info[~center_mask].reset_index(drop=True)
+    
+    return processed_data, updated_info
 
 def combine_parcellation_regions(fine_parcellation, labels, region_mapping):
     """
