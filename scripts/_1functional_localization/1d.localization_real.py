@@ -5,11 +5,10 @@ import matplotlib.pyplot as plt
 import construct as ut
 import OptimalBattery.evaluate as ev
 import Functional_Fusion.atlas_map as am
-from IndividualParcellation.global_config import *
 import OptimalBattery.estimate as es
 import OptimalBattery.util as ut
 import OptimalBattery.construct as ct
-import OptimalBattery.plot as plot
+# import OptimalBattery.plot as plot
 import OptimalBattery.simulate as sim
 from scipy.optimize import brentq
 import matplotlib.pyplot as plt
@@ -21,6 +20,7 @@ import nitools as nt
 from scipy.stats import sem  
 import pandas as pd 
 from OptimalBattery.global_config import save_dir, data_dir, repo_dir
+import torch as pt
 
 
 # save figs?
@@ -29,8 +29,8 @@ save_plot = False
 ############## Load data ##############
 space = 'SUIT3'
 atlas,_= am.get_atlas(atlas_str=space)
-subj = ['sub-02','sub-03','sub-04','sub-06','sub-07','sub-08','sub-09','sub-10','sub-12','sub-13','sub-14','sub-15','sub-16','sub-17','sub-18','sub-19']
-# subj= ['sub-02','sub-04','sub-06']
+subj = ['sub-01','sub-02','sub-03','sub-04','sub-06','sub-07','sub-08','sub-09','sub-10','sub-12','sub-13','sub-14','sub-15','sub-16','sub-17','sub-18','sub-19']
+
 lang_dataset = DataSetLanguage(f'{data_dir}/FunctionalFusion_new/Language')
 
 data_run,info_run  =lang_dataset.get_data(space=space,ses_id='ses-localizer',type='CondRun',subj=subj)

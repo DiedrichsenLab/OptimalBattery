@@ -17,11 +17,10 @@ atlas,_= am.get_atlas(atlas_str=space)
   
 # Load data
 MDTB_dataset = DataSetLanguage(f'{data_dir}/FunctionalFusion_new/Language')
+subj = None
 
-subj = ['sub-02','sub-03','sub-04','sub-06','sub-07','sub-08','sub-09','sub-10','sub-12','sub-13','sub-14','sub-15','sub-16','sub-17','sub-18','sub-19']
 
-
-data_mdtb_s1_run,info_mdtb_1_run  =MDTB_dataset.get_data(space=space,ses_id='ses-localizer',type='CondRun',subj=subj)
+data_mdtb_s1_run,info_mdtb_1_run  =MDTB_dataset.get_data(space=space,ses_id='ses-localizer',type='CondRun',subj=None)
 data_mdtb_s1_run[np.isnan(data_mdtb_s1_run)] = 0
 
 mask = ~info_mdtb_1_run["cond_code"].isin(["sentence", "noword"])
@@ -49,7 +48,7 @@ snr_list = (var[:, 0] + var[:, 1]).tolist()
 
 # check localizer size make sure tasks represented relative to rest
 data_mdtb_s1_run,info_mdtb_1_run  =MDTB_dataset.get_data(space=space,ses_id='ses-localizer',type='CondRun',subj=subj)
-data_mdtb_s1_run = ut.recenter_fmri_data(data_mdtb_s1_run,info_mdtb_1_run,task_column_name='task_name',center_condition='rest')
+data_mdtb_s1_run, info_mdtb_1_run = ut.recenter_data(data_mdtb_s1_run,info_mdtb_1_run,center_full_code='rest_task',keep_center= True)
 data_mdtb_s1_run[np.isnan(data_mdtb_s1_run)] = 0
 
 sentence_indices = info_mdtb_1_run.index[info_mdtb_1_run["cond_code"] == "sentence"].tolist()
