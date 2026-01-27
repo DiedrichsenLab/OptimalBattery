@@ -309,12 +309,11 @@ if __name__ == "__main__":
     base_dir=f'{data_dir}/FunctionalFusion_new'
     sessions_to_use = {'MDTB': ['s1','s2'],
                     'Language' : ['localizer'],
-                    'HCPur100' : ['task2']
 
                     }
 
     # define atlas to create library in and give the library a version
-    atlas = 'fs32k'
+    atlas = 'multiatlasHCP'
     version = 'V1'
     data , info = make_task_library(base_dir, sessions_to_use, atlas=atlas)
 
