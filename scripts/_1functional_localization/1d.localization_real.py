@@ -2,7 +2,6 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import construct as ut
 import OptimalBattery.evaluate as ev
 import Functional_Fusion.atlas_map as am
 import OptimalBattery.estimate as es
@@ -15,12 +14,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from Functional_Fusion.dataset import DataSetLanguage
 from matplotlib.colors import ListedColormap
-from scipy.stats import ttest_rel,  ttest_1samp
+from scipy.stats import ttest_rel,  ttest_1samp,pearsonr
 import nitools as nt
 from scipy.stats import sem  
 import pandas as pd 
 from OptimalBattery.global_config import save_dir, data_dir, repo_dir
 import torch as pt
+import Functional_Fusion.reliability as rel
+
 
 
 # save figs?
@@ -123,6 +124,20 @@ comb_names, Uhats_multi_full, Uhats_multi_collapsed =ev.real_localization_multi(
 # compute average roi size in multi to find optimal fixed and adaptive thresholds
 roi_sizes = Uhats_multi_collapsed.sum(axis=1)
 avg_size = roi_sizes.mean()
+
+
+# fSNR vs multi-task ROI size correlation
+mask_fsnr = ~info_run["cond_code"].isin(["sentence", "noword"])
+data_fsnr = data_run[:, mask_fsnr.values, :].cpu().numpy()
+info_fsnr = info_run[mask_fsnr].copy()
+n_cond_fsnr = info_fsnr['cond_num'].nunique()
+n_part_fsnr = info_fsnr['run'].nunique()
+cond_vec = np.tile(np.arange(1, n_cond_fsnr + 1), n_part_fsnr)
+part_vec = np.repeat(np.arange(1, n_part_fsnr + 1), n_cond_fsnr)
+var = rel.decompose_subj_group(data_fsnr, cond_vec, part_vec, separate='subject_wise', subtract_mean=False)
+snr_list = (var[:, 0] + var[:, 1]).tolist()
+r, p = pearsonr(snr_list, roi_sizes.tolist())
+print(f"fSNR vs multi-task ROI size: r={r:.3f}, p={p:.3f}")
 
 if save_plot:
     group_percent_map = np.nanmean(Uhats_multi_collapsed, axis=0) * 100 * np.array(ROI_mask.cpu())

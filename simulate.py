@@ -720,10 +720,10 @@ def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_rat
 
     # generate Vs that are orthonal on the column and row (has to be square matrix)
     rng= np.random.default_rng(seed)
-    V = np.eye(5, 5)
+    V = np.eye(5, 5) * np.sqrt(5)
     A = rng.normal(size=(5, 5))
     Q, _ = np.linalg.qr(A)
-    V_lib = Q @ V
+    V_lib = Q @ V 
     V_lib = pt.tensor(V_lib, dtype=pt.float64, device=device)
 
     parcellation_contrast_T = []
@@ -789,13 +789,10 @@ def sim_single_vs_multi(U_individuals,U_individuals_collapsed,base_noise,snr_rat
             Y_battery = Y_battery + battery_noise
 
             if type == 'multitask':
-                # Y_battery = ut.center_matrix(Y_battery,axis=0)
-                Y_battery = ut.normalize_matrix(Y_battery,axis=0)
+                Y_norm = ut.normalize_matrix(Y_battery,axis=0)
+                V_norm = ut.normalize_matrix(V_battery,axis=0)
 
-                # V_battery = ut.center_matrix(V_battery,axis=0)
-                V_battery = ut.normalize_matrix(V_battery,axis=0)
-
-                U_hat = et.estimate_Us(Y_battery, V_battery, method='cos_angle', hard=True)
+                U_hat = et.estimate_Us(Y_norm, V_norm, method='cos_angle', hard=True)
                 U_hat= collapse_U(U_hat, target_parcels_indices=[4])[0]
                 parcellation_multi.append(U_hat.cpu().numpy())
 
