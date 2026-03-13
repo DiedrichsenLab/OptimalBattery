@@ -224,21 +224,27 @@ dice_multi_list = ev.calculate_crosssub_overlap(Uhats_multi_collapsed)
 print(np.mean(dice_multi_list))
 print( np.std(dice_multi_list)/np.sqrt(len(dice_multi_list)))
 t,p = ttest_1samp(dice_multi_list, 0.0)
-print(f"t={t:.3f}, p={p:.3f}")
+print(f"t={t}, p={p}")
 
 print ('fixed')
 dice_fixed_list = ev.calculate_crosssub_overlap(contrasts_fixed)
 print(np.mean(dice_fixed_list))
 print(np.std(dice_fixed_list)/np.sqrt(len(dice_fixed_list)))
 t,p = ttest_1samp(dice_fixed_list, 0.0)
-print(f"t={t:.3f}, p={p:.3f}")
+print(f"t={t}, p={p}")
 
 print ('adaptive')
 dice_adaptive_list = ev.calculate_crosssub_overlap(contrasts_adaptive)
 print(np.mean(dice_adaptive_list))
 print(np.std(dice_adaptive_list)/np.sqrt(len(dice_adaptive_list)))
 t,p = ttest_1samp(dice_adaptive_list, 0.0)
-print(f"t={t:.3f}, p={p:.3f}")
+print(f"t={t}, p={p:}")
+
+print('dice differences')
+t, p = ttest_rel(dice_multi_list, dice_fixed_list)
+print(f"multi vs fixed: t={t}, p={p}")
+t, p = ttest_rel(dice_multi_list, dice_adaptive_list)
+print(f"multi vs adaptive: t={t}, p={p})")
 
 # Dice bar plot with SEM 
 
