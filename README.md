@@ -1,6 +1,6 @@
 # OptimalBattery
 
-The OptimalBattery project implements the analyses underlying the paper **"Multi-Task Batteries for Individualized Functional Brain Mapping"** by Arafat, Nettekoven & Diedrichsen (2026).
+The OptimalBattery project implements the analyses underlying the paper **"Multi-Task Batteries for Precision Functional Mapping"** by Arafat, Nettekoven, Xiang & Diedrichsen (2026).
 
 ## Dependencies
 
