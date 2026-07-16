@@ -181,22 +181,39 @@ def build_library(raw, fold_idx, scale_factors=None):
 
 
 # ------------------------------ plotting ------------------------------------
-def plot_cortex(S_cv, out_png=OUT_PNG):
+def plot_cortex(S_cv, out_png=OUT_PNG, n_cond=None):
     """S_cv (P,) in multiatlasHCP grayordinates -> 4-view inflated cortex PNG.
-    Diverging about zero, because S_cv is signed and zero is the meaningful point."""
+
+    Displayed as the SIGNED SQUARE ROOT, sign(S_cv)*sqrt(|S_cv|/n_cond):
+    S_cv is a squared-type quantity with a ~250x dynamic range, so plotting it
+    raw crushes ~95% of cortex into near-white and shows only visual cortex.
+    The signed sqrt compresses that ~15x and puts it back in activation units
+    (the unbiased analogue of the across-task SD), while keeping the sign so
+    zero -- the meaningful point -- stays readable.
+    """
     template = nb.load(os.path.join(repo_dir, 'task_library', f'template_space-{ATLAS}.dscalar.nii'))
     header = nb.Cifti2Header.from_axes((nb.cifti2.ScalarAxis(['S_cv']), template.header.get_axis(1)))
     cifti = nb.Cifti2Image(dataobj=S_cv[None, :].astype(np.float64), header=header)
     surfL, surfR = [np.squeeze(np.asarray(x)) for x in nt.surf_from_cifti(cifti)]
 
-    both = np.concatenate([surfL, surfR])
-    valid = ~np.isnan(both)
+    raw = np.concatenate([surfL, surfR])
+    valid = ~np.isnan(raw)
     print(f'\n=== cross-validated task coverage (cortex, {int(valid.sum())} vertices) ===')
-    print(f'  median S_cv        : {np.nanmedian(both):.4f}')
-    print(f'  vertices S_cv <= 0 : {int(np.sum(both[valid] <= 0))} '
-          f'({100*np.mean(both[valid] <= 0):.2f}%)   <- no detectable task-induced variation')
+    print(f'  median S_cv        : {np.nanmedian(raw):.4f}')
+    print(f'  vertices S_cv <= 0 : {int(np.sum(raw[valid] <= 0))} '
+          f'({100*np.mean(raw[valid] <= 0):.2f}%)   <- no detectable task-induced variation')
+    print(f'  dynamic range p99/p1 (positive part): '
+          f'{np.nanpercentile(raw,99)/max(np.nanpercentile(raw[raw>0],1),1e-9):.0f}x')
     for p in [1, 5, 25, 50, 75, 95, 99]:
-        print(f'  p{p:<3}: {np.nanpercentile(both, p):8.4f}')
+        print(f'  p{p:<3}: {np.nanpercentile(raw, p):8.4f}')
+
+    # signed sqrt for display (see docstring)
+    N = n_cond if n_cond else 1
+    sgn = lambda a: np.sign(a) * np.sqrt(np.abs(a) / N)
+    surfL, surfR = sgn(surfL), sgn(surfR)
+    both = np.concatenate([surfL, surfR])
+    print(f'  -> displayed as signed sqrt: median={np.nanmedian(both):.4f}  '
+          f'p99={np.nanpercentile(both,99):.4f}')
 
     fs32k = os.path.join(os.path.dirname(am.__file__), 'Atlases', 'tpl-fs32k')
     infl = {'left': os.path.join(fs32k, 'tpl-fs32k_hemi-L_veryinflated.surf.gii'),
@@ -229,7 +246,7 @@ def plot_cortex(S_cv, out_png=OUT_PNG):
     cb = matplotlib.colorbar.ColorbarBase(
         cax, cmap=plt.get_cmap('RdBu_r'),
         norm=matplotlib.colors.Normalize(vmin=-vmax, vmax=vmax), orientation='vertical')
-    cb.ax.tick_params(labelsize=8); cb.set_label('cross-validated S_cv', fontsize=9)
+    cb.ax.tick_params(labelsize=8); cb.set_label('cross-validated coverage  sign(S_cv)*sqrt(|S_cv|/N)', fontsize=8)
     buf = io.BytesIO(); fig.savefig(buf, format='png', dpi=100, bbox_inches='tight', transparent=True)
     plt.close(fig); buf.seek(0)
     cbi = Image.open(buf).convert('RGBA'); cbi = cbi.crop(cbi.getbbox())
@@ -290,7 +307,7 @@ def main():
               f'median S_cv={np.median(s_cv):.4f}  frac<=0={np.mean(s_cv <= 0):.3f}')
     S_cv /= N_SPLITS
 
-    out = plot_cortex(S_cv)
+    out = plot_cortex(S_cv, n_cond=len(codes_ref))
     try:
         plt.figure(figsize=(11, 7)); plt.imshow(Image.open(out)); plt.axis('off'); plt.show()
     except Exception:
