@@ -11,9 +11,6 @@ import nitools as nt
 from OptimalBattery.global_config import save_dir, data_dir
 import torch as pt
 
-from DCBC.dcbc import compute_DCBC
-from DCBC.utilities import compute_dist
-
 
 # save figs?
 save_plot = False
@@ -121,61 +118,47 @@ masks = {
     "contrast_adaptive": contrasts_adaptive.cpu().numpy(),
 }
 
-############## DCBC ##############
-max_dist = 35
-bin_width = 5
+############## Spatial dispersion ##############
+coords = atlas.world.T   
 
-coords_fov = atlas.world.T[ROI_indices]                        # (N_fov, 3) right-hemi voxels
-dist = compute_dist(coords_fov, backend='torch').to_sparse()
-
-dcbc_conds = ['intact_passage', 'degraded_passage', 'n_back', 'rest']
-heldout_idx = np.where(info_all['task_name'].isin(dcbc_conds).values)[0]
-print(f"DCBC conditions ({len(heldout_idx)}): {list(info_all['task_name'].iloc[heldout_idx])}")
-func_all = data_all.detach().cpu().numpy()[:, heldout_idx, :]
-
-
-def dcbc_for_mask(mask):
+def dispersion_for_mask(mask):
     vals = []
     for s in range(mask.shape[0]):
-        parc = mask[s, ROI_indices]
-        func = func_all[s][:, ROI_indices].T
-        D = compute_DCBC(maxDist=max_dist, binWidth=bin_width,
-                         parcellation=parc, func=func,
-                         dist=dist, weighting=True, backend='torch')
-        vals.append(float(D['DCBC']))
+        idx = np.where(mask[s] > 0)[0]
+        c = coords[idx]                                          
+        rms = np.sqrt(np.mean(np.sum((c - c.mean(axis=0)) ** 2, axis=1)))  
+        vals.append(float(rms))
     return vals
 
 
-dcbc = {name: dcbc_for_mask(m) for name, m in masks.items()}
+dispersion = {name: dispersion_for_mask(m) for name, m in masks.items()}
 
-print("\nDCBC (mean +/- sem, t vs 0):")
-for name, vals in dcbc.items():
+print("\nSpatial dispersion (mm, mean +/- sem):")
+for name, vals in dispersion.items():
     v = np.array(vals, dtype=float)
-    t, p = ttest_1samp(v, 0.0, nan_policy='omit')
-    print(f"  {name:18s}: {np.nanmean(v):.4f} +/- {sem(v, nan_policy='omit'):.4f}   t={t:.2f}, p={p:.2e}")
+    print(f"  {name:18s}: {np.nanmean(v):.3f} +/- {sem(v, nan_policy='omit'):.3f}")
 
-print("\nPaired tests (multi vs single):")
+print("\nPaired tests (single vs multi):")
 for single in ["contrast_fixed", "contrast_adaptive"]:
-    t, p = ttest_rel(dcbc["multitask"], dcbc[single], nan_policy='omit')
-    print(f"  multitask vs {single}: t={t:.2f}, p={p:.2e}")
+    t, p = ttest_rel(dispersion[single], dispersion["multitask"], nan_policy='omit')
+    print(f"  {single} vs multitask: t={t:.2f}, p={p:.2e}")
 
 # Bar plot
 palette = {"multitask": "#A34700", "contrast_fixed": "#005788", "contrast_adaptive": "#007656"}
 
 plot_labels = ["contrast_fixed", "contrast_adaptive", "multitask"]
-means = [np.nanmean(dcbc[l]) for l in plot_labels]
-sems = [sem(np.array(dcbc[l], dtype=float), nan_policy='omit') for l in plot_labels]
+means = [np.nanmean(dispersion[l]) for l in plot_labels]
+sems = [sem(np.array(dispersion[l], dtype=float), nan_policy='omit') for l in plot_labels]
 colors = [palette[l] for l in plot_labels]
 
 fig, ax = plt.subplots(figsize=(5, 4))
 x = np.arange(len(plot_labels))
 ax.bar(x, means, yerr=sems, capsize=5, color=colors, alpha=0.85)
-ax.axhline(0, color='k', lw=0.8)
 ax.set_xticks(x)
 ax.set_xticklabels(plot_labels, rotation=20)
-ax.set_ylabel("DCBC")
+ax.set_ylabel("Spatial dispersion (mm)")
 ax.spines["top"].set_visible(False)
 ax.spines["right"].set_visible(False)
 plt.tight_layout()
-fig.savefig(f"{save_dir}/single_vs_multi/real_dcbc_barplot_testconds.pdf", bbox_inches="tight")
+fig.savefig(f"{save_dir}/single_vs_multi/real_dispersion_barplot.pdf", bbox_inches="tight")
 plt.show()
