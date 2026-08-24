@@ -6,7 +6,7 @@ if not os.path.exists(data_dir):
 if not os.path.exists(data_dir):
     data_dir = "/Volumes/diedrichsen_data$/data"
 
-save_dir = 'C:/Users/barafat/Dropbox (Personal)/Papers/MultiTaskBattery_paper/Figures'
+save_dir = 'C:/Users/barafat/Diedrichsenlab Dropbox/Lab Manager/Papers/MultiTaskBattery_paper/Figures'
 if not os.path.exists(save_dir):
     save_dir = '/Users/jdiedrichsen/Dropbox/papers/MultiTaskBattery_paper/Figures'
 
