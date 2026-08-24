@@ -83,3 +83,6 @@ for thr in thresholds:
     p_values.append(p)
 
 print(np.mean(r_values))
+
+# print range
+print(f'Range of thresholds: {np.min(r_values)} to {np.max(r_values)}')
