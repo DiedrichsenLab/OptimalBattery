@@ -8,7 +8,7 @@ import OptimalBattery.util as ut
 from OptimalBattery.global_config import data_dir, save_dir
 
 # build transition matrix for visualization only...
-dat_file = df = pd.read_csv(f"{data_dir}/Cerebellum/super_cerebellum/sc1/data/s16/sc1_s16.dat", delim_whitespace=True, header=0)
+dat_file = df = pd.read_csv(f"{data_dir}/Cerebellum/super_cerebellum/sc1/data/s16/sc1_s16.dat", sep='\t',header=0)
 filtered_dat = dat_file[dat_file["runNum"] >= 51].copy()
 filtered_dat["run"] = filtered_dat["runNum"] - 50
 filtered_dat = filtered_dat.drop(columns=["runNum"])
@@ -21,9 +21,9 @@ atlas,_= am.get_atlas(atlas_str=space)
 func_fus_dir = os.path.join(data_dir, 'FunctionalFusion_new')
 
 MDTB_dataset = DataSetMDTB(f'{func_fus_dir}/MDTB')
-subj = None
-data_mdtb_s1_run,info_mdtb_1_run  =MDTB_dataset.get_data(space=space,ses_id='ses-s1',type='TaskRun',subj=subj)
-data_mdtb_s1_run = ut.recenter_fmri_data(data_mdtb_s1_run , info_mdtb_1_run ,task_column_name = 'cond_name',center_condition='rest')
+subj = [1,2,3]
+data_mdtb_s1_run,info_mdtb_1_run  = MDTB_dataset.get_data(space=space,ses_id='ses-s1',type='TaskRun',subj=subj)
+data_mdtb_s1_run,info_mdtb_1_run = ut.recenter_data(data_mdtb_s1_run , info_mdtb_1_run ,center_full_code='rest_task')
 # nans to 0
 data_mdtb_s1_run = np.nan_to_num(data_mdtb_s1_run)
 n_sub, n_reg,n_vox = data_mdtb_s1_run.shape
@@ -101,3 +101,4 @@ ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
 plt.savefig(f"{save_dir}/carryover_tempAutocorrelation/temp_auto.pdf", bbox_inches='tight')
 plt.show()
+pass 
