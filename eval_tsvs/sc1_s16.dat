@@ -1,0 +1,462 @@
+startTime	endTime	taskName	taskFile	taskFunction	taskNum	instructTime	TRreal	timeOfTR	realStartTime	runNum
+  0	 50	stroop           	sc1_stroop_0.txt            	sc1_run_stroop           	 1	5	  0	-0.76228	0.03358134	 1
+ 50	 85	stroop           	sc1_stroop_1.txt            	sc1_run_stroop           	 2	5	  0	-0.76228	  130.0973	 1
+ 85	120	stroop           	sc1_stroop_2.txt            	sc1_run_stroop           	 3	5	  0	-0.76228	  168.8622	 1
+120	155	stroop           	sc1_stroop_3.txt            	sc1_run_stroop           	 4	5	  0	-0.76228	  201.6816	 1
+155	190	stroop           	sc1_stroop_4.txt            	sc1_run_stroop           	 5	5	  0	-0.76228	  233.3501	 1
+190	225	stroop           	sc1_stroop_5.txt            	sc1_run_stroop           	 6	5	  0	-0.76228	  264.8198	 1
+225	260	stroop           	sc1_stroop_6.txt            	sc1_run_stroop           	 7	5	  0	-0.76228	  296.2367	 1
+260	295	stroop           	sc1_stroop_7.txt            	sc1_run_stroop           	 8	5	  0	-0.76228	  327.7566	 1
+  0	 50	nBack            	sc1_nBack_0.txt             	sc1_run_nBack            	 1	5	  0	-0.64597	0.01703612	 2
+ 50	 85	nBack            	sc1_nBack_1.txt             	sc1_run_nBack            	 2	5	  0	-0.64597	  80.55053	 2
+ 85	120	nBack            	sc1_nBack_2.txt             	sc1_run_nBack            	 3	5	  0	-0.64597	  113.2041	 2
+120	155	nBack            	sc1_nBack_3.txt             	sc1_run_nBack            	 4	5	  0	-0.64597	  144.6557	 2
+155	190	nBack            	sc1_nBack_4.txt             	sc1_run_nBack            	 5	5	  0	-0.64597	  176.1575	 2
+  0	 35	verbGeneration   	sc1_verbGeneration_1.txt    	sc1_run_verbGeneration   	 1	5	  0	-0.49735	  0.019702	 3
+ 35	 70	verbGeneration   	sc1_verbGeneration_2.txt    	sc1_run_verbGeneration   	 2	5	  0	-0.49735	   78.0629	 3
+  0	 35	spatialNavigation	sc1_spatialNavigation_1.txt 	sc1_run_spatialNavigation	 1	5	  0	-0.53762	0.03207659	 4
+ 35	 70	spatialNavigation	sc1_spatialNavigation_2.txt 	sc1_run_spatialNavigation	 2	5	  0	-0.53762	  85.08986	 4
+  0	 50	visualSearch     	sc1_visualSearch_0.txt      	sc1_run_visualSearch     	 1	5	  0	-0.55756	0.01695114	 5
+ 50	 85	visualSearch     	sc1_visualSearch_1.txt      	sc1_run_visualSearch     	 2	5	  0	-0.55756	  56.71265	 5
+ 85	120	visualSearch     	sc1_visualSearch_2.txt      	sc1_run_visualSearch     	 3	5	  0	-0.55756	  88.19625	 5
+120	155	visualSearch     	sc1_visualSearch_3.txt      	sc1_run_visualSearch     	 4	5	  0	-0.55756	  119.7993	 5
+155	190	visualSearch     	sc1_visualSearch_4.txt      	sc1_run_visualSearch     	 5	5	  0	-0.55756	  151.1342	 5
+  0	 94	GoNoGo           	sc1_GoNoGo_0.txt            	sc1_run_GoNoGo           	 1	5	  0	-0.60414	0.01709104	 6
+ 94	129	GoNoGo           	sc1_GoNoGo_1.txt            	sc1_run_GoNoGo           	 2	5	  0	-0.60414	  133.1869	 6
+129	164	GoNoGo           	sc1_GoNoGo_2.txt            	sc1_run_GoNoGo           	 3	5	  0	-0.60414	  172.7688	 6
+164	199	GoNoGo           	sc1_GoNoGo_3.txt            	sc1_run_GoNoGo           	 4	5	  0	-0.60414	  204.8712	 6
+199	234	GoNoGo           	sc1_GoNoGo_4.txt            	sc1_run_GoNoGo           	 5	5	  0	-0.60414	  236.5567	 6
+  0	 50	nBackPic         	sc1_nBackPic_0.txt          	sc1_run_nBackPic         	 1	5	  0	 -0.6999	0.01683997	 7
+ 50	 85	nBackPic         	sc1_nBackPic_1.txt          	sc1_run_nBackPic         	 2	5	  0	 -0.6999	  51.00215	 7
+ 85	120	nBackPic         	sc1_nBackPic_2.txt          	sc1_run_nBackPic         	 3	5	  0	 -0.6999	  82.43677	 7
+120	155	nBackPic         	sc1_nBackPic_3.txt          	sc1_run_nBackPic         	 4	5	  0	 -0.6999	  113.9887	 7
+155	190	nBackPic         	sc1_nBackPic_4.txt          	sc1_run_nBackPic         	 5	5	  0	 -0.6999	   145.557	 7
+  0	 35	checkerBoard     	sc1_checkerBoard_1.txt      	sc1_run_checkerBoard     	 1	5	  0	-0.61726	 0.0185032	 8
+  0	 50	affective        	sc1_affective_0.txt         	sc1_run_affective        	 1	5	  0	 -2.0155	0.01526212	 9
+ 50	 85	affective        	sc1_affective_1.txt         	sc1_run_affective        	 2	5	  0	 -2.0155	  52.58686	 9
+  0	 50	emotional        	sc1_emotional_0.txt         	sc1_run_emotional        	 1	5	  0	 -0.6524	0.01714822	10
+ 50	 85	emotional        	sc1_emotional_1.txt         	sc1_run_emotional        	 2	5	  0	 -0.6524	  47.71359	10
+  0	 35	ToM              	sc1_ToM_1.txt               	sc1_run_ToM              	 1	5	  0	-0.55422	 0.0178864	11
+ 35	 70	ToM              	sc1_ToM_2.txt               	sc1_run_ToM              	 2	5	  0	-0.55422	  48.07904	11
+ 70	105	ToM              	sc1_ToM_3.txt               	sc1_run_ToM              	 3	5	  0	-0.55422	  80.28341	11
+  0	 55	arithmetic       	sc1_arithmetic_0.txt        	sc1_run_arithmetic       	 1	5	  0	-0.57911	0.02026952	12
+ 55	 90	arithmetic       	sc1_arithmetic_1.txt        	sc1_run_arithmetic       	 2	5	  0	-0.57911	  48.12953	12
+ 90	125	arithmetic       	sc1_arithmetic_2.txt        	sc1_run_arithmetic       	 3	5	  0	-0.57911	  79.91635	12
+125	160	arithmetic       	sc1_arithmetic_3.txt        	sc1_run_arithmetic       	 4	5	  0	-0.57911	  111.4847	12
+  0	 35	actionObservation	sc1_actionObservation_1.txt 	sc1_run_actionObservation	 1	5	  0	-0.62288	0.03369806	13
+  0	 35	motorImagery     	sc1_motorImagery_1.txt      	sc1_run_motorImagery     	 1	5	  0	-0.64463	0.01707892	14
+ 35	 70	motorImagery     	sc1_motorImagery_2.txt      	sc1_run_motorImagery     	 2	5	  0	-0.64463	  44.59186	14
+  0	 35	intervalTiming   	sc1_intervalTiming_1.txt    	sc1_run_intervalTiming   	 1	5	  0	-0.51027	0.01690653	15
+ 35	 70	intervalTiming   	sc1_intervalTiming_2.txt    	sc1_run_intervalTiming   	 2	5	  0	-0.51027	  48.08049	15
+ 70	105	intervalTiming   	sc1_intervalTiming_3.txt    	sc1_run_intervalTiming   	 3	5	  0	-0.51027	   79.5167	15
+  0	 50	motorSequence    	sc1_motorSequence_0.txt     	sc1_run_motorSequence    	 1	5	  0	-0.56423	0.01705803	16
+ 50	 85	motorSequence    	sc1_motorSequence_1.txt     	sc1_run_motorSequence    	 2	5	  0	-0.56423	  60.81725	16
+ 85	120	motorSequence    	sc1_motorSequence_2.txt     	sc1_run_motorSequence    	 3	5	  0	-0.56423	  92.53716	16
+120	155	motorSequence    	sc1_motorSequence_3.txt     	sc1_run_motorSequence    	 4	5	  0	-0.56423	  124.0054	16
+155	190	motorSequence    	sc1_motorSequence_4.txt     	sc1_run_motorSequence    	 5	5	  0	-0.56423	  155.5572	16
+  0	 35	emotional        	sc1_emotional_2.txt         	sc1_run_emotional        	 1	5	  0	-0.66876	0.08234194	17
+ 35	 70	nBackPic         	sc1_nBackPic_5.txt          	sc1_run_nBackPic         	 2	5	  0	-0.66876	  33.40636	17
+ 70	105	arithmetic       	sc1_arithmetic_4.txt        	sc1_run_arithmetic       	 3	5	  0	-0.66876	  68.46402	17
+105	140	affective        	sc1_affective_2.txt         	sc1_run_affective        	 4	5	  0	-0.66876	   101.703	17
+140	175	GoNoGo           	sc1_GoNoGo_5.txt            	sc1_run_GoNoGo           	 5	5	  0	-0.66876	  135.1066	17
+175	210	intervalTiming   	sc1_intervalTiming_4.txt    	sc1_run_intervalTiming   	 6	5	  0	-0.66876	  170.5149	17
+210	245	ToM              	sc1_ToM_4.txt               	sc1_run_ToM              	 7	5	  0	-0.66876	  202.9016	17
+245	280	motorSequence    	sc1_motorSequence_5.txt     	sc1_run_motorSequence    	 8	5	  0	-0.66876	   235.956	17
+280	315	visualSearch     	sc1_visualSearch_5.txt      	sc1_run_visualSearch     	 9	5	  0	-0.66876	  268.0921	17
+315	350	stroop           	sc1_stroop_8.txt            	sc1_run_stroop           	10	5	  0	-0.66876	  301.3454	17
+350	385	nBack            	sc1_nBack_5.txt             	sc1_run_nBack            	11	5	  0	-0.66876	  339.7752	17
+  0	 35	arithmetic       	sc1_arithmetic_5.txt        	sc1_run_arithmetic       	 1	5	  0	-0.67021	 0.1002053	18
+ 35	 70	nBackPic         	sc1_nBackPic_6.txt          	sc1_run_nBackPic         	 2	5	  0	-0.67021	  32.53948	18
+ 70	105	visualSearch     	sc1_visualSearch_6.txt      	sc1_run_visualSearch     	 3	5	  0	-0.67021	   66.2949	18
+105	140	affective        	sc1_affective_3.txt         	sc1_run_affective        	 4	5	  0	-0.67021	  99.63143	18
+140	175	motorSequence    	sc1_motorSequence_6.txt     	sc1_run_motorSequence    	 5	5	  0	-0.67021	  131.7022	18
+175	210	nBack            	sc1_nBack_6.txt             	sc1_run_nBack            	 6	5	  0	-0.67021	  163.8384	18
+210	245	emotional        	sc1_emotional_3.txt         	sc1_run_emotional        	 7	5	  0	-0.67021	  196.6759	18
+245	280	GoNoGo           	sc1_GoNoGo_6.txt            	sc1_run_GoNoGo           	 8	5	  0	-0.67021	  229.0109	18
+280	315	ToM              	sc1_ToM_5.txt               	sc1_run_ToM              	 9	5	  0	-0.67021	  262.3839	18
+315	350	intervalTiming   	sc1_intervalTiming_5.txt    	sc1_run_intervalTiming   	10	5	  0	-0.67021	  294.8038	18
+350	385	stroop           	sc1_stroop_9.txt            	sc1_run_stroop           	11	5	  0	-0.67021	   327.758	18
+  0	 35	emotional        	sc1_emotional_4.txt         	sc1_run_emotional        	 1	5	  0	-0.62035	 0.1002574	19
+ 35	 70	intervalTiming   	sc1_intervalTiming_6.txt    	sc1_run_intervalTiming   	 2	5	  0	-0.62035	  35.65865	19
+ 70	105	motorSequence    	sc1_motorSequence_7.txt     	sc1_run_motorSequence    	 3	5	  0	-0.62035	  73.36933	19
+105	140	nBack            	sc1_nBack_7.txt             	sc1_run_nBack            	 4	5	  0	-0.62035	  105.5901	19
+140	175	nBackPic         	sc1_nBackPic_7.txt          	sc1_run_nBackPic         	 5	5	  0	-0.62035	  138.5611	19
+175	210	ToM              	sc1_ToM_6.txt               	sc1_run_ToM              	 6	5	  0	-0.62035	  171.4318	19
+210	245	affective        	sc1_affective_4.txt         	sc1_run_affective        	 7	5	  0	-0.62035	  203.2843	19
+245	280	GoNoGo           	sc1_GoNoGo_7.txt            	sc1_run_GoNoGo           	 8	5	  0	-0.62035	  235.7039	19
+280	315	arithmetic       	sc1_arithmetic_6.txt        	sc1_run_arithmetic       	 9	5	  0	-0.62035	  271.4628	19
+315	350	stroop           	sc1_stroop_10.txt           	sc1_run_stroop           	10	5	  0	-0.62035	  304.0331	19
+350	385	visualSearch     	sc1_visualSearch_7.txt      	sc1_run_visualSearch     	11	5	  0	-0.62035	  336.6702	19
+  0	 35	nBackPic         	sc1_nBackPic_8.txt          	sc1_run_nBackPic         	 1	5	  0	-0.62321	 0.1173005	20
+ 35	 70	intervalTiming   	sc1_intervalTiming_7.txt    	sc1_run_intervalTiming   	 2	5	  0	-0.62321	  35.64194	20
+ 70	105	stroop           	sc1_stroop_11.txt           	sc1_run_stroop           	 3	5	  0	-0.62321	  70.31573	20
+105	140	ToM              	sc1_ToM_7.txt               	sc1_run_ToM              	 4	5	  0	-0.62321	  105.1714	20
+140	175	affective        	sc1_affective_5.txt         	sc1_run_affective        	 5	5	  0	-0.62321	  140.1804	20
+175	210	nBack            	sc1_nBack_8.txt             	sc1_run_nBack            	 6	5	  0	-0.62321	  175.3213	20
+210	245	GoNoGo           	sc1_GoNoGo_8.txt            	sc1_run_GoNoGo           	 7	5	  0	-0.62321	   210.379	20
+245	280	motorSequence    	sc1_motorSequence_8.txt     	sc1_run_motorSequence    	 8	5	  0	-0.62321	  245.3031	20
+280	315	arithmetic       	sc1_arithmetic_7.txt        	sc1_run_arithmetic       	 9	5	  0	-0.62321	  280.2271	20
+315	350	emotional        	sc1_emotional_5.txt         	sc1_run_emotional        	10	5	  0	-0.62321	  315.2182	20
+350	385	visualSearch     	sc1_visualSearch_8.txt      	sc1_run_visualSearch     	11	5	  0	-0.62321	  350.2423	20
+  0	 35	stroop           	sc1_stroop_12.txt           	sc1_run_stroop           	 1	5	  0	-0.65243	 0.1659269	21
+ 35	 70	visualSearch     	sc1_visualSearch_9.txt      	sc1_run_visualSearch     	 2	5	  0	-0.65243	  35.22612	21
+ 70	105	ToM              	sc1_ToM_8.txt               	sc1_run_ToM              	 3	5	  0	-0.65243	   70.2668	21
+105	140	nBackPic         	sc1_nBackPic_9.txt          	sc1_run_nBackPic         	 4	5	  0	-0.65243	  105.2075	21
+140	175	arithmetic       	sc1_arithmetic_8.txt        	sc1_run_arithmetic       	 5	5	  0	-0.65243	  140.2486	21
+175	210	affective        	sc1_affective_6.txt         	sc1_run_affective        	 6	5	  0	-0.65243	  175.2059	21
+210	245	intervalTiming   	sc1_intervalTiming_8.txt    	sc1_run_intervalTiming   	 7	5	  0	-0.65243	  210.1802	21
+245	280	nBack            	sc1_nBack_9.txt             	sc1_run_nBack            	 8	5	  0	-0.65243	  245.3045	21
+280	315	GoNoGo           	sc1_GoNoGo_9.txt            	sc1_run_GoNoGo           	 9	5	  0	-0.65243	  280.3955	21
+315	350	motorSequence    	sc1_motorSequence_9.txt     	sc1_run_motorSequence    	10	5	  0	-0.65243	  315.3531	21
+350	385	emotional        	sc1_emotional_6.txt         	sc1_run_emotional        	11	5	  0	-0.65243	  350.2104	21
+  0	 35	visualSearch     	sc1_visualSearch_10.txt     	sc1_run_visualSearch     	 1	5	  0	-0.61798	 0.1500999	22
+ 35	 70	nBack            	sc1_nBack_10.txt            	sc1_run_nBack            	 2	5	  0	-0.61798	   35.2077	22
+ 70	105	motorSequence    	sc1_motorSequence_10.txt    	sc1_run_motorSequence    	 3	5	  0	-0.61798	  70.28208	22
+105	140	emotional        	sc1_emotional_7.txt         	sc1_run_emotional        	 4	5	  0	-0.61798	   105.224	22
+140	175	stroop           	sc1_stroop_13.txt           	sc1_run_stroop           	 5	5	  0	-0.61798	  140.3149	22
+175	210	intervalTiming   	sc1_intervalTiming_9.txt    	sc1_run_intervalTiming   	 6	5	  0	-0.61798	  175.2209	22
+210	245	affective        	sc1_affective_7.txt         	sc1_run_affective        	 7	5	  0	-0.61798	  210.2131	22
+245	280	arithmetic       	sc1_arithmetic_9.txt        	sc1_run_arithmetic       	 8	5	  0	-0.61798	  245.2708	22
+280	315	ToM              	sc1_ToM_9.txt               	sc1_run_ToM              	 9	5	  0	-0.61798	  280.1781	22
+315	350	GoNoGo           	sc1_GoNoGo_10.txt           	sc1_run_GoNoGo           	10	5	  0	-0.61798	  315.4362	22
+350	385	nBackPic         	sc1_nBackPic_10.txt         	sc1_run_nBackPic         	11	5	  0	-0.61798	  350.3436	22
+  6	 41	actionObservation	sc1_actionObservation_2.txt 	sc1_run_actionObservation	 1	5	  0	-0.96121	  6.000941	23
+ 41	 76	arithmetic       	sc1_arithmetic_10.txt       	sc1_run_arithmetic       	 2	5	  0	-0.96121	  43.18951	23
+ 76	111	nBackPic         	sc1_nBackPic_11.txt         	sc1_run_nBackPic         	 3	5	  0	-0.96121	  77.68064	23
+111	146	checkerBoard     	sc1_checkerBoard_2.txt      	sc1_run_checkerBoard     	 4	5	  0	-0.96121	  112.5202	23
+146	181	affective        	sc1_affective_8.txt         	sc1_run_affective        	 5	5	  0	-0.96121	  147.6943	23
+181	216	stroop           	sc1_stroop_14.txt           	sc1_run_stroop           	 6	5	  0	-0.96121	  182.7184	23
+216	251	motorImagery     	sc1_motorImagery_3.txt      	sc1_run_motorImagery     	 7	5	  0	-0.96121	  217.6093	23
+251	286	nBack            	sc1_nBack_11.txt            	sc1_run_nBack            	 8	5	  0	-0.96121	  252.6168	23
+286	321	emotional        	sc1_emotional_8.txt         	sc1_run_emotional        	 9	5	  0	-0.96121	  287.6578	23
+321	356	verbGeneration   	sc1_verbGeneration_3.txt    	sc1_run_verbGeneration   	10	5	  0	-0.96121	  322.5817	23
+356	391	motorSequence    	sc1_motorSequence_11.txt    	sc1_run_motorSequence    	11	5	  0	-0.96121	  357.6227	23
+391	426	GoNoGo           	sc1_GoNoGo_11.txt           	sc1_run_GoNoGo           	12	5	  0	-0.96121	  392.7971	23
+426	461	rest             	sc1_rest_1.txt              	sc1_run_rest             	13	5	  0	-0.96121	  427.5546	23
+461	496	ToM              	sc1_ToM_10.txt              	sc1_run_ToM              	14	5	  0	-0.96121	  462.5285	23
+496	531	intervalTiming   	sc1_intervalTiming_10.txt   	sc1_run_intervalTiming   	15	5	  0	-0.96121	  497.5863	23
+531	566	spatialNavigation	sc1_spatialNavigation_3.txt 	sc1_run_spatialNavigation	16	5	  0	-0.96121	   532.527	23
+566	601	visualSearch     	sc1_visualSearch_11.txt     	sc1_run_visualSearch     	17	5	  0	-0.96121	  567.6834	23
+  6	 41	ToM              	sc1_ToM_11.txt              	sc1_run_ToM              	 1	5	  0	 -1.3989	   6.00141	24
+ 41	 76	verbGeneration   	sc1_verbGeneration_4.txt    	sc1_run_verbGeneration   	 2	5	  0	 -1.3989	  42.75599	24
+ 76	111	rest             	sc1_rest_2.txt              	sc1_run_rest             	 3	5	  0	 -1.3989	  77.46437	24
+111	146	motorSequence    	sc1_motorSequence_12.txt    	sc1_run_motorSequence    	 4	5	  0	 -1.3989	  112.6042	24
+146	181	arithmetic       	sc1_arithmetic_11.txt       	sc1_run_arithmetic       	 5	5	  0	 -1.3989	  147.6618	24
+181	216	actionObservation	sc1_actionObservation_3.txt 	sc1_run_actionObservation	 6	5	  0	 -1.3989	   182.536	24
+216	251	intervalTiming   	sc1_intervalTiming_11.txt   	sc1_run_intervalTiming   	 7	5	  0	 -1.3989	  220.8809	24
+251	286	affective        	sc1_affective_9.txt         	sc1_run_affective        	 8	5	  0	 -1.3989	  252.7512	24
+286	321	checkerBoard     	sc1_checkerBoard_3.txt      	sc1_run_checkerBoard     	 9	5	  0	 -1.3989	  287.5086	24
+321	356	nBackPic         	sc1_nBackPic_12.txt         	sc1_run_nBackPic         	10	5	  0	 -1.3989	  322.6328	24
+356	391	GoNoGo           	sc1_GoNoGo_12.txt           	sc1_run_GoNoGo           	11	5	  0	 -1.3989	  357.8574	24
+391	426	nBack            	sc1_nBack_12.txt            	sc1_run_nBack            	12	5	  0	 -1.3989	   392.698	24
+426	461	visualSearch     	sc1_visualSearch_12.txt     	sc1_run_visualSearch     	13	5	  0	 -1.3989	  427.6389	24
+461	496	motorImagery     	sc1_motorImagery_4.txt      	sc1_run_motorImagery     	14	5	  0	 -1.3989	  462.5295	24
+496	531	stroop           	sc1_stroop_15.txt           	sc1_run_stroop           	15	5	  0	 -1.3989	  497.7373	24
+531	566	spatialNavigation	sc1_spatialNavigation_4.txt 	sc1_run_spatialNavigation	16	5	  0	 -1.3989	  532.5447	24
+566	601	emotional        	sc1_emotional_9.txt         	sc1_run_emotional        	17	5	  0	 -1.3989	  567.5856	24
+  6	 41	arithmetic       	sc1_arithmetic_12.txt       	sc1_run_arithmetic       	 1	5	  0	-0.69494	  6.001147	25
+ 41	 76	actionObservation	sc1_actionObservation_4.txt 	sc1_run_actionObservation	 2	5	  0	-0.69494	  41.10231	25
+ 76	111	motorSequence    	sc1_motorSequence_13.txt    	sc1_run_motorSequence    	 3	5	  0	-0.69494	  76.29326	25
+111	146	verbGeneration   	sc1_verbGeneration_5.txt    	sc1_run_verbGeneration   	 4	5	  0	-0.69494	  111.1338	25
+146	181	stroop           	sc1_stroop_16.txt           	sc1_run_stroop           	 5	5	  0	-0.69494	  146.3081	25
+181	216	affective        	sc1_affective_10.txt        	sc1_run_affective        	 6	5	  0	-0.69494	  181.2643	25
+216	251	nBack            	sc1_nBack_13.txt            	sc1_run_nBack            	 7	5	  0	-0.69494	  216.2901	25
+251	286	intervalTiming   	sc1_intervalTiming_12.txt   	sc1_run_intervalTiming   	 8	5	  0	-0.69494	  251.2139	25
+286	321	emotional        	sc1_emotional_10.txt        	sc1_run_emotional        	 9	5	  0	-0.69494	  286.2217	25
+321	356	rest             	sc1_rest_3.txt              	sc1_run_rest             	10	5	  0	-0.69494	  321.1125	25
+356	391	spatialNavigation	sc1_spatialNavigation_5.txt 	sc1_run_spatialNavigation	11	5	  0	-0.69494	  356.0863	25
+391	426	nBackPic         	sc1_nBackPic_13.txt         	sc1_run_nBackPic         	12	5	  0	-0.69494	  391.2111	25
+426	461	visualSearch     	sc1_visualSearch_13.txt     	sc1_run_visualSearch     	13	5	  0	-0.69494	  426.2685	25
+461	496	motorImagery     	sc1_motorImagery_5.txt      	sc1_run_motorImagery     	14	5	  0	-0.69494	  461.1258	25
+496	531	checkerBoard     	sc1_checkerBoard_4.txt      	sc1_run_checkerBoard     	15	5	  0	-0.69494	  496.0832	25
+531	566	GoNoGo           	sc1_GoNoGo_13.txt           	sc1_run_GoNoGo           	16	5	  0	-0.69494	  531.4246	25
+566	601	ToM              	sc1_ToM_12.txt              	sc1_run_ToM              	17	5	  0	-0.69494	  566.2151	25
+  6	 41	actionObservation	sc1_actionObservation_5.txt 	sc1_run_actionObservation	 1	5	  0	-0.61075	  6.000926	26
+ 41	 76	intervalTiming   	sc1_intervalTiming_13.txt   	sc1_run_intervalTiming   	 2	5	  0	-0.61075	  41.31821	26
+ 76	111	rest             	sc1_rest_4.txt              	sc1_run_rest             	 3	5	  0	-0.61075	  76.12676	26
+111	146	spatialNavigation	sc1_spatialNavigation_6.txt 	sc1_run_spatialNavigation	 4	5	  0	-0.61075	   111.084	26
+146	181	nBackPic         	sc1_nBackPic_14.txt         	sc1_run_nBackPic         	 5	5	  0	-0.61075	  146.3085	26
+181	216	verbGeneration   	sc1_verbGeneration_6.txt    	sc1_run_verbGeneration   	 6	5	  0	-0.61075	  181.1828	26
+216	251	motorSequence    	sc1_motorSequence_14.txt    	sc1_run_motorSequence    	 7	5	  0	-0.61075	  216.2401	26
+251	286	affective        	sc1_affective_11.txt        	sc1_run_affective        	 8	5	  0	-0.61075	  251.2976	26
+286	321	emotional        	sc1_emotional_11.txt        	sc1_run_emotional        	 9	5	  0	-0.61075	  286.2384	26
+321	356	nBack            	sc1_nBack_14.txt            	sc1_run_nBack            	10	5	  0	-0.61075	  321.2461	26
+356	391	ToM              	sc1_ToM_13.txt              	sc1_run_ToM              	11	5	  0	-0.61075	  356.1705	26
+391	426	motorImagery     	sc1_motorImagery_6.txt      	sc1_run_motorImagery     	12	5	  0	-0.61075	  391.0775	26
+426	461	GoNoGo           	sc1_GoNoGo_14.txt           	sc1_run_GoNoGo           	13	5	  0	-0.61075	   426.419	26
+461	496	stroop           	sc1_stroop_17.txt           	sc1_run_stroop           	14	5	  0	-0.61075	  461.4266	26
+496	531	visualSearch     	sc1_visualSearch_14.txt     	sc1_run_visualSearch     	15	5	  0	-0.61075	   496.299	26
+531	566	arithmetic       	sc1_arithmetic_13.txt       	sc1_run_arithmetic       	16	5	  0	-0.61075	  531.2913	26
+566	601	checkerBoard     	sc1_checkerBoard_5.txt      	sc1_run_checkerBoard     	17	5	  0	-0.61075	  566.1319	26
+  6	 41	spatialNavigation	sc1_spatialNavigation_7.txt 	sc1_run_spatialNavigation	 1	5	  7	5.999093	   6.00286	51
+ 41	 76	stroop           	sc1_stroop_18.txt           	sc1_run_stroop           	 2	5	 42	40.99886	  41.70597	51
+ 76	111	arithmetic       	sc1_arithmetic_14.txt       	sc1_run_arithmetic       	 3	5	 77	75.99823	  76.32051	51
+111	146	motorSequence    	sc1_motorSequence_15.txt    	sc1_run_motorSequence    	 4	5	112	110.9971	  111.6848	51
+146	181	nBack            	sc1_nBack_15.txt            	sc1_run_nBack            	 5	5	147	145.9962	  146.3491	51
+181	216	visualSearch     	sc1_visualSearch_15.txt     	sc1_run_visualSearch     	 6	5	182	180.9938	  181.2803	51
+216	251	checkerBoard     	sc1_checkerBoard_6.txt      	sc1_run_checkerBoard     	 7	5	217	215.9941	   216.228	51
+251	286	affective        	sc1_affective_12.txt        	sc1_run_affective        	 8	5	252	250.9932	  251.3257	51
+286	321	ToM              	sc1_ToM_14.txt              	sc1_run_ToM              	 9	5	287	285.9915	  286.1402	51
+321	356	GoNoGo           	sc1_GoNoGo_15.txt           	sc1_run_GoNoGo           	10	5	322	 320.991	   321.488	51
+356	391	emotional        	sc1_emotional_12.txt        	sc1_run_emotional        	11	5	357	355.9908	  356.3191	51
+391	426	verbGeneration   	sc1_verbGeneration_7.txt    	sc1_run_verbGeneration   	12	5	392	390.9912	  391.2003	51
+426	461	actionObservation	sc1_actionObservation_6.txt 	sc1_run_actionObservation	13	5	427	425.9896	   426.148	51
+461	496	motorImagery     	sc1_motorImagery_7.txt      	sc1_run_motorImagery     	14	5	449	459.9996	   461.228	51
+496	531	nBackPic         	sc1_nBackPic_15.txt         	sc1_run_nBackPic         	15	5	484	495.9879	  496.5772	51
+531	566	rest             	sc1_rest_5.txt              	sc1_run_rest             	16	5	519	530.9855	  531.1581	51
+566	601	intervalTiming   	sc1_intervalTiming_14.txt   	sc1_run_intervalTiming   	17	5	554	565.9855	  566.2224	51
+  6	 41	intervalTiming   	sc1_intervalTiming_15.txt   	sc1_run_intervalTiming   	 1	5	  7	 5.99751	  6.001042	52
+ 41	 76	verbGeneration   	sc1_verbGeneration_8.txt    	sc1_run_verbGeneration   	 2	5	 41	40.99817	  41.19492	52
+ 76	111	rest             	sc1_rest_6.txt              	sc1_run_rest             	 3	5	 76	75.99664	  76.09381	52
+111	146	arithmetic       	sc1_arithmetic_15.txt       	sc1_run_arithmetic       	 4	5	111	 110.996	  111.2901	52
+146	181	nBack            	sc1_nBack_16.txt            	sc1_run_nBack            	 5	5	146	 145.995	  146.4046	52
+181	216	motorSequence    	sc1_motorSequence_16.txt    	sc1_run_motorSequence    	 6	5	181	180.9929	  181.3857	52
+216	251	visualSearch     	sc1_visualSearch_16.txt     	sc1_run_visualSearch     	 7	5	215	215.9923	  216.3169	52
+251	286	stroop           	sc1_stroop_19.txt           	sc1_run_stroop           	 8	5	250	250.9921	  251.5143	52
+286	321	checkerBoard     	sc1_checkerBoard_7.txt      	sc1_run_checkerBoard     	 9	5	285	  285.99	   286.229	52
+321	356	emotional        	sc1_emotional_13.txt        	sc1_run_emotional        	10	5	320	320.9899	  321.3104	52
+356	391	ToM              	sc1_ToM_15.txt              	sc1_run_ToM              	11	5	355	355.9883	  356.1744	52
+391	426	spatialNavigation	sc1_spatialNavigation_8.txt 	sc1_run_spatialNavigation	12	5	390	390.9885	  391.1056	52
+426	461	actionObservation	sc1_actionObservation_7.txt 	sc1_run_actionObservation	13	5	425	425.9881	  426.1699	52
+461	496	nBackPic         	sc1_nBackPic_16.txt         	sc1_run_nBackPic         	14	5	456	460.0031	  461.3678	52
+496	531	GoNoGo           	sc1_GoNoGo_16.txt           	sc1_run_GoNoGo           	15	5	491	495.9842	  496.5823	52
+531	566	motorImagery     	sc1_motorImagery_8.txt      	sc1_run_motorImagery     	16	5	526	 530.984	    531.23	52
+566	601	affective        	sc1_affective_13.txt        	sc1_run_affective        	17	5	561	565.9831	  566.4278	52
+  6	 41	nBack            	sc1_nBack_17.txt            	sc1_run_nBack            	 1	5	  7	5.999828	  6.001826	53
+ 41	 76	actionObservation	sc1_actionObservation_8.txt 	sc1_run_actionObservation	 2	5	 42	40.99842	  41.13504	53
+ 76	111	arithmetic       	sc1_arithmetic_16.txt       	sc1_run_arithmetic       	 3	5	 55	67.00261	  76.33292	53
+111	146	visualSearch     	sc1_visualSearch_17.txt     	sc1_run_visualSearch     	 4	5	 90	110.9976	  111.2972	53
+146	181	GoNoGo           	sc1_GoNoGo_17.txt           	sc1_run_GoNoGo           	 5	5	125	145.9956	  146.5949	53
+181	216	rest             	sc1_rest_7.txt              	sc1_run_rest             	 6	5	160	 180.996	  181.2096	53
+216	251	nBackPic         	sc1_nBackPic_17.txt         	sc1_run_nBackPic         	 7	5	195	215.9946	  216.2559	53
+251	286	ToM              	sc1_ToM_16.txt              	sc1_run_ToM              	 8	5	230	250.9931	   251.155	53
+286	321	intervalTiming   	sc1_intervalTiming_16.txt   	sc1_run_intervalTiming   	 9	5	265	285.9935	   286.236	53
+321	356	stroop           	sc1_stroop_20.txt           	sc1_run_stroop           	10	5	300	320.9916	  321.4675	53
+356	391	motorSequence    	sc1_motorSequence_17.txt    	sc1_run_motorSequence    	11	5	335	355.9901	  356.3817	53
+391	426	verbGeneration   	sc1_verbGeneration_9.txt    	sc1_run_verbGeneration   	12	5	369	390.9904	   391.246	53
+426	461	motorImagery     	sc1_motorImagery_9.txt      	sc1_run_motorImagery     	13	5	404	  425.99	  426.1106	53
+461	496	spatialNavigation	sc1_spatialNavigation_9.txt 	sc1_run_spatialNavigation	14	5	439	460.9873	  461.1084	53
+496	531	affective        	sc1_affective_14.txt        	sc1_run_affective        	15	5	474	495.9884	  496.2894	53
+531	566	checkerBoard     	sc1_checkerBoard_8.txt      	sc1_run_checkerBoard     	16	5	509	530.9864	  531.2209	53
+566	601	emotional        	sc1_emotional_14.txt        	sc1_run_emotional        	17	5	544	565.9861	  566.2183	53
+  6	 41	nBackPic         	sc1_nBackPic_18.txt         	sc1_run_nBackPic         	 1	5	  7	 5.99844	  6.001553	54
+ 41	 76	GoNoGo           	sc1_GoNoGo_18.txt           	sc1_run_GoNoGo           	 2	5	 42	40.99712	  41.64958	54
+ 76	111	emotional        	sc1_emotional_15.txt        	sc1_run_emotional        	 3	5	 77	75.99592	  76.38071	54
+111	146	checkerBoard     	sc1_checkerBoard_9.txt      	sc1_run_checkerBoard     	 4	5	112	110.9947	  111.1783	54
+146	181	motorImagery     	sc1_motorImagery_10.txt     	sc1_run_motorImagery     	 5	5	147	145.9941	  146.0915	54
+181	216	intervalTiming   	sc1_intervalTiming_17.txt   	sc1_run_intervalTiming   	 6	5	182	 180.993	  181.2228	54
+216	251	arithmetic       	sc1_arithmetic_17.txt       	sc1_run_arithmetic       	 7	5	217	215.9918	  216.3052	54
+251	286	visualSearch     	sc1_visualSearch_18.txt     	sc1_run_visualSearch     	 8	5	251	250.9917	  251.3694	54
+286	321	motorSequence    	sc1_motorSequence_18.txt    	sc1_run_motorSequence    	 9	5	286	285.9906	  286.3839	54
+321	356	verbGeneration   	sc1_verbGeneration_10.txt   	sc1_run_verbGeneration   	10	5	321	320.9908	  321.2316	54
+356	391	actionObservation	sc1_actionObservation_9.txt 	sc1_run_actionObservation	11	5	356	355.9894	  356.1295	54
+391	426	nBack            	sc1_nBack_18.txt            	sc1_run_nBack            	12	5	373	374.9978	  391.3941	54
+426	461	ToM              	sc1_ToM_17.txt              	sc1_run_ToM              	13	5	408	425.9878	  426.1918	54
+461	496	rest             	sc1_rest_8.txt              	sc1_run_rest             	14	5	442	460.9847	   461.106	54
+496	531	affective        	sc1_affective_15.txt        	sc1_run_affective        	15	5	477	495.9857	  496.2708	54
+531	566	spatialNavigation	sc1_spatialNavigation_10.txt	sc1_run_spatialNavigation	16	5	512	530.9836	  531.1685	54
+566	601	stroop           	sc1_stroop_21.txt           	sc1_run_stroop           	17	5	547	565.9831	  566.5982	54
+  6	 41	affective        	sc1_affective_16.txt        	sc1_run_affective        	 1	5	  7	 5.99813	  6.001754	55
+ 41	 76	motorSequence    	sc1_motorSequence_19.txt    	sc1_run_motorSequence    	 2	5	 42	  40.998	  41.38538	55
+ 76	111	checkerBoard     	sc1_checkerBoard_10.txt     	sc1_run_checkerBoard     	 3	5	 76	75.99635	  76.18315	55
+111	146	stroop           	sc1_stroop_22.txt           	sc1_run_stroop           	 4	5	111	110.9961	  111.4307	55
+146	181	spatialNavigation	sc1_spatialNavigation_11.txt	sc1_run_spatialNavigation	 5	5	146	145.9945	  146.1622	55
+181	216	GoNoGo           	sc1_GoNoGo_19.txt           	sc1_run_GoNoGo           	 6	5	181	180.9942	  181.5263	55
+216	251	intervalTiming   	sc1_intervalTiming_18.txt   	sc1_run_intervalTiming   	 7	5	216	 215.993	   216.424	55
+251	286	rest             	sc1_rest_9.txt              	sc1_run_rest             	 8	5	251	250.9924	  251.1719	55
+286	321	verbGeneration   	sc1_verbGeneration_11.txt   	sc1_run_verbGeneration   	 9	5	286	285.9905	  286.1697	55
+321	356	ToM              	sc1_ToM_18.txt              	sc1_run_ToM              	10	5	321	320.9887	  321.1509	55
+356	391	actionObservation	sc1_actionObservation_10.txt	sc1_run_actionObservation	11	5	356	355.9894	  356.1153	55
+391	426	emotional        	sc1_emotional_16.txt        	sc1_run_emotional        	12	5	369	389.9979	  391.4285	55
+426	461	nBackPic         	sc1_nBackPic_19.txt         	sc1_run_nBackPic         	13	5	404	425.9889	  426.3446	55
+461	496	visualSearch     	sc1_visualSearch_19.txt     	sc1_run_visualSearch     	14	5	439	 460.986	  461.4418	55
+496	531	motorImagery     	sc1_motorImagery_11.txt     	sc1_run_motorImagery     	15	5	474	495.9868	  496.1563	55
+531	566	nBack            	sc1_nBack_19.txt            	sc1_run_nBack            	16	5	509	530.9855	  531.2709	55
+566	601	arithmetic       	sc1_arithmetic_18.txt       	sc1_run_arithmetic       	17	5	544	565.9834	   566.352	55
+  6	 41	nBack            	sc1_nBack_20.txt            	sc1_run_nBack            	 1	5	  7	5.998412	  6.001997	56
+ 41	 76	GoNoGo           	sc1_GoNoGo_20.txt           	sc1_run_GoNoGo           	 2	5	 42	40.99759	  41.64855	56
+ 76	111	ToM              	sc1_ToM_19.txt              	sc1_run_ToM              	 3	5	 77	75.99648	  76.27969	56
+111	146	visualSearch     	sc1_visualSearch_20.txt     	sc1_run_visualSearch     	 4	5	111	110.9958	  111.2605	56
+146	181	intervalTiming   	sc1_intervalTiming_19.txt   	sc1_run_intervalTiming   	 5	5	146	145.9953	  146.4251	56
+181	216	verbGeneration   	sc1_verbGeneration_12.txt   	sc1_run_verbGeneration   	 6	5	181	180.9953	  181.2562	56
+216	251	motorImagery     	sc1_motorImagery_12.txt     	sc1_run_motorImagery     	 7	5	215	215.9942	  216.1206	56
+251	286	rest             	sc1_rest_10.txt             	sc1_run_rest             	 8	5	250	250.9929	  251.1353	56
+286	321	checkerBoard     	sc1_checkerBoard_11.txt     	sc1_run_checkerBoard     	 9	5	285	285.9933	  286.1494	56
+321	356	motorSequence    	sc1_motorSequence_20.txt    	sc1_run_motorSequence    	10	5	320	320.9907	  321.3809	56
+356	391	spatialNavigation	sc1_spatialNavigation_12.txt	sc1_run_spatialNavigation	11	5	355	355.9896	  356.2951	56
+391	426	arithmetic       	sc1_arithmetic_19.txt       	sc1_run_arithmetic       	12	5	390	390.9889	  391.2764	56
+426	461	emotional        	sc1_emotional_17.txt        	sc1_run_emotional        	13	5	425	425.9875	  426.4407	56
+461	496	actionObservation	sc1_actionObservation_11.txt	sc1_run_actionObservation	14	5	460	460.9868	  461.2385	56
+496	531	affective        	sc1_affective_17.txt        	sc1_run_affective        	15	5	484	494.9896	  496.3531	56
+531	566	stroop           	sc1_stroop_23.txt           	sc1_run_stroop           	16	5	519	530.9856	  531.5346	56
+566	601	nBackPic         	sc1_nBackPic_20.txt         	sc1_run_nBackPic         	17	5	554	565.9852	  566.4485	56
+  6	 41	spatialNavigation	sc1_spatialNavigation_13.txt	sc1_run_spatialNavigation	 1	5	  7	5.997153	  6.000881	57
+ 41	 76	motorImagery     	sc1_motorImagery_13.txt     	sc1_run_motorImagery     	 2	5	 42	40.99742	  41.09477	57
+ 76	111	rest             	sc1_rest_11.txt             	sc1_run_rest             	 3	5	 77	75.99775	  76.09267	57
+111	146	nBackPic         	sc1_nBackPic_21.txt         	sc1_run_nBackPic         	 4	5	112	110.9956	  111.2901	57
+146	181	ToM              	sc1_ToM_20.txt              	sc1_run_ToM              	 5	5	147	 145.995	   146.188	57
+181	216	GoNoGo           	sc1_GoNoGo_21.txt           	sc1_run_GoNoGo           	 6	5	182	180.9939	  181.6189	57
+216	251	stroop           	sc1_stroop_24.txt           	sc1_run_stroop           	 7	5	217	215.9928	  216.6001	57
+251	286	affective        	sc1_affective_18.txt        	sc1_run_affective        	 8	5	252	250.9907	  251.4301	57
+286	321	intervalTiming   	sc1_intervalTiming_20.txt   	sc1_run_intervalTiming   	 9	5	287	285.9915	  286.3124	57
+321	356	actionObservation	sc1_actionObservation_12.txt	sc1_run_actionObservation	10	5	322	320.9896	  321.1768	57
+356	391	motorSequence    	sc1_motorSequence_21.txt    	sc1_run_motorSequence    	11	5	340	354.9944	  356.4247	57
+391	426	checkerBoard     	sc1_checkerBoard_12.txt     	sc1_run_checkerBoard     	12	5	375	 390.988	  391.2391	57
+426	461	visualSearch     	sc1_visualSearch_21.txt     	sc1_run_visualSearch     	13	5	410	425.9867	  426.4203	57
+461	496	emotional        	sc1_emotional_18.txt        	sc1_run_emotional        	14	5	445	460.9868	  461.3847	57
+496	531	arithmetic       	sc1_arithmetic_20.txt       	sc1_run_arithmetic       	15	5	480	495.9858	  496.3658	57
+531	566	nBack            	sc1_nBack_21.txt            	sc1_run_nBack            	16	5	515	530.9843	  531.3301	57
+566	601	verbGeneration   	sc1_verbGeneration_13.txt   	sc1_run_verbGeneration   	17	5	550	565.9833	  566.2613	57
+  6	 41	ToM              	sc1_ToM_21.txt              	sc1_run_ToM              	 1	5	  7	5.998697	  6.000595	58
+ 41	 76	visualSearch     	sc1_visualSearch_22.txt     	sc1_run_visualSearch     	 2	5	 42	40.99713	  41.35686	58
+ 76	111	motorImagery     	sc1_motorImagery_14.txt     	sc1_run_motorImagery     	 3	5	 77	75.99588	  76.18805	58
+111	146	stroop           	sc1_stroop_25.txt           	sc1_run_stroop           	 4	5	112	110.9956	  111.4688	58
+146	181	verbGeneration   	sc1_verbGeneration_14.txt   	sc1_run_verbGeneration   	 5	5	147	145.9948	  146.2667	58
+181	216	intervalTiming   	sc1_intervalTiming_21.txt   	sc1_run_intervalTiming   	 6	5	182	180.9947	  181.3144	58
+216	251	motorSequence    	sc1_motorSequence_22.txt    	sc1_run_motorSequence    	 7	5	217	215.9932	  216.4288	58
+251	286	nBack            	sc1_nBack_22.txt            	sc1_run_nBack            	 8	5	251	250.9917	  251.8099	58
+286	321	arithmetic       	sc1_arithmetic_21.txt       	sc1_run_arithmetic       	 9	5	286	 285.991	  286.3745	58
+321	356	emotional        	sc1_emotional_19.txt        	sc1_run_emotional        	10	5	321	320.9908	  321.6721	58
+356	391	affective        	sc1_affective_19.txt        	sc1_run_affective        	11	5	356	355.9902	  356.4203	58
+391	426	nBackPic         	sc1_nBackPic_22.txt         	sc1_run_nBackPic         	12	5	391	390.9887	  391.4343	58
+426	461	checkerBoard     	sc1_checkerBoard_13.txt     	sc1_run_checkerBoard     	13	5	426	 425.987	  426.2656	58
+461	496	rest             	sc1_rest_12.txt             	sc1_run_rest             	14	5	461	460.9876	    461.13	58
+496	531	actionObservation	sc1_actionObservation_13.txt	sc1_run_actionObservation	15	5	496	495.9875	  496.1278	58
+531	566	GoNoGo           	sc1_GoNoGo_22.txt           	sc1_run_GoNoGo           	16	5	522	529.9951	   531.726	58
+566	601	spatialNavigation	sc1_spatialNavigation_14.txt	sc1_run_spatialNavigation	17	5	557	565.9845	  566.3233	58
+  6	 41	nBackPic         	sc1_nBackPic_23.txt         	sc1_run_nBackPic         	 1	5	  7	5.997314	  6.002384	59
+ 41	 76	affective        	sc1_affective_20.txt        	sc1_run_affective        	 2	5	 42	40.99604	  41.60138	59
+ 76	111	spatialNavigation	sc1_spatialNavigation_15.txt	sc1_run_spatialNavigation	 3	5	 77	75.99529	  76.18254	59
+111	146	actionObservation	sc1_actionObservation_14.txt	sc1_run_actionObservation	 4	5	112	110.9937	  111.1968	59
+146	181	emotional        	sc1_emotional_20.txt        	sc1_run_emotional        	 5	5	142	144.9975	  146.4946	59
+181	216	checkerBoard     	sc1_checkerBoard_14.txt     	sc1_run_checkerBoard     	 6	5	177	180.9918	  181.3425	59
+216	251	motorSequence    	sc1_motorSequence_23.txt    	sc1_run_motorSequence    	 7	5	212	 215.991	  216.3901	59
+251	286	motorImagery     	sc1_motorImagery_15.txt     	sc1_run_motorImagery     	 8	5	246	250.9895	  251.2046	59
+286	321	stroop           	sc1_stroop_26.txt           	sc1_run_stroop           	 9	5	281	285.9882	  286.5192	59
+321	356	arithmetic       	sc1_arithmetic_22.txt       	sc1_run_arithmetic       	10	5	316	320.9879	  321.4668	59
+356	391	rest             	sc1_rest_13.txt             	sc1_run_rest             	11	5	351	 355.987	   356.148	59
+391	426	nBack            	sc1_nBack_23.txt            	sc1_run_nBack            	12	5	386	390.9866	   391.329	59
+426	461	intervalTiming   	sc1_intervalTiming_22.txt   	sc1_run_intervalTiming   	13	5	421	425.9858	  426.4267	59
+461	496	ToM              	sc1_ToM_22.txt              	sc1_run_ToM              	14	5	456	460.9858	  461.2415	59
+496	531	visualSearch     	sc1_visualSearch_23.txt     	sc1_run_visualSearch     	15	5	490	495.9832	  496.4059	59
+531	566	verbGeneration   	sc1_verbGeneration_15.txt   	sc1_run_verbGeneration   	16	5	525	530.9833	  531.2869	59
+566	601	GoNoGo           	sc1_GoNoGo_23.txt           	sc1_run_GoNoGo           	17	5	560	565.9824	  566.7513	59
+  6	 41	visualSearch     	sc1_visualSearch_24.txt     	sc1_run_visualSearch     	 1	5	  7	5.998622	  6.001549	60
+ 41	 76	motorSequence    	sc1_motorSequence_24.txt    	sc1_run_motorSequence    	 2	5	 42	40.99811	  41.86836	60
+ 76	111	actionObservation	sc1_actionObservation_15.txt	sc1_run_actionObservation	 3	5	 76	75.99683	  76.39957	60
+111	146	motorImagery     	sc1_motorImagery_16.txt     	sc1_run_motorImagery     	 4	5	 87	101.0005	  111.3032	60
+146	181	intervalTiming   	sc1_intervalTiming_23.txt   	sc1_run_intervalTiming   	 5	5	122	145.9939	  146.3449	60
+181	216	stroop           	sc1_stroop_27.txt           	sc1_run_stroop           	 6	5	157	180.9944	  181.5927	60
+216	251	nBack            	sc1_nBack_24.txt            	sc1_run_nBack            	 7	5	191	 215.993	  216.6404	60
+251	286	arithmetic       	sc1_arithmetic_23.txt       	sc1_run_arithmetic       	 8	5	226	250.9928	  251.4882	60
+286	321	checkerBoard     	sc1_checkerBoard_15.txt     	sc1_run_checkerBoard     	 9	5	261	285.9924	  286.2529	60
+321	356	spatialNavigation	sc1_spatialNavigation_16.txt	sc1_run_spatialNavigation	10	5	296	320.9916	  321.1509	60
+356	391	rest             	sc1_rest_14.txt             	sc1_run_rest             	11	5	331	355.9897	  356.0984	60
+391	426	ToM              	sc1_ToM_23.txt              	sc1_run_ToM              	12	5	366	390.9899	  391.2462	60
+426	461	emotional        	sc1_emotional_21.txt        	sc1_run_emotional        	13	5	401	425.9874	  426.3606	60
+461	496	GoNoGo           	sc1_GoNoGo_24.txt           	sc1_run_GoNoGo           	14	5	436	460.9872	  461.7921	60
+496	531	nBackPic         	sc1_nBackPic_24.txt         	sc1_run_nBackPic         	15	5	471	495.9867	  496.6061	60
+531	566	verbGeneration   	sc1_verbGeneration_16.txt   	sc1_run_verbGeneration   	16	5	506	 530.984	  531.3214	60
+566	601	affective        	sc1_affective_21.txt        	sc1_run_affective        	17	5	541	565.9842	  566.3685	60
+  6	 41	GoNoGo           	sc1_GoNoGo_25.txt           	sc1_run_GoNoGo           	 1	5	  7	5.998228	  6.001101	61
+ 41	 76	motorSequence    	sc1_motorSequence_25.txt    	sc1_run_motorSequence    	 2	5	 42	40.99797	  41.73875	61
+ 76	111	verbGeneration   	sc1_verbGeneration_17.txt   	sc1_run_verbGeneration   	 3	5	 77	75.99562	  76.33646	61
+111	146	motorImagery     	sc1_motorImagery_17.txt     	sc1_run_motorImagery     	 4	5	112	110.9952	   111.151	61
+146	181	ToM              	sc1_ToM_24.txt              	sc1_run_ToM              	 5	5	147	145.9944	  146.1319	61
+181	216	checkerBoard     	sc1_checkerBoard_16.txt     	sc1_run_checkerBoard     	 6	5	182	180.9946	  181.1796	61
+216	251	rest             	sc1_rest_15.txt             	sc1_run_rest             	 7	5	217	215.9933	  216.1275	61
+251	286	spatialNavigation	sc1_spatialNavigation_17.txt	sc1_run_spatialNavigation	 8	5	252	250.9935	  251.1088	61
+286	321	affective        	sc1_affective_22.txt        	sc1_run_affective        	 9	5	287	285.9908	   286.323	61
+321	356	visualSearch     	sc1_visualSearch_25.txt     	sc1_run_visualSearch     	10	5	322	320.9894	  321.5209	61
+356	391	arithmetic       	sc1_arithmetic_24.txt       	sc1_run_arithmetic       	11	5	356	355.9885	  356.4191	61
+391	426	nBackPic         	sc1_nBackPic_25.txt         	sc1_run_nBackPic         	12	5	391	390.9873	  391.5163	61
+426	461	nBack            	sc1_nBack_25.txt            	sc1_run_nBack            	13	5	426	425.9888	  426.3975	61
+461	496	emotional        	sc1_emotional_22.txt        	sc1_run_emotional        	14	5	461	460.9868	  461.3953	61
+496	531	actionObservation	sc1_actionObservation_16.txt	sc1_run_actionObservation	15	5	496	495.9843	  496.1764	61
+531	566	intervalTiming   	sc1_intervalTiming_24.txt   	sc1_run_intervalTiming   	16	5	520	529.9942	  531.4744	61
+566	601	stroop           	sc1_stroop_28.txt           	sc1_run_stroop           	17	5	555	565.9842	  566.6553	61
+  6	 41	rest             	sc1_rest_16.txt             	sc1_run_rest             	 1	5	  7	 5.99804	  6.001803	62
+ 41	 76	nBack            	sc1_nBack_26.txt            	sc1_run_nBack            	 2	5	 42	40.99604	   41.7029	62
+ 76	111	GoNoGo           	sc1_GoNoGo_26.txt           	sc1_run_GoNoGo           	 3	5	 77	75.99589	  76.85067	62
+111	146	actionObservation	sc1_actionObservation_17.txt	sc1_run_actionObservation	 4	5	112	 110.996	  111.3318	62
+146	181	motorImagery     	sc1_motorImagery_18.txt     	sc1_run_motorImagery     	 5	5	130	144.9994	   146.245	62
+181	216	affective        	sc1_affective_23.txt        	sc1_run_affective        	 6	5	165	180.9923	  181.2938	62
+216	251	intervalTiming   	sc1_intervalTiming_25.txt   	sc1_run_intervalTiming   	 7	5	200	 215.991	  216.4084	62
+251	286	motorSequence    	sc1_motorSequence_26.txt    	sc1_run_motorSequence    	 8	5	234	250.9913	  251.4549	62
+286	321	arithmetic       	sc1_arithmetic_25.txt       	sc1_run_arithmetic       	 9	5	268	285.9913	   286.454	62
+321	356	visualSearch     	sc1_visualSearch_26.txt     	sc1_run_visualSearch     	10	5	303	320.9894	  321.4518	62
+356	391	nBackPic         	sc1_nBackPic_26.txt         	sc1_run_nBackPic         	11	5	338	355.9893	   356.483	62
+391	426	ToM              	sc1_ToM_25.txt              	sc1_run_ToM              	12	5	373	390.9877	  391.2475	62
+426	461	verbGeneration   	sc1_verbGeneration_18.txt   	sc1_run_verbGeneration   	13	5	408	425.9872	  426.2451	62
+461	496	stroop           	sc1_stroop_29.txt           	sc1_run_stroop           	14	5	443	460.9855	  461.5929	62
+496	531	spatialNavigation	sc1_spatialNavigation_18.txt	sc1_run_spatialNavigation	15	5	478	495.9847	   496.324	62
+531	566	emotional        	sc1_emotional_23.txt        	sc1_run_emotional        	16	5	513	530.9844	  531.3039	62
+566	601	checkerBoard     	sc1_checkerBoard_17.txt     	sc1_run_checkerBoard     	17	5	548	565.9821	  566.2697	62
+  6	 41	arithmetic       	sc1_arithmetic_26.txt       	sc1_run_arithmetic       	 1	5	  7	5.997896	  6.001139	63
+ 41	 76	intervalTiming   	sc1_intervalTiming_26.txt   	sc1_run_intervalTiming   	 2	5	 42	40.99847	  41.72471	63
+ 76	111	visualSearch     	sc1_visualSearch_27.txt     	sc1_run_visualSearch     	 3	5	 77	75.99766	    76.488	63
+111	146	checkerBoard     	sc1_checkerBoard_18.txt     	sc1_run_checkerBoard     	 4	5	112	110.9962	  111.3369	63
+146	181	nBackPic         	sc1_nBackPic_27.txt         	sc1_run_nBackPic         	 5	5	147	 145.994	  146.4513	63
+181	216	spatialNavigation	sc1_spatialNavigation_19.txt	sc1_run_spatialNavigation	 6	5	182	180.9935	  181.2657	63
+216	251	motorSequence    	sc1_motorSequence_27.txt    	sc1_run_motorSequence    	 7	5	217	215.9925	  216.4469	63
+251	286	stroop           	sc1_stroop_30.txt           	sc1_run_stroop           	 8	5	252	250.9915	  251.6779	63
+286	321	GoNoGo           	sc1_GoNoGo_27.txt           	sc1_run_GoNoGo           	 9	5	286	 285.991	  286.9758	63
+321	356	ToM              	sc1_ToM_26.txt              	sc1_run_ToM              	10	5	321	320.9896	   321.357	63
+356	391	motorImagery     	sc1_motorImagery_19.txt     	sc1_run_motorImagery     	11	5	356	355.9881	  356.1216	63
+391	426	actionObservation	sc1_actionObservation_18.txt	sc1_run_actionObservation	12	5	391	390.9886	  391.1193	63
+426	461	verbGeneration   	sc1_verbGeneration_19.txt   	sc1_run_verbGeneration   	13	5	424	425.0033	  426.4503	63
+461	496	nBack            	sc1_nBack_27.txt            	sc1_run_nBack            	14	5	459	460.9873	   461.798	63
+496	531	affective        	sc1_affective_24.txt        	sc1_run_affective        	15	5	494	495.9855	  496.4457	63
+531	566	emotional        	sc1_emotional_24.txt        	sc1_run_emotional        	16	5	529	530.9851	  531.4103	63
+566	601	rest             	sc1_rest_17.txt             	sc1_run_rest             	17	5	564	565.9846	  566.2581	63
+  6	 41	verbGeneration   	sc1_verbGeneration_20.txt   	sc1_run_verbGeneration   	 1	5	  7	5.997819	  6.000675	64
+ 41	 76	emotional        	sc1_emotional_25.txt        	sc1_run_emotional        	 2	5	 42	40.99743	  41.36221	64
+ 76	111	actionObservation	sc1_actionObservation_19.txt	sc1_run_actionObservation	 3	5	 77	75.99623	  76.22684	64
+111	146	arithmetic       	sc1_arithmetic_27.txt       	sc1_run_arithmetic       	 4	5	108	109.0102	  111.4242	64
+146	181	affective        	sc1_affective_25.txt        	sc1_run_affective        	 5	5	143	145.9946	  146.4056	64
+181	216	ToM              	sc1_ToM_27.txt              	sc1_run_ToM              	 6	5	178	180.9948	  181.2535	64
+216	251	nBackPic         	sc1_nBackPic_28.txt         	sc1_run_nBackPic         	 7	5	213	215.9934	  216.4342	64
+251	286	motorImagery     	sc1_motorImagery_20.txt     	sc1_run_motorImagery     	 8	5	248	250.9912	  251.2321	64
+286	321	intervalTiming   	sc1_intervalTiming_27.txt   	sc1_run_intervalTiming   	 9	5	283	285.9918	  286.3631	64
+321	356	rest             	sc1_rest_18.txt             	sc1_run_rest             	10	5	318	320.9906	  321.1943	64
+356	391	visualSearch     	sc1_visualSearch_28.txt     	sc1_run_visualSearch     	11	5	352	355.9898	  356.3921	64
+391	426	motorSequence    	sc1_motorSequence_28.txt    	sc1_run_motorSequence    	12	5	387	390.9886	  391.5069	64
+426	461	stroop           	sc1_stroop_31.txt           	sc1_run_stroop           	13	5	422	425.9868	   426.771	64
+461	496	GoNoGo           	sc1_GoNoGo_28.txt           	sc1_run_GoNoGo           	14	5	457	 460.986	  461.9354	64
+496	531	spatialNavigation	sc1_spatialNavigation_20.txt	sc1_run_spatialNavigation	15	5	492	495.9864	  496.3666	64
+531	566	checkerBoard     	sc1_checkerBoard_19.txt     	sc1_run_checkerBoard     	16	5	527	530.9861	  531.2143	64
+566	601	nBack            	sc1_nBack_28.txt            	sc1_run_nBack            	17	5	562	565.9845	  566.4121	64
+  6	 41	ToM              	sc1_ToM_28.txt              	sc1_run_ToM              	 1	5	  7	6.000612	   6.00239	65
+ 41	 76	nBack            	sc1_nBack_29.txt            	sc1_run_nBack            	 2	5	 41	40.99904	  41.41552	65
+ 76	111	verbGeneration   	sc1_verbGeneration_21.txt   	sc1_run_verbGeneration   	 3	5	 76	75.99741	  76.36366	65
+111	146	stroop           	sc1_stroop_32.txt           	sc1_run_stroop           	 4	5	111	110.9969	  111.5943	65
+146	181	rest             	sc1_rest_19.txt             	sc1_run_rest             	 5	5	146	145.9959	  146.2589	65
+181	216	affective        	sc1_affective_26.txt        	sc1_run_affective        	 6	5	181	180.9958	  181.3732	65
+216	251	motorSequence    	sc1_motorSequence_29.txt    	sc1_run_motorSequence    	 7	5	216	215.9935	  216.5043	65
+251	286	visualSearch     	sc1_visualSearch_29.txt     	sc1_run_visualSearch     	 8	5	250	250.9919	  251.4855	65
+286	321	emotional        	sc1_emotional_26.txt        	sc1_run_emotional        	 9	5	285	 285.992	   286.482	65
+321	356	spatialNavigation	sc1_spatialNavigation_21.txt	sc1_run_spatialNavigation	10	5	320	320.9912	  321.2145	65
+356	391	motorImagery     	sc1_motorImagery_21.txt     	sc1_run_motorImagery     	11	5	355	355.9911	  356.1123	65
+391	426	arithmetic       	sc1_arithmetic_28.txt       	sc1_run_arithmetic       	12	5	390	390.9894	  391.3432	65
+426	461	nBackPic         	sc1_nBackPic_29.txt         	sc1_run_nBackPic         	13	5	425	425.9886	  426.4744	65
+461	496	GoNoGo           	sc1_GoNoGo_29.txt           	sc1_run_GoNoGo           	14	5	460	460.9877	  461.9389	65
+496	531	checkerBoard     	sc1_checkerBoard_20.txt     	sc1_run_checkerBoard     	15	5	495	495.9867	  496.5367	65
+531	566	intervalTiming   	sc1_intervalTiming_28.txt   	sc1_run_intervalTiming   	16	5	530	 530.985	   531.401	65
+566	601	actionObservation	sc1_actionObservation_20.txt	sc1_run_actionObservation	17	5	565	565.9851	   566.249	65
+  6	 41	visualSearch     	sc1_visualSearch_30.txt     	sc1_run_visualSearch     	 1	5	  7	5.998307	  6.001575	66
+ 41	 76	intervalTiming   	sc1_intervalTiming_29.txt   	sc1_run_intervalTiming   	 2	5	 42	40.99773	  41.76008	66
+ 76	111	checkerBoard     	sc1_checkerBoard_21.txt     	sc1_run_checkerBoard     	 3	5	 77	75.99725	  76.30749	66
+111	146	affective        	sc1_affective_27.txt        	sc1_run_affective        	 4	5	112	110.9959	  111.4052	66
+146	181	nBackPic         	sc1_nBackPic_30.txt         	sc1_run_nBackPic         	 5	5	147	145.9947	  146.5362	66
+181	216	arithmetic       	sc1_arithmetic_29.txt       	sc1_run_arithmetic       	 6	5	181	180.9951	  181.5174	66
+216	251	stroop           	sc1_stroop_33.txt           	sc1_run_stroop           	 7	5	216	215.9929	  216.7151	66
+251	286	rest             	sc1_rest_20.txt             	sc1_run_rest             	 8	5	251	 250.992	  251.2797	66
+286	321	spatialNavigation	sc1_spatialNavigation_22.txt	sc1_run_spatialNavigation	 9	5	286	285.9939	  286.1108	66
+321	356	GoNoGo           	sc1_GoNoGo_30.txt           	sc1_run_GoNoGo           	10	5	321	320.9892	  321.9584	66
+356	391	verbGeneration   	sc1_verbGeneration_22.txt   	sc1_run_verbGeneration   	11	5	356	355.9882	  356.4731	66
+391	426	actionObservation	sc1_actionObservation_21.txt	sc1_run_actionObservation	12	5	391	390.9898	  391.4208	66
+426	461	ToM              	sc1_ToM_29.txt              	sc1_run_ToM              	13	5	423	424.9887	  426.2352	66
+461	496	motorSequence    	sc1_motorSequence_30.txt    	sc1_run_motorSequence    	14	5	458	460.9881	  461.4497	66
+496	531	motorImagery     	sc1_motorImagery_22.txt     	sc1_run_motorImagery     	15	5	493	495.9857	  496.2312	66
+531	566	nBack            	sc1_nBack_30.txt            	sc1_run_nBack            	16	5	528	530.9854	  531.3786	66
+566	601	emotional        	sc1_emotional_27.txt        	sc1_run_emotional        	17	5	563	565.9834	  566.4752	66
