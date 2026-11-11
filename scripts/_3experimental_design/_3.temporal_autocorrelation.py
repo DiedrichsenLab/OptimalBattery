@@ -1,103 +1,55 @@
+"""
+Temporal autocorrelation of the noise in the MDTB data (Fig 4a):
+covariance between the residual activity patterns of two tasks in the same run,
+as a function of how many task positions they were apart.
+"""
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
-import Functional_Fusion.atlas_map as am
 from Functional_Fusion.dataset import DataSetMDTB
-import os
 import OptimalBattery.util as ut
 from OptimalBattery.global_config import data_dir, save_dir
 
-# build transition matrix for visualization only...
-dat_file = df = pd.read_csv(f"{data_dir}/Cerebellum/super_cerebellum/sc1/data/s16/sc1_s16.dat", delim_whitespace=True, header=0)
-filtered_dat = dat_file[dat_file["runNum"] >= 51].copy()
-filtered_dat["run"] = filtered_dat["runNum"] - 50
-filtered_dat = filtered_dat.drop(columns=["runNum"])
-filtered_dat = filtered_dat.rename(columns={"taskName": "task_name"})
+# Load the activity patterns per task and run (cortex), relative to rest
+dataset = DataSetMDTB(f'{data_dir}/FunctionalFusion_new/MDTB')
+data, info = dataset.get_data(space='fs32k', ses_id='ses-s1', type='TaskRun', subj=None)
+data, info = ut.recenter_data(data, info, center_full_code='rest_task', keep_center=True)
+data = np.nan_to_num(data)
 
+# Remove the mean of each task across runs, leaving the run-specific residuals
+for cond in np.unique(info['cond_num']):
+    rows = (info['cond_num'] == cond).values
+    data[:, rows, :] -= data[:, rows, :].mean(axis=1, keepdims=True)
 
-# Load data
-space = 'fs32k'
-atlas,_= am.get_atlas(atlas_str=space)
-func_fus_dir = os.path.join(data_dir, 'FunctionalFusion_new')
+# Sort the tasks of each run into the order in which they were presented
+data, info = ut.sort_by_presentation_order(data, info, ut.load_mdtb_task_order())
+runs = np.unique(info['run'])
+n_sub = data.shape[0]
+n_tasks = len(np.unique(info['task_num_orig']))
 
-MDTB_dataset = DataSetMDTB(f'{func_fus_dir}/MDTB')
-subj = None
-data_mdtb_s1_run,info_mdtb_1_run  =MDTB_dataset.get_data(space=space,ses_id='ses-s1',type='TaskRun',subj=subj)
-data_mdtb_s1_run = ut.recenter_fmri_data(data_mdtb_s1_run , info_mdtb_1_run ,task_column_name = 'cond_name',center_condition='rest')
-# nans to 0
-data_mdtb_s1_run = np.nan_to_num(data_mdtb_s1_run)
-n_sub, n_reg,n_vox = data_mdtb_s1_run.shape
-
-cond_vec = info_mdtb_1_run['cond_num'].values
-part_vec  = info_mdtb_1_run["run"].values
-
-# Remove task mean from each task condition for all runs
-data_residual = data_mdtb_s1_run.copy()
-for t in np.unique(cond_vec):
-    mask = (cond_vec == t)
-    task_mean = data_mdtb_s1_run[:, mask, :].mean(axis=1, keepdims=True)
-    data_residual[:, mask, :] = data_mdtb_s1_run[:, mask, :] - task_mean
-# add true order to info
-info_with_order = ut.add_original_order(info_mdtb_1_run,filtered_dat)
-
-# get the sort order based on (run, task_num_orig)
-sort_order = info_with_order.sort_values(by=["run", "task_num_orig"]).index
-
-
-# resort the info and data using the task_num_orig
-info_sorted = info_with_order.loc[sort_order].reset_index(drop=True)
-data_sorted = data_residual[:, sort_order, :]
-
-
-n_runs = len(np.unique(info_sorted["run"]))
-n_tasks = len(np.unique(info_sorted["task_num_orig"]))
-
-cov_mats_runs = np.zeros((n_sub, n_runs, n_tasks, n_tasks))
-for r, run in enumerate(np.unique(info_sorted["run"])):
-    mask = info_sorted["run"].values == run
-    conds = info_sorted.loc[mask, "task_num_orig"].values
-
-    for s in range(n_sub):
-        X = data_sorted[s, mask, :] 
-        cov_mats_runs[s, r] = np.cov(X, rowvar=True)
-
-# Average across runs for each subject, ignoring zeros (rest)
-cov_mats_per_subj = np.zeros((n_sub, n_tasks, n_tasks))
+# Covariance (across vertices) between the tasks of a run: subjects x runs x position x position
+cov = np.zeros((n_sub, len(runs), n_tasks, n_tasks))
 for s in range(n_sub):
-    mats = cov_mats_runs[s]
-    # set zeros to nan before averaging
-    mats[mats == 0] = np.nan
-    cov_mats_per_subj[s] = np.nanmean(mats, axis=0)
+    for r, run in enumerate(runs):
+        cov[s, r] = np.cov(data[s, info['run'].values == run, :])
+cov[cov == 0] = np.nan         # rest is all zeros after recentering: ignore it
+cov = np.nanmean(cov, axis=1)  # average across runs
 
-
-cov_mat_avg = cov_mats_per_subj.mean(axis=0)
-
-
-
-# collect by lag
-lags = np.arange(1, n_tasks)   # 1..16
-mean_by_lag = np.zeros((n_sub, len(lags)))
-
+# Mean covariance of all pairs of tasks that were `lag` positions apart, per subject
+lags = np.arange(1, n_tasks)
+cov_by_lag = np.zeros((n_sub, len(lags)))
 for s in range(n_sub):
-    cov_mat = cov_mats_per_subj[s]
     for j, lag in enumerate(lags):
-        vals = []
-        for i in range(n_tasks - lag):
-            vals.append(cov_mat[i, i+lag])
-        mean_by_lag[s, j] = np.nanmean(vals)
-
-# mean and SEM across subjects
-mean_across_subj = np.nanmean(mean_by_lag, axis=0)
-sem_across_subj = np.nanstd(mean_by_lag, axis=0) / np.sqrt(n_sub)
+        pairs = np.diagonal(cov[s], offset=lag)  # covariances of all task pairs `lag` positions apart
+        cov_by_lag[s, j] = np.nanmean(pairs)
+mean = np.nanmean(cov_by_lag, axis=0)
+sem = np.nanstd(cov_by_lag, axis=0) / np.sqrt(n_sub)
 
 plt.figure(figsize=(6, 4))
-plt.errorbar(lags, mean_across_subj, yerr=sem_across_subj, marker='o')
+plt.errorbar(lags, mean, yerr=sem, marker='o')
 plt.xlabel("Task position difference (lag)")
 plt.ylabel("Mean covariance")
 plt.title("Covariance decay with task position (Cortex)")
 plt.ylim(bottom=0)
-ax = plt.gca()
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
+plt.gca().spines[['top', 'right']].set_visible(False)
 plt.savefig(f"{save_dir}/carryover_tempAutocorrelation/temp_auto.pdf", bbox_inches='tight')
 plt.show()

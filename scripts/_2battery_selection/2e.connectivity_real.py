@@ -41,8 +41,8 @@ data_mdtb_s1_all_fs,info_mdtb_1_all  =MDTB_dataset.get_data(space=space,ses_id='
 data_mdtb_s1_all_fs[np.isnan(data_mdtb_s1_all_fs)] = 0
 
 # recenter data around rest for eigenmetric evaluation
-data_mdtb_s2_run_fs = ut.recenter_fmri_data(data_mdtb_s2_run_fs,info_mdtb_2_run,task_column_name='cond_name',center_condition='rest')
-data_mdtb_s2_all_fs = ut.recenter_fmri_data(data_mdtb_s2_all_fs,info_mdtb_2_all,task_column_name='cond_name',center_condition='rest')
+data_mdtb_s2_run_fs, info_mdtb_2_run = ut.recenter_data(data_mdtb_s2_run_fs,info_mdtb_2_run,center_full_code='rest_task',keep_center= True)
+data_mdtb_s2_all_fs, info_mdtb_2_all = ut.recenter_data(data_mdtb_s2_all_fs,info_mdtb_2_all,center_full_code='rest_task',keep_center= True)
 
 ncond = info_mdtb_2_run['cond_num'].nunique()
 npart = info_mdtb_2_run['run'].nunique() 

@@ -3,7 +3,9 @@ Module for utility functions
 Author: Bassel Arafat
 """
 import torch as pt
+import os
 import numpy as np
+import pandas as pd
 
 def center_matrix(X,axis =0):
     """Center the matrix by subtracting the mean.
@@ -37,88 +39,41 @@ def normalize_matrix(X,axis = 0):
     X = X / norm
     return X
 
-def recenter_data(data, info, center_full_code='rest_task', keep_center=False):
+def recenter_data(data, info, center_full_code='rest_task', keep_center=True):
     """
-    Recenter  data by subtracting the center condition from each partition.
-    Works with CondAll, CondHalf, and CondRun data types.
-    
+    Recenter data by subtracting the center condition (e.g. rest) within each partition (half or run).
+    Works with the All, Half and Run data types.
+
     Parameters:
-        data (np.ndarray):  data of shape (n_subjects, n_conditions x repititions, n_voxels)
-        info (pd.DataFrame): condition information with columns like 'task_code', 'cond_code', 'half', 'run'
-        center_full_code (str): full task condition code to center around as 'taskcode_condcode' (default: 'rest_task')
-        keep_center (bool): if True, keep center condition as zeros; if False, remove it
-    
+        data (np.ndarray): data of shape (n_subjects, n_rows, n_voxels)
+        info (pd.DataFrame): one row per data row, with columns 'task_code', 'cond_code' and optionally 'half' or 'run'
+        center_full_code (str): center condition as 'taskcode_condcode' (default: 'rest_task')
+        keep_center (bool): if True, keep the center condition (as zeros); if False, remove it
+
     Returns:
-        processed_data (np.ndarray): recentered fMRI data
-        updated_info (pd.DataFrame): updated info
+        data (np.ndarray): recentered data
+        info (pd.DataFrame): matching info
     """
-    n_subjects, _, _ = data.shape
-    
-    # Split on first underscore only
     center_task, center_cond = center_full_code.split('_', 1)
-    
-    # Determine partition column
-    if 'half' in info.columns:
-        partition_col = 'half'
-        partitions = info['half'].unique()
-    elif 'run' in info.columns:
-        partition_col = 'run'
-        partitions = info['run'].unique()
-    else:
-        partition_col = None
-        partitions = [None]
-    
-    # Find center condition indices (match both task_code and cond_code)
-    center_mask = (info['task_code'] == center_task) & (info['cond_code'] == center_cond)
-    
-    if not center_mask.any():
+    is_center = ((info['task_code'] == center_task) & (info['cond_code'] == center_cond)).values
+    if not is_center.any():
         raise ValueError(f"Center condition with task_code='{center_task}' and cond_code='{center_cond}' not found in data")
-    
-    # Process each subject
-    processed_data_list = []
-    for subject_idx in range(n_subjects):
-        subject_data = data[subject_idx]
-        subject_recentered = []
-        
-        for partition in partitions:
-            # Get partition mask
-            if partition_col is not None:
-                partition_mask = (info[partition_col] == partition)
-            else:
-                partition_mask = np.ones(len(info), dtype=bool)
-            
-            # Find center condition for this partition
-            center_idx_partition = np.where(partition_mask & center_mask)[0]
-            
-            if len(center_idx_partition) == 0:
-                raise ValueError(f"No center condition '{center_full_code}' found for partition {partition}")
-            
-            # Get center condition data
-            center_data = subject_data[center_idx_partition[0]]
-            
-            if keep_center:
-                # Keep all conditions including center (as zeros)
-                partition_indices = np.where(partition_mask)[0]
-                recentered = subject_data[partition_indices] - center_data
-            else:
-                # Remove center condition
-                task_mask = partition_mask & ~center_mask
-                partition_indices = np.where(task_mask)[0]
-                recentered = subject_data[partition_indices] - center_data
-            
-            subject_recentered.append(recentered)
-        
-        processed_data_list.append(np.vstack(subject_recentered))
-    
-    processed_data = np.stack(processed_data_list, axis=0)
-    
-    # Update info
+
+    # Rows are recentered within their half or run; without either, all rows form one partition
+    partition_col = next((col for col in ['half', 'run'] if col in info.columns), None)
+    partition = info[partition_col].values if partition_col else np.zeros(len(info))
+
+    data = data.copy()
+    for p in np.unique(partition):
+        rows = partition == p
+        center = np.where(rows & is_center)[0]
+        if len(center) == 0:
+            raise ValueError(f"No center condition '{center_full_code}' found for partition {p}")
+        data[:, rows, :] -= data[:, center[:1], :]
+
     if keep_center:
-        updated_info = info.copy()
-    else:
-        updated_info = info[~center_mask].reset_index(drop=True)
-    
-    return processed_data, updated_info
+        return data, info.copy()
+    return data[:, ~is_center, :], info[~is_center].reset_index(drop=True)
 
 def combine_parcellation_regions(fine_parcellation, labels, region_mapping):
     """
@@ -175,3 +130,34 @@ def add_original_order(info, original_dat):
         original_dat[["run", "task_name", "task_num_orig"]], on=["run", "task_name"], how="left")
     
     return info
+
+
+def load_mdtb_task_order():
+    """
+    Load the order in which the tasks were presented in the MDTB scanning runs (task set A, subject s16),
+    from eval_tsvs/sc1_s16.dat in this repo.
+
+    Returns:
+        task_order (pd.DataFrame): one row per task block, in presentation order, with columns ['run', 'task_name']
+    """
+    dat = pd.read_csv(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'eval_tsvs', 'sc1_s16.dat'), sep=r'\s+')
+    dat = dat[dat['runNum'] >= 51]  # runs 51-66 are the 16 scanning runs
+    return pd.DataFrame({'run': dat['runNum'] - 50, 'task_name': dat['taskName']}).reset_index(drop=True)
+
+
+def sort_by_presentation_order(data, info, task_order):
+    """
+    Sort data and info by run, and within each run by the order in which the tasks were presented.
+
+    Parameters:
+        data (np.ndarray): data of shape (n_subjects, n_rows, n_voxels)
+        info (pd.DataFrame): info with columns ["run", "task_name", ...]
+        task_order (pd.DataFrame): presentation order, from load_mdtb_task_order
+
+    Returns:
+        data (np.ndarray): sorted data
+        info (pd.DataFrame): sorted info, with the position within the run in column "task_num_orig"
+    """
+    info = add_original_order(info, task_order)
+    order = info.sort_values(by=["run", "task_num_orig"]).index.to_numpy()
+    return data[:, order, :], info.loc[order].reset_index(drop=True)
