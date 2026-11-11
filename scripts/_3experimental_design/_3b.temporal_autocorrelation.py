@@ -20,7 +20,8 @@ for cond in np.unique(info['cond_num']):
     data[:, rows, :] -= data[:, rows, :].mean(axis=1, keepdims=True)
 
 # Sort the tasks of each run into the order in which they were presented
-data, info = ut.sort_by_presentation_order(data, info, ut.load_mdtb_task_order())
+mdtb_task_order = ut.load_mdtb_task_order()
+data, info = ut.sort_by_presentation_order(data, info, mdtb_task_order)
 runs = np.unique(info['run'])
 n_sub = data.shape[0]
 n_tasks = len(np.unique(info['task_num_orig']))
@@ -56,5 +57,5 @@ plt.ylabel("Mean variance of contrast")
 plt.title("Contrast variance by task distance (Cortex)")
 plt.ylim(bottom=0)
 plt.gca().spines[['top', 'right']].set_visible(False)
-plt.savefig(f"{save_dir}/carryover_tempAutocorrelation/temp_auto_contrast.pdf", bbox_inches='tight')
+# plt.savefig(f"{save_dir}/carryover_tempAutocorrelation/temp_auto_contrast.pdf", bbox_inches='tight')
 plt.show()
